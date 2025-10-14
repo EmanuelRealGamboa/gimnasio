@@ -48,6 +48,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'inventario',
+    'facturacion',
+    'venta',
 ]
 
 AUTH_USER_MODEL = 'authentication.User'
@@ -98,8 +101,6 @@ DATABASES = {
     }
 }
 
-
-
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -134,8 +135,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
+# Directorios donde Django buscará tus archivos estáticos durante el desarrollo
+STATICFILES_DIRS = [
+]
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -153,7 +157,7 @@ REST_FRAMEWORK = {
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
-    'http://127.0.0.1:3000',
+
 ]
 
 CORS_ALLOW_CREDENTIALS = True
