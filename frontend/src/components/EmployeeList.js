@@ -3,6 +3,26 @@ import { useNavigate } from 'react-router-dom';
 import employeeService from '../services/employeeService';
 import './EmployeeList.css';
 
+// Función para obtener el badge del rol
+const getRoleBadge = (rolNombre) => {
+  if (!rolNombre) return { color: '#6b7280', icon: '👤' };
+
+  // Normalizar el nombre del rol para hacer la comparación
+  const rolNormalizado = rolNombre.toLowerCase().trim();
+
+  const roleMap = {
+    'administrador': { color: '#ef4444', icon: '👑' },
+    'entrenador': { color: '#10b981', icon: '💪' },
+    'recepcionista': { color: '#ec4899', icon: '🎫' },
+    'cajero': { color: '#3b82f6', icon: '💰' },
+    'supervisor de espacio': { color: '#8b5cf6', icon: '🏗️' },
+    'personal de limpieza': { color: '#06b6d4', icon: '🧹' },
+    'cliente': { color: '#f59e0b', icon: '🏋️' }
+  };
+
+  return roleMap[rolNormalizado] || { color: '#6b7280', icon: '👤' };
+};
+
 function EmployeeList() {
   const [employees, setEmployees] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
@@ -37,18 +57,21 @@ function EmployeeList() {
   const filterEmployees = () => {
     let filtered = [...employees];
 
-    // Filter by search term
+    // Filter by search term - buscar por nombre completo
     if (searchTerm) {
-      filtered = filtered.filter(emp =>
-        emp.email.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      filtered = filtered.filter(emp => {
+        // Construir nombre completo del empleado
+        const nombreCompleto = `${emp.nombre || ''} ${emp.apellido_paterno || ''} ${emp.apellido_materno || ''}`.toLowerCase();
+        return nombreCompleto.includes(searchTerm.toLowerCase());
+      });
     }
 
-    // Filter by status
+    // Filter by status - usando el campo 'estado' del backend
     if (statusFilter !== 'all') {
-      filtered = filtered.filter(emp =>
-        statusFilter === 'active' ? emp.is_active : !emp.is_active
-      );
+      filtered = filtered.filter(emp => {
+        const isActive = emp.estado && emp.estado.toLowerCase() === 'activo';
+        return statusFilter === 'active' ? isActive : !isActive;
+      });
     }
 
     setFilteredEmployees(filtered);
@@ -98,7 +121,7 @@ function EmployeeList() {
           <span className="search-icon">🔍</span>
           <input
             type="text"
-            placeholder="Buscar por email..."
+            placeholder="Buscar por nombre..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
@@ -131,10 +154,10 @@ function EmployeeList() {
         <table className="employee-table">
           <thead>
             <tr>
-              <th>ID</th>
+              <th>Nombre</th>
               <th>Email</th>
+              <th>Rol</th>
               <th>Estado</th>
-              <th>Persona ID</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -148,17 +171,35 @@ function EmployeeList() {
                 </td>
               </tr>
             ) : (
-              filteredEmployees.map((employee) => (
-                <tr key={employee.id}>
-                  <td className="td-id">{employee.id}</td>
-                  <td className="td-email">{employee.email}</td>
-                  <td>
-                    <span className={`status-badge ${employee.is_active ? 'status-active' : 'status-inactive'}`}>
-                      {employee.is_active ? 'Activo' : 'Inactivo'}
-                    </span>
-                  </td>
-                  <td>{employee.persona || '-'}</td>
-                  <td className="actions">
+              filteredEmployees.map((employee) => {
+                const roleBadge = getRoleBadge(employee.rol_nombre);
+                const nombreCompleto = `${employee.nombre || ''} ${employee.apellido_paterno || ''} ${employee.apellido_materno || ''}`.trim();
+                return (
+                  <tr key={employee.id}>
+                    <td className="td-nombre">{nombreCompleto || 'Sin nombre'}</td>
+                    <td className="td-email">{employee.email}</td>
+                    <td>
+                      {employee.rol_nombre ? (
+                        <span
+                          className="role-badge"
+                          style={{
+                            backgroundColor: `${roleBadge.color}20`,
+                            color: roleBadge.color,
+                            borderColor: roleBadge.color
+                          }}
+                        >
+                          {employee.rol_nombre}
+                        </span>
+                      ) : (
+                        <span className="text-muted">Sin rol</span>
+                      )}
+                    </td>
+                    <td>
+                      <span className={`status-badge ${employee.estado && employee.estado.toLowerCase() === 'activo' ? 'status-active' : 'status-inactive'}`}>
+                        {employee.estado || 'INACTIVO'}
+                      </span>
+                    </td>
+                    <td className="actions">
                     <button
                       className="btn-action btn-view"
                       onClick={() => handleViewDetail(employee.id)}
@@ -180,9 +221,10 @@ function EmployeeList() {
                     >
                       🗑️
                     </button>
-                  </td>
-                </tr>
-              ))
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>

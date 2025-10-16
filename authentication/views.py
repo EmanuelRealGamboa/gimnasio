@@ -1,22 +1,14 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import EmpleadoUserCreateSerializer, EmpleadoRegistroSerializer, EmpleadoUserDetailSerializer
+from .serializers import (
+    EmpleadoUserCreateSerializer,
+    EmpleadoRegistroSerializer,
+    EmpleadoUserDetailSerializer,
+    UserListSerializer
+)
 from .permissions import TienePermisoGestionarEmpleados
 from .models import User
-from rest_framework import serializers
-
-
-class UserListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'email', 'persona']
-
-
-class UserDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = '__all__'  # Muestra todos los campos del usuario
 
 class EmpleadoUserCreateView(APIView):
     """
@@ -34,8 +26,8 @@ class EmpleadoUserCreateView(APIView):
             serializer = EmpleadoUserDetailSerializer(user)
             return Response(serializer.data)
         else:
-            # Listado de usuarios
-            users = User.objects.all()
+            # Listado de usuarios con información completa
+            users = User.objects.select_related('persona').all()
             serializer = UserListSerializer(users, many=True)
             return Response(serializer.data) 
  
@@ -84,7 +76,7 @@ class EmpleadoUserCreateView(APIView):
             user = User.objects.get(pk=pk)
         except User.DoesNotExist:
             return Response({'detail': 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
-        serializer = UserDetailSerializer(user)
+        serializer = EmpleadoUserDetailSerializer(user)
         return Response(serializer.data)
 	   
 

@@ -107,33 +107,37 @@ function EmployeeDetail() {
           <div className="detail-grid">
             <div className="detail-item">
               <label>Puesto:</label>
-              <span>{employee.puesto}</span>
+              <span>{employee.puesto || 'No especificado'}</span>
             </div>
             <div className="detail-item">
               <label>Departamento:</label>
-              <span>{employee.departamento}</span>
+              <span>{employee.departamento || 'No especificado'}</span>
             </div>
             <div className="detail-item">
               <label>Fecha de Contratación:</label>
-              <span>{employee.fecha_contratacion}</span>
+              <span>{employee.fecha_contratacion || 'No especificado'}</span>
             </div>
             <div className="detail-item">
               <label>Tipo de Contrato:</label>
-              <span>{employee.tipo_contrato}</span>
+              <span>{employee.tipo_contrato || 'No especificado'}</span>
             </div>
             <div className="detail-item">
               <label>Salario:</label>
-              <span>${parseFloat(employee.salario).toLocaleString('es-MX')}</span>
+              <span>
+                {employee.salario
+                  ? `$${parseFloat(employee.salario).toLocaleString('es-MX')}`
+                  : 'No especificado'}
+              </span>
             </div>
             <div className="detail-item">
               <label>Estado:</label>
-              <span className={`status status-${employee.estado.toLowerCase()}`}>
-                {employee.estado}
+              <span className={`status ${employee.estado ? `status-${employee.estado.toLowerCase()}` : 'status-sin-estado'}`}>
+                {employee.estado || 'Sin estado'}
               </span>
             </div>
             <div className="detail-item">
               <label>RFC:</label>
-              <span>{employee.rfc}</span>
+              <span>{employee.rfc || 'No especificado'}</span>
             </div>
             <div className="detail-item">
               <label>Rol:</label>
