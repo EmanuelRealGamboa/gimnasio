@@ -13,10 +13,48 @@ class EmpleadoSerializer(serializers.ModelSerializer):
         model = Empleado
         fields = '__all__'
 
-class UserListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'email', 'persona']
+class UserListSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    email = serializers.EmailField()
+    is_active = serializers.BooleanField()
+    nombre = serializers.SerializerMethodField()
+    apellido_paterno = serializers.SerializerMethodField()
+    apellido_materno = serializers.SerializerMethodField()
+    rol_id = serializers.SerializerMethodField()
+    rol_nombre = serializers.SerializerMethodField()
+    estado = serializers.SerializerMethodField()
+
+    def get_nombre(self, obj):
+        return obj.persona.nombre if obj.persona else None
+
+    def get_apellido_paterno(self, obj):
+        return obj.persona.apellido_paterno if obj.persona else None
+
+    def get_apellido_materno(self, obj):
+        return obj.persona.apellido_materno if obj.persona else None
+
+    def get_rol_id(self, obj):
+        try:
+            persona_rol = PersonaRol.objects.filter(persona=obj.persona).first()
+            return persona_rol.rol.id if persona_rol else None
+        except Exception:
+            return None
+
+    def get_rol_nombre(self, obj):
+        try:
+            persona_rol = PersonaRol.objects.filter(persona=obj.persona).first()
+            return persona_rol.rol.nombre if persona_rol else None
+        except Exception:
+            return None
+
+    def get_estado(self, obj):
+        try:
+            empleado = Empleado.objects.get(persona=obj.persona)
+            return empleado.estado
+        except Empleado.DoesNotExist:
+            return "Sin estado"
+        except Exception:
+            return "Sin estado"
 
 class UserDetailSerializer(serializers.ModelSerializer):
     persona = PersonaSerializer()
@@ -55,6 +93,9 @@ class EmpleadoUserCreateSerializer(serializers.Serializer):
     rfc = serializers.CharField(max_length=13)
     # Rol
     rol_id = serializers.IntegerField()
+    # Documentos (archivos)
+    identificacion = serializers.FileField(required=False, allow_null=True)
+    comprobante = serializers.FileField(required=False, allow_null=True)
 
     def validate_email(self, value):
         """Validar que el email no exista ya en la BD"""
@@ -83,6 +124,10 @@ class EmpleadoUserCreateSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
+        # Extraer archivos antes de crear los objetos
+        identificacion = validated_data.pop('identificacion', None)
+        comprobante = validated_data.pop('comprobante', None)
+
         # 1. Crear Persona
         persona = Persona.objects.create(
             nombre=validated_data['nombre'],
@@ -99,7 +144,7 @@ class EmpleadoUserCreateSerializer(serializers.Serializer):
             password=validated_data['password'],
             persona=persona
         )
-        # 3. Crear Empleado
+        # 3. Crear Empleado con archivos
         empleado = Empleado.objects.create(
             persona=persona,
             puesto=validated_data['puesto'],
@@ -109,13 +154,19 @@ class EmpleadoUserCreateSerializer(serializers.Serializer):
             salario=validated_data['salario'],
             estado=validated_data['estado'],
             rfc=validated_data['rfc'],
-        ) 
+            identificacion=identificacion,
+            comprobante_domicilio=comprobante,
+        )
         # 4. Asignar Rol
         rol = Rol.objects.get(pk=validated_data['rol_id'])
         PersonaRol.objects.create(persona=persona, rol=rol)
         return user
 
     def update(self, instance, validated_data):
+        # Extraer archivos
+        identificacion = validated_data.pop('identificacion', None)
+        comprobante = validated_data.pop('comprobante', None)
+
         # Actualiza Persona
         persona = instance.persona
         for field in ['nombre', 'apellido_paterno', 'apellido_materno', 'fecha_nacimiento', 'sexo', 'direccion', 'telefono']:
@@ -136,6 +187,13 @@ class EmpleadoUserCreateSerializer(serializers.Serializer):
         for field in ['puesto', 'departamento', 'fecha_contratacion', 'tipo_contrato', 'salario', 'estado', 'rfc']:
             if field in validated_data:
                 setattr(empleado, field, validated_data[field])
+
+        # Actualizar archivos si se enviaron nuevos
+        if identificacion:
+            empleado.identificacion = identificacion
+        if comprobante:
+            empleado.comprobante_domicilio = comprobante
+
         empleado.save()
 
         # Actualiza Rol si se envía

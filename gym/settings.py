@@ -139,6 +139,10 @@ STATIC_URL = '/static/'
 # Directorios donde Django buscará tus archivos estáticos durante el desarrollo
 STATICFILES_DIRS = [
 ]
+
+# Media files (Uploaded files)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

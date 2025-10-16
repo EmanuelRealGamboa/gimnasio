@@ -1,9 +1,8 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './components/Login';
 import Layout from './components/Layout';
 import EmployeeList from './components/EmployeeList';
-import EmployeeForm from './components/EmployeeForm';
+import EmployeeFormWizard from './components/EmployeeFormWizard';
 import EmployeeDetail from './components/EmployeeDetail';
 import DashboardAdmin from './components/DashboardAdmin';
 import DashboardEntrenador from './components/DashboardEntrenador';
@@ -103,7 +102,7 @@ function App() {
             element={
               <ProtectedRoute>
                 <Layout>
-                  <EmployeeForm />
+                  <EmployeeFormWizard />
                 </Layout>
               </ProtectedRoute>
             }
@@ -114,7 +113,7 @@ function App() {
             element={
               <ProtectedRoute>
                 <Layout>
-                  <EmployeeForm />
+                  <EmployeeFormWizard />
                 </Layout>
               </ProtectedRoute>
             }

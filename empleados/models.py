@@ -18,6 +18,11 @@ class Empleado(models.Model):
     nss = models.CharField(max_length=11, blank=True)
     sede = models.ForeignKey(Sede, on_delete=models.SET_NULL, null=True, blank=True)
 
+    # Documentos del empleado
+    identificacion = models.FileField(upload_to='documentos/identificaciones/', null=True, blank=True)
+    comprobante_domicilio = models.FileField(upload_to='documentos/comprobantes/', null=True, blank=True)
+    certificados = models.FileField(upload_to='documentos/certificados/', null=True, blank=True)
+
 
 
 class Entrenador(models.Model):
