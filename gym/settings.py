@@ -50,7 +50,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'inventario',
     'facturacion',
-    'venta',
 ]
 
 AUTH_USER_MODEL = 'authentication.User'
