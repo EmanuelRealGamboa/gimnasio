@@ -23,7 +23,7 @@ class EmpleadoUserCreateView(APIView):
                 user = User.objects.get(pk=pk)
             except User.DoesNotExist:
                 return Response({'detail': 'Usuario no encontrado.'}, status=status.HTTP_404_NOT_FOUND)
-            serializer = EmpleadoUserDetailSerializer(user)
+            serializer = EmpleadoUserDetailSerializer(user, context={'request': request})
             return Response(serializer.data)
         else:
             # Listado de usuarios con información completa
