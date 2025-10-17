@@ -145,6 +145,68 @@ function EmployeeDetail() {
             </div>
           </div>
         </div>
+
+        <div className="detail-section">
+          <h3>Documentos Adjuntos</h3>
+          <div className="documents-grid">
+            <div className="document-item">
+              <div className="document-header">
+                <span className="document-icon">📄</span>
+                <label>Identificación Oficial</label>
+              </div>
+              {employee.identificacion_url ? (
+                <a
+                  href={employee.identificacion_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-document"
+                >
+                  Ver Documento
+                </a>
+              ) : (
+                <span className="no-document">No disponible</span>
+              )}
+            </div>
+
+            <div className="document-item">
+              <div className="document-header">
+                <span className="document-icon">🏠</span>
+                <label>Comprobante de Domicilio</label>
+              </div>
+              {employee.comprobante_url ? (
+                <a
+                  href={employee.comprobante_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-document"
+                >
+                  Ver Documento
+                </a>
+              ) : (
+                <span className="no-document">No disponible</span>
+              )}
+            </div>
+
+            <div className="document-item">
+              <div className="document-header">
+                <span className="document-icon">🎓</span>
+                <label>Certificados</label>
+              </div>
+              {employee.certificados_url ? (
+                <a
+                  href={employee.certificados_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-document"
+                >
+                  Ver Documento
+                </a>
+              ) : (
+                <span className="no-document">No disponible</span>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
