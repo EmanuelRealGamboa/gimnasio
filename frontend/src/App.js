@@ -4,6 +4,8 @@ import Layout from './components/Layout';
 import EmployeeList from './components/EmployeeList';
 import EmployeeFormWizard from './components/EmployeeFormWizard';
 import EmployeeDetail from './components/EmployeeDetail';
+import SedeList from './components/SedeList';
+import SedeForm from './components/SedeForm';
 import DashboardAdmin from './components/DashboardAdmin';
 import DashboardEntrenador from './components/DashboardEntrenador';
 import DashboardRecepcion from './components/DashboardRecepcion';
@@ -125,6 +127,40 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <EmployeeDetail />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Rutas de gestión de sedes */}
+          <Route
+            path="/sedes"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <SedeList />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/sedes/new"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <SedeForm />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/sedes/edit/:id"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <SedeForm />
                 </Layout>
               </ProtectedRoute>
             }

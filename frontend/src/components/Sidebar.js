@@ -9,6 +9,9 @@ function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const userData = authService.getUserData();
 
+  // Determinar si el usuario es administrador
+  const isAdmin = userData?.dashboard === 'Administrador' || userData?.permisos?.includes('gestionar_empleados');
+
   const menuItems = [
     {
       id: 'dashboard',
@@ -21,6 +24,14 @@ function Sidebar() {
       label: 'Personal',
       icon: '👥',
       path: '/employees',
+      adminOnly: true,
+    },
+    {
+      id: 'sedes',
+      label: 'Sedes',
+      icon: '🏢',
+      path: '/sedes',
+      adminOnly: true,
     },
     {
       id: 'accesos',
@@ -28,7 +39,7 @@ function Sidebar() {
       icon: '🔐',
       path: '/accesos',
     },
-  ];
+  ].filter(item => !item.adminOnly || isAdmin);
 
   const handleLogout = () => {
     authService.logout();

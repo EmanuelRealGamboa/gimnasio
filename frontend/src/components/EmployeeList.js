@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import employeeService from '../services/employeeService';
+import ConfirmModal from './ConfirmModal';
 import './EmployeeList.css';
 
 // Función para obtener el badge del rol
@@ -30,6 +31,8 @@ function EmployeeList() {
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [employeeToDelete, setEmployeeToDelete] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -77,16 +80,42 @@ function EmployeeList() {
     setFilteredEmployees(filtered);
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('¿Estás seguro de eliminar este empleado?')) {
-      try {
-        await employeeService.deleteEmployee(id);
-        setEmployees(employees.filter(emp => emp.id !== id));
-      } catch (err) {
-        alert('Error al eliminar el empleado');
-        console.error(err);
-      }
+  const handleDeleteClick = (employee) => {
+    setEmployeeToDelete(employee);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await employeeService.deleteEmployee(employeeToDelete.id);
+      setEmployees(employees.filter(emp => emp.id !== employeeToDelete.id));
+      setShowDeleteModal(false);
+      setEmployeeToDelete(null);
+      showSuccessMessage('Empleado eliminado exitosamente');
+    } catch (err) {
+      setError('Error al eliminar el empleado');
+      console.error(err);
+      setShowDeleteModal(false);
     }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+    setEmployeeToDelete(null);
+  };
+
+  const showSuccessMessage = (message) => {
+    const successModal = document.createElement('div');
+    successModal.className = 'success-modal-overlay';
+    successModal.innerHTML = `
+      <div class="success-modal">
+        <div class="success-icon">✓</div>
+        <h2>¡Éxito!</h2>
+        <p>${message}</p>
+      </div>
+    `;
+    document.body.appendChild(successModal);
+    setTimeout(() => successModal.remove(), 2000);
   };
 
   const handleViewDetail = (id) => {
@@ -216,7 +245,7 @@ function EmployeeList() {
                     </button>
                     <button
                       className="btn-action btn-delete"
-                      onClick={() => handleDelete(employee.id)}
+                      onClick={() => handleDeleteClick(employee)}
                       title="Eliminar"
                     >
                       🗑️
@@ -229,6 +258,17 @@ function EmployeeList() {
           </tbody>
         </table>
       </div>
+
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        title="¿Eliminar empleado?"
+        message={`¿Estás seguro de que deseas eliminar a ${employeeToDelete ? `${employeeToDelete.nombre} ${employeeToDelete.apellido_paterno}` : 'este empleado'}? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        type="danger"
+      />
     </div>
   );
 }

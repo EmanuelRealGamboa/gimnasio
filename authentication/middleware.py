@@ -29,20 +29,9 @@ class RoleDashboardMiddleware:
         ]
 
     def __call__(self, request):
-        # Verificar si el usuario está autenticado
-        if request.user.is_authenticated:
-            current_path = request.path
-
-            # No redirigir si está en una URL excluida
-            if any(current_path.startswith(path) for path in self.excluded_paths):
-                return self.get_response(request)
-
-            # Redirigir desde la raíz o dashboard genérico
-            if current_path in ['/', '/dashboard/', '/dashboard']:
-                dashboard_url = self._get_user_dashboard(request.user)
-                if dashboard_url:
-                    return redirect(dashboard_url)
-
+        # Este middleware está deshabilitado porque el frontend de React
+        # maneja sus propias redirecciones basadas en roles
+        # El backend solo provee APIs REST
         return self.get_response(request)
 
     def _get_user_dashboard(self, user):
