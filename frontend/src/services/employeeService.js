@@ -13,12 +13,26 @@ class EmployeeService {
 
   // Crear empleado
   createEmployee(data) {
-    return api.post('/admin/empleados/', data);
+    // Detectar si es FormData (con archivos) o JSON
+    const isFormData = data instanceof FormData;
+
+    return api.post('/admin/empleados/', data, {
+      headers: isFormData ? {
+        'Content-Type': 'multipart/form-data'
+      } : {}
+    });
   }
 
   // Actualizar empleado completo (PUT)
   updateEmployee(id, data) {
-    return api.put(`/admin/empleados/${id}/`, data);
+    // Detectar si es FormData (con archivos) o JSON
+    const isFormData = data instanceof FormData;
+
+    return api.put(`/admin/empleados/${id}/`, data, {
+      headers: isFormData ? {
+        'Content-Type': 'multipart/form-data'
+      } : {}
+    });
   }
 
   // Actualizar empleado parcial (PATCH)
