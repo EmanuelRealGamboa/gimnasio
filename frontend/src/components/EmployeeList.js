@@ -17,8 +17,7 @@ const getRoleBadge = (rolNombre) => {
     'recepcionista': { color: '#ec4899', icon: '🎫' },
     'cajero': { color: '#3b82f6', icon: '💰' },
     'supervisor de espacio': { color: '#8b5cf6', icon: '🏗️' },
-    'personal de limpieza': { color: '#06b6d4', icon: '🧹' },
-    'cliente': { color: '#f59e0b', icon: '🏋️' }
+    'personal de limpieza': { color: '#06b6d4', icon: '🧹' }
   };
 
   return roleMap[rolNormalizado] || { color: '#6b7280', icon: '👤' };

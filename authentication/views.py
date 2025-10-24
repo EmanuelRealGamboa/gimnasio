@@ -26,8 +26,11 @@ class EmpleadoUserCreateView(APIView):
             serializer = EmpleadoUserDetailSerializer(user, context={'request': request})
             return Response(serializer.data)
         else:
-            # Listado de usuarios con información completa
-            users = User.objects.select_related('persona').all()
+            # Listado de usuarios con información completa - SOLO EMPLEADOS
+            # Filtrar solo usuarios que tengan un registro de Empleado asociado a través de persona
+            users = User.objects.select_related('persona').filter(
+                persona__empleado__isnull=False
+            ).all()
             serializer = UserListSerializer(users, many=True)
             return Response(serializer.data) 
  
