@@ -1,8 +1,14 @@
 from rest_framework import serializers
 from django.utils import timezone
-from .models import TipoActividad, Horario, SesionClase, BloqueoHorario
+from .models import (
+    TipoActividad, Horario, SesionClase, BloqueoHorario,
+    EquipoActividad, ClienteMembresia, ReservaClase, 
+    ReservaEquipo, ReservaEntrenador
+)
 from empleados.models import Entrenador
 from instalaciones.models import Espacio
+from clientes.models import Cliente
+from gestion_equipos.models import Activo
 
 
 class TipoActividadSerializer(serializers.ModelSerializer):
@@ -229,3 +235,216 @@ class HorarioDisponibilidadSerializer(serializers.Serializer):
         if data['fecha_inicio'] > data['fecha_fin']:
             raise serializers.ValidationError("La fecha de inicio debe ser anterior a la fecha de fin")
         return data
+
+
+class ClienteBasicSerializer(serializers.ModelSerializer):
+    """Serializer básico para cliente"""
+    nombre_completo = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Cliente
+        fields = ['persona', 'nombre_completo', 'objetivo_fitness', 'nivel_experiencia', 'estado']
+    
+    def get_nombre_completo(self, obj):
+        persona = obj.persona
+        return f"{persona.nombre} {persona.apellido_paterno} {persona.apellido_materno}"
+
+
+class ActivoBasicSerializer(serializers.ModelSerializer):
+    """Serializer básico para activo"""
+    categoria_nombre = serializers.CharField(source='categoria.nombre', read_only=True)
+    sede_nombre = serializers.CharField(source='sede.nombre', read_only=True)
+    
+    class Meta:
+        model = Activo
+        fields = ['activo_id', 'codigo', 'nombre', 'categoria_nombre', 'estado', 'sede_nombre']
+
+
+class EquipoActividadSerializer(serializers.ModelSerializer):
+    tipo_actividad_detalle = TipoActividadSerializer(source='tipo_actividad', read_only=True)
+    activo_detalle = ActivoBasicSerializer(source='activo', read_only=True)
+    
+    class Meta:
+        model = EquipoActividad
+        fields = [
+            'id', 'tipo_actividad', 'activo', 'cantidad_necesaria', 'obligatorio',
+            'tipo_actividad_detalle', 'activo_detalle'
+        ]
+
+
+class ClienteMembresiaSerializer(serializers.ModelSerializer):
+    cliente_detalle = ClienteBasicSerializer(source='cliente', read_only=True)
+    membresia_nombre = serializers.CharField(source='membresia.nombre_plan', read_only=True)
+    esta_activa = serializers.ReadOnlyField()
+    dias_restantes = serializers.ReadOnlyField()
+    
+    class Meta:
+        model = ClienteMembresia
+        fields = [
+            'id', 'cliente', 'membresia', 'fecha_inicio', 'fecha_fin', 'estado',
+            'fecha_creacion', 'fecha_modificacion',
+            'cliente_detalle', 'membresia_nombre', 'esta_activa', 'dias_restantes'
+        ]
+        read_only_fields = ['fecha_creacion', 'fecha_modificacion']
+
+
+class ReservaClaseSerializer(serializers.ModelSerializer):
+    cliente_detalle = ClienteBasicSerializer(source='cliente', read_only=True)
+    sesion_detalle = SesionClaseSerializer(source='sesion_clase', read_only=True)
+    actividad_nombre = serializers.CharField(source='sesion_clase.horario.tipo_actividad.nombre', read_only=True)
+    fecha_sesion = serializers.DateField(source='sesion_clase.fecha', read_only=True)
+    hora_inicio = serializers.TimeField(source='sesion_clase.hora_inicio_efectiva', read_only=True)
+    hora_fin = serializers.TimeField(source='sesion_clase.hora_fin_efectiva', read_only=True)
+    
+    class Meta:
+        model = ReservaClase
+        fields = [
+            'id', 'cliente', 'sesion_clase', 'fecha_reserva', 'estado',
+            'observaciones', 'fecha_cancelacion', 'motivo_cancelacion',
+            'cliente_detalle', 'sesion_detalle', 'actividad_nombre',
+            'fecha_sesion', 'hora_inicio', 'hora_fin'
+        ]
+        read_only_fields = ['fecha_reserva', 'fecha_cancelacion']
+
+    def validate(self, data):
+        """Validaciones personalizadas"""
+        cliente = data.get('cliente')
+        sesion_clase = data.get('sesion_clase')
+        
+        if cliente and sesion_clase:
+            # Verificar membresía activa
+            if not cliente.membresias.filter(
+                estado='activa',
+                fecha_inicio__lte=timezone.now().date(),
+                fecha_fin__gte=timezone.now().date()
+            ).exists():
+                raise serializers.ValidationError("El cliente no tiene una membresía activa")
+            
+            # Verificar cupo disponible
+            if sesion_clase.esta_llena:
+                raise serializers.ValidationError("La sesión ya está llena")
+        
+        return data
+
+
+class ReservaClaseCreateSerializer(serializers.ModelSerializer):
+    """Serializer para crear reservas de clase"""
+    
+    class Meta:
+        model = ReservaClase
+        fields = ['cliente', 'sesion_clase', 'observaciones']
+    
+    def validate(self, data):
+        return ReservaClaseSerializer().validate(data)
+
+
+class ReservaEquipoSerializer(serializers.ModelSerializer):
+    cliente_detalle = ClienteBasicSerializer(source='cliente', read_only=True)
+    activo_detalle = ActivoBasicSerializer(source='activo', read_only=True)
+    duracion_programada = serializers.ReadOnlyField()
+    
+    class Meta:
+        model = ReservaEquipo
+        fields = [
+            'id', 'cliente', 'activo', 'fecha_reserva', 'hora_inicio', 'hora_fin',
+            'estado', 'fecha_creacion', 'observaciones', 'tiempo_uso_real',
+            'cliente_detalle', 'activo_detalle', 'duracion_programada'
+        ]
+        read_only_fields = ['fecha_creacion']
+
+    def validate(self, data):
+        """Validaciones personalizadas"""
+        if data.get('hora_inicio') and data.get('hora_fin'):
+            if data['hora_inicio'] >= data['hora_fin']:
+                raise serializers.ValidationError("La hora de inicio debe ser anterior a la hora de fin")
+        
+        # Verificar disponibilidad del equipo
+        activo = data.get('activo')
+        if activo and activo.estado != 'activo':
+            raise serializers.ValidationError(f"El equipo {activo.nombre} no está disponible")
+        
+        return data
+
+
+class ReservaEquipoCreateSerializer(serializers.ModelSerializer):
+    """Serializer para crear reservas de equipo"""
+    
+    class Meta:
+        model = ReservaEquipo
+        fields = [
+            'cliente', 'activo', 'fecha_reserva', 'hora_inicio', 'hora_fin', 'observaciones'
+        ]
+    
+    def validate(self, data):
+        return ReservaEquipoSerializer().validate(data)
+
+
+class ReservaEntrenadorSerializer(serializers.ModelSerializer):
+    cliente_detalle = ClienteBasicSerializer(source='cliente', read_only=True)
+    entrenador_detalle = EntrenadorBasicSerializer(source='entrenador', read_only=True)
+    espacio_detalle = EspacioBasicSerializer(source='espacio', read_only=True)
+    clientes_adicionales_detalle = ClienteBasicSerializer(source='clientes_adicionales', many=True, read_only=True)
+    duracion = serializers.ReadOnlyField()
+    total_clientes = serializers.ReadOnlyField()
+    
+    class Meta:
+        model = ReservaEntrenador
+        fields = [
+            'id', 'cliente', 'entrenador', 'fecha_sesion', 'hora_inicio', 'hora_fin',
+            'tipo_sesion', 'estado', 'objetivo', 'espacio', 'precio',
+            'clientes_adicionales', 'fecha_creacion', 'observaciones', 'notas_entrenador',
+            'cliente_detalle', 'entrenador_detalle', 'espacio_detalle',
+            'clientes_adicionales_detalle', 'duracion', 'total_clientes'
+        ]
+        read_only_fields = ['fecha_creacion']
+
+    def validate(self, data):
+        """Validaciones personalizadas"""
+        if data.get('hora_inicio') and data.get('hora_fin'):
+            if data['hora_inicio'] >= data['hora_fin']:
+                raise serializers.ValidationError("La hora de inicio debe ser anterior a la hora de fin")
+        
+        # Verificar que el espacio esté en la misma sede del entrenador
+        entrenador = data.get('entrenador')
+        espacio = data.get('espacio')
+        if entrenador and espacio and espacio.sede != entrenador.sede:
+            raise serializers.ValidationError("El espacio debe estar en la misma sede del entrenador")
+        
+        return data
+
+
+class ReservaEntrenadorCreateSerializer(serializers.ModelSerializer):
+    """Serializer para crear reservas de entrenador"""
+    
+    class Meta:
+        model = ReservaEntrenador
+        fields = [
+            'cliente', 'entrenador', 'fecha_sesion', 'hora_inicio', 'hora_fin',
+            'tipo_sesion', 'objetivo', 'espacio', 'precio', 'clientes_adicionales',
+            'observaciones'
+        ]
+    
+    def validate(self, data):
+        return ReservaEntrenadorSerializer().validate(data)
+
+
+class DisponibilidadEquipoSerializer(serializers.Serializer):
+    """Serializer para consultar disponibilidad de equipos"""
+    activo_id = serializers.IntegerField()
+    fecha = serializers.DateField()
+    hora_inicio = serializers.TimeField(required=False)
+    hora_fin = serializers.TimeField(required=False)
+    
+    def validate(self, data):
+        if data.get('hora_inicio') and data.get('hora_fin'):
+            if data['hora_inicio'] >= data['hora_fin']:
+                raise serializers.ValidationError("La hora de inicio debe ser anterior a la hora de fin")
+        return data
+
+
+class EstadisticasSerializer(serializers.Serializer):
+    """Serializer para estadísticas de horarios"""
+    fecha_inicio = serializers.DateField(required=False)
+    fecha_fin = serializers.DateField(required=False)
+    sede_id = serializers.IntegerField(required=False)
+    tipo_actividad_id = serializers.IntegerField(required=False)

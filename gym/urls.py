@@ -30,6 +30,7 @@ urlpatterns = [
     path('api/facturacion/', include('facturacion.urls')),
     path('api/instalaciones/', include('instalaciones.urls')),
     path('api/gestion-equipos/', include('gestion_equipos.urls')),
+    path('api/horarios/', include('horarios.urls')),  # Nueva API de horarios y reservas
 ]
 
 # Servir archivos media en desarrollo

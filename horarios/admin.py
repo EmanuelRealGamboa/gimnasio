@@ -2,7 +2,11 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from .models import TipoActividad, Horario, SesionClase, BloqueoHorario
+from .models import (
+    TipoActividad, Horario, SesionClase, BloqueoHorario,
+    EquipoActividad, ClienteMembresia, ReservaClase, 
+    ReservaEquipo, ReservaEntrenador
+)
 
 
 @admin.register(TipoActividad)
@@ -204,7 +208,164 @@ class BloqueoHorarioAdmin(admin.ModelAdmin):
         )
 
 
+@admin.register(EquipoActividad)
+class EquipoActividadAdmin(admin.ModelAdmin):
+    list_display = ['tipo_actividad', 'activo_info', 'cantidad_necesaria', 'obligatorio']
+    list_filter = ['obligatorio', 'tipo_actividad', 'activo__categoria']
+    search_fields = ['tipo_actividad__nombre', 'activo__nombre', 'activo__codigo']
+    
+    def activo_info(self, obj):
+        return f"{obj.activo.codigo} - {obj.activo.nombre}"
+    activo_info.short_description = 'Activo'
+
+
+@admin.register(ClienteMembresia)
+class ClienteMembresiaAdmin(admin.ModelAdmin):
+    list_display = ['cliente_nombre', 'membresia', 'fecha_inicio', 'fecha_fin', 'estado', 'dias_restantes_display']
+    list_filter = ['estado', 'membresia__tipo', 'fecha_inicio']
+    search_fields = [
+        'cliente__persona__nombre',
+        'cliente__persona__apellido_paterno',
+        'membresia__nombre_plan'
+    ]
+    date_hierarchy = 'fecha_inicio'
+    
+    def cliente_nombre(self, obj):
+        return f"{obj.cliente.persona.nombre} {obj.cliente.persona.apellido_paterno}"
+    cliente_nombre.short_description = 'Cliente'
+    
+    def dias_restantes_display(self, obj):
+        dias = obj.dias_restantes
+        if dias > 30:
+            color = 'green'
+        elif dias > 7:
+            color = 'orange'
+        else:
+            color = 'red'
+        return format_html('<span style="color: {};">{} días</span>', color, dias)
+    dias_restantes_display.short_description = 'Días Restantes'
+
+
+@admin.register(ReservaClase)
+class ReservaClaseAdmin(admin.ModelAdmin):
+    list_display = [
+        'cliente_nombre', 'actividad_info', 'fecha_sesion', 
+        'entrenador_nombre', 'estado', 'fecha_reserva'
+    ]
+    list_filter = [
+        'estado', 'sesion_clase__horario__tipo_actividad',
+        'sesion_clase__fecha', 'sesion_clase__horario__espacio__sede'
+    ]
+    search_fields = [
+        'cliente__persona__nombre',
+        'cliente__persona__apellido_paterno',
+        'sesion_clase__horario__tipo_actividad__nombre'
+    ]
+    date_hierarchy = 'sesion_clase__fecha'
+    
+    def cliente_nombre(self, obj):
+        return f"{obj.cliente.persona.nombre} {obj.cliente.persona.apellido_paterno}"
+    cliente_nombre.short_description = 'Cliente'
+    
+    def actividad_info(self, obj):
+        return obj.sesion_clase.horario.tipo_actividad.nombre
+    actividad_info.short_description = 'Actividad'
+    
+    def fecha_sesion(self, obj):
+        return obj.sesion_clase.fecha
+    fecha_sesion.short_description = 'Fecha Sesión'
+    
+    def entrenador_nombre(self, obj):
+        entrenador = obj.sesion_clase.entrenador_efectivo
+        return f"{entrenador.empleado.persona.nombre} {entrenador.empleado.persona.apellido_paterno}"
+    entrenador_nombre.short_description = 'Entrenador'
+
+
+@admin.register(ReservaEquipo)
+class ReservaEquipoAdmin(admin.ModelAdmin):
+    list_display = [
+        'cliente_nombre', 'equipo_info', 'fecha_reserva', 
+        'horario_reserva', 'estado', 'duracion_display'
+    ]
+    list_filter = [
+        'estado', 'fecha_reserva', 'activo__categoria',
+        'activo__sede'
+    ]
+    search_fields = [
+        'cliente__persona__nombre',
+        'cliente__persona__apellido_paterno',
+        'activo__nombre', 'activo__codigo'
+    ]
+    date_hierarchy = 'fecha_reserva'
+    
+    def cliente_nombre(self, obj):
+        return f"{obj.cliente.persona.nombre} {obj.cliente.persona.apellido_paterno}"
+    cliente_nombre.short_description = 'Cliente'
+    
+    def equipo_info(self, obj):
+        return f"{obj.activo.codigo} - {obj.activo.nombre}"
+    equipo_info.short_description = 'Equipo'
+    
+    def horario_reserva(self, obj):
+        return f"{obj.hora_inicio} - {obj.hora_fin}"
+    horario_reserva.short_description = 'Horario'
+    
+    def duracion_display(self, obj):
+        duracion = obj.duracion_programada
+        horas = duracion.seconds // 3600
+        minutos = (duracion.seconds % 3600) // 60
+        return f"{horas}h {minutos}m"
+    duracion_display.short_description = 'Duración'
+
+
+@admin.register(ReservaEntrenador)
+class ReservaEntrenadorAdmin(admin.ModelAdmin):
+    list_display = [
+        'cliente_nombre', 'entrenador_nombre', 'fecha_sesion',
+        'horario_sesion', 'tipo_sesion', 'estado', 'precio'
+    ]
+    list_filter = [
+        'estado', 'tipo_sesion', 'fecha_sesion',
+        'entrenador__sede'
+    ]
+    search_fields = [
+        'cliente__persona__nombre',
+        'cliente__persona__apellido_paterno',
+        'entrenador__empleado__persona__nombre',
+        'entrenador__empleado__persona__apellido_paterno'
+    ]
+    date_hierarchy = 'fecha_sesion'
+    
+    fieldsets = (
+        ('Información Básica', {
+            'fields': ('cliente', 'entrenador', 'tipo_sesion', 'estado')
+        }),
+        ('Horario', {
+            'fields': ('fecha_sesion', 'hora_inicio', 'hora_fin', 'espacio')
+        }),
+        ('Detalles de la Sesión', {
+            'fields': ('objetivo', 'precio', 'clientes_adicionales')
+        }),
+        ('Observaciones', {
+            'fields': ('observaciones', 'notas_entrenador'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def cliente_nombre(self, obj):
+        return f"{obj.cliente.persona.nombre} {obj.cliente.persona.apellido_paterno}"
+    cliente_nombre.short_description = 'Cliente'
+    
+    def entrenador_nombre(self, obj):
+        return f"{obj.entrenador.empleado.persona.nombre} {obj.entrenador.empleado.persona.apellido_paterno}"
+    entrenador_nombre.short_description = 'Entrenador'
+    
+    def horario_sesion(self, obj):
+        return f"{obj.hora_inicio} - {obj.hora_fin}"
+    horario_sesion.short_description = 'Horario'
+
+
 # Configuración adicional del admin
-admin.site.site_header = "Administración de Horarios - Gimnasio"
+admin.site.site_header = "Administración de Horarios y Reservas - Gimnasio"
 admin.site.site_title = "Horarios Gimnasio"
-admin.site.index_title = "Panel de Administración de Horarios"
+admin.site.index_title = "Panel de Administración de Horarios y Reservas"
