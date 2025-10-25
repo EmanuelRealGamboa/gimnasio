@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'empleados',
     'control_acceso',
     'instalaciones',
+    'horarios',  # Nueva app de gestión de horarios
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
