@@ -1,11 +1,10 @@
-import { useState } from 'react';
 import './RoleSelector.css';
 
 const ROLES = [
   {
     id: 'entrenador',
     nombre: 'Entrenador',
-    nombreDB: 'entrenador',
+    nombreDB: 'Entrenador',
     icon: '💪',
     descripcion: 'Gestión de entrenamientos y rutinas',
     color: '#10b981'
@@ -13,7 +12,7 @@ const ROLES = [
   {
     id: 'cajero',
     nombre: 'Cajero',
-    nombreDB: 'cajero',
+    nombreDB: 'Recepcionista',
     icon: '💰',
     descripcion: 'Gestión de pagos y transacciones',
     color: '#ec4899'
@@ -21,7 +20,7 @@ const ROLES = [
   {
     id: 'limpieza',
     nombre: 'Personal de Limpieza',
-    nombreDB: 'personal de limpieza',
+    nombreDB: 'Personal de Limpieza',
     icon: '🧹',
     descripcion: 'Gestión de tareas de limpieza',
     color: '#06b6d4'
@@ -29,7 +28,7 @@ const ROLES = [
   {
     id: 'supervisor',
     nombre: 'Supervisor de Espacio',
-    nombreDB: 'supervisor de espacio',
+    nombreDB: 'Supervisor de Instalaciones',
     icon: '🏗️',
     descripcion: 'Supervisión de instalaciones y equipamiento',
     color: '#8b5cf6'
