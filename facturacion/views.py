@@ -6,30 +6,31 @@ from django_filters.rest_framework import DjangoFilterBackend, FilterSet, DateFr
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 import io
+
 from .models import Factura, DetalleFactura, Pago
 from .serializers import FacturaSerializer, DetalleFacturaSerializer, PagoSerializer
 
 
-# -------------------------
-# 🔹 Filtro de facturas
-# -------------------------
+# ====================================================
+# 🔹 FILTRO DE FACTURAS (por fecha, estado o cliente)
+# ====================================================
 class FacturaFilter(FilterSet):
     fecha_emision = DateFromToRangeFilter()
 
     class Meta:
         model = Factura
-        fields = ['fecha_emision', 'estado_pago', 'cliente_name']  # 👈 actualizado
+        fields = ['fecha_emision', 'estado_pago', 'cliente']
 
 
-# -------------------------
+# ====================================================
 # 🔹 FACTURA VIEWSET
-# -------------------------
+# ====================================================
 class FacturaViewSet(viewsets.ModelViewSet):
     queryset = Factura.objects.all().order_by('-fecha_emision')
     serializer_class = FacturaSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_class = FacturaFilter
-    search_fields = ['cliente_name']  # 👈 actualizado
+    search_fields = ['cliente__persona__nombre', 'cliente__persona__apellido_paterno']
 
     # ✅ Generar factura en PDF (visible sin token)
     @action(detail=True, methods=['get'], permission_classes=[permissions.AllowAny])
@@ -40,55 +41,81 @@ class FacturaViewSet(viewsets.ModelViewSet):
         buffer = io.BytesIO()
         p = canvas.Canvas(buffer, pagesize=letter)
 
-        # Encabezado
+        # ===========================
+        # 🔹 ENCABEZADO DEL DOCUMENTO
+        # ===========================
         p.setFont("Helvetica-Bold", 16)
         p.drawString(200, 780, "FACTURA DE COMPRA")
 
         p.setFont("Helvetica", 12)
         p.drawString(100, 750, f"Número de Factura: {factura.factura_id}")
-        p.drawString(100, 730, f"Cliente: {factura.cliente_name}")  # 👈 actualizado
+
+        # Mostrar nombre del cliente desde Persona
+        if factura.cliente and factura.cliente.persona:
+            nombre = factura.cliente.persona.nombre
+            apellido = factura.cliente.persona.apellido_paterno
+            p.drawString(100, 730, f"Cliente: {nombre} {apellido}")
+        else:
+            p.drawString(100, 730, "Cliente: No especificado")
+
         p.drawString(100, 710, f"Fecha de Emisión: {factura.fecha_emision}")
         p.drawString(100, 690, f"Estado de Pago: {factura.estado_pago}")
 
-        # Detalles de la factura
+        # ===========================
+        # 🔹 DETALLES DE PRODUCTOS
+        # ===========================
         p.setFont("Helvetica-Bold", 12)
         p.drawString(100, 660, "Detalles de productos:")
         p.setFont("Helvetica", 11)
         y = 640
+
         for detalle in factura.detalles.all():
             total_linea = detalle.precio_unitario * detalle.cantidad
-            p.drawString(100, y, f"{detalle.producto} x {detalle.cantidad} = ${total_linea}")
+            producto = detalle.producto.nombre if detalle.producto else "Producto eliminado"
+            p.drawString(100, y, f"{producto} x {detalle.cantidad} = ${total_linea}")
             y -= 20
+            if y < 80:  # Nueva página si se llena
+                p.showPage()
+                y = 750
 
-        # Total
+        # ===========================
+        # 🔹 TOTAL Y PIE DE PÁGINA
+        # ===========================
         p.setFont("Helvetica-Bold", 12)
         p.drawString(100, y - 10, f"Total de la factura: ${factura.total}")
-
-        # Cierre del PDF
+        p.setFont("Helvetica-Oblique", 10)
+        p.drawString(100, y - 40, "Gracias por su compra.")
         p.showPage()
         p.save()
-        buffer.seek(0)
 
-        # ✅ Mostrar PDF en el navegador (no descargar)
+        # Retornar PDF en navegador
+        buffer.seek(0)
         response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
-        response['Content-Disposition'] = 'inline; filename="factura.pdf"'
+        response['Content-Disposition'] = 'inline; filename=\"factura.pdf\"'
         return response
 
 
-# -------------------------
+# ====================================================
 # 🔹 DETALLE FACTURA VIEWSET
-# -------------------------
+# ====================================================
 class DetalleFacturaViewSet(viewsets.ModelViewSet):
-    queryset = DetalleFactura.objects.all()
+    queryset = DetalleFactura.objects.all().order_by('-factura__fecha_emision')
     serializer_class = DetalleFacturaSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['factura', 'producto']
+    search_fields = [
+        'factura__cliente__persona__nombre',
+        'factura__cliente__persona__apellido_paterno',
+        'producto__nombre'
+    ]
 
 
-# -------------------------
-# 🔹 PAGO VIEWSET (sin informe PDF)
-# -------------------------
+# ====================================================
+# 🔹 PAGO VIEWSET
+# ====================================================
 class PagoViewSet(viewsets.ModelViewSet):
     queryset = Pago.objects.all().order_by('-fecha_pago')
     serializer_class = PagoSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['metodo_pago', 'fecha_pago']
-    search_fields = ['factura__cliente_name']  # 👈 actualizado
+    filterset_fields = ['metodo_pago', 'fecha_pago', 'factura']
+    search_fields = ['factura__cliente__persona__nombre', 'factura__cliente__persona__apellido_paterno']
