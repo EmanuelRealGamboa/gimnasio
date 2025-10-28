@@ -9,6 +9,9 @@ function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const userData = authService.getUserData();
 
+  // Determinar si el usuario es administrador
+  const isAdmin = userData?.dashboard === 'Administrador' || userData?.permisos?.includes('gestionar_empleados');
+
   const menuItems = [
     {
       id: 'dashboard',
@@ -21,6 +24,35 @@ function Sidebar() {
       label: 'Personal',
       icon: '👥',
       path: '/employees',
+      adminOnly: true,
+    },
+    {
+      id: 'clientes',
+      label: 'Clientes',
+      icon: '🤸',
+      path: '/clientes',
+      adminOnly: true,
+    },
+    {
+      id: 'membresias',
+      label: 'Membresías',
+      icon: '💳',
+      path: '/membresias',
+      adminOnly: true,
+    },
+    {
+      id: 'instalaciones',
+      label: 'Instalaciones',
+      icon: '🏢',
+      path: '/instalaciones',
+      adminOnly: true,
+    },
+    {
+      id: 'gestion-equipos',
+      label: 'Equipos y Mantenimiento',
+      icon: '🔧',
+      path: '/gestion-equipos',
+      adminOnly: true,
     },
     {
       id: 'accesos',
@@ -28,7 +60,7 @@ function Sidebar() {
       icon: '🔐',
       path: '/accesos',
     },
-  ];
+  ].filter(item => !item.adminOnly || isAdmin);
 
   const handleLogout = () => {
     authService.logout();

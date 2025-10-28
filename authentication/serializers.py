@@ -229,6 +229,10 @@ class EmpleadoUserDetailSerializer(serializers.Serializer):
     rfc = serializers.CharField(source='persona.empleado.rfc')
     rol_id = serializers.SerializerMethodField()
     rol_nombre = serializers.SerializerMethodField()
+    # Documentos
+    identificacion_url = serializers.SerializerMethodField()
+    comprobante_url = serializers.SerializerMethodField()
+    certificados_url = serializers.SerializerMethodField()
 
     def get_rol_id(self, obj):
         persona_rol = PersonaRol.objects.filter(persona=obj.persona).first()
@@ -237,3 +241,39 @@ class EmpleadoUserDetailSerializer(serializers.Serializer):
     def get_rol_nombre(self, obj):
         persona_rol = PersonaRol.objects.filter(persona=obj.persona).first()
         return persona_rol.rol.nombre if persona_rol else None
+
+    def get_identificacion_url(self, obj):
+        try:
+            empleado = Empleado.objects.get(persona=obj.persona)
+            if empleado.identificacion:
+                request = self.context.get('request')
+                if request:
+                    return request.build_absolute_uri(empleado.identificacion.url)
+                return empleado.identificacion.url
+        except Empleado.DoesNotExist:
+            pass
+        return None
+
+    def get_comprobante_url(self, obj):
+        try:
+            empleado = Empleado.objects.get(persona=obj.persona)
+            if empleado.comprobante_domicilio:
+                request = self.context.get('request')
+                if request:
+                    return request.build_absolute_uri(empleado.comprobante_domicilio.url)
+                return empleado.comprobante_domicilio.url
+        except Empleado.DoesNotExist:
+            pass
+        return None
+
+    def get_certificados_url(self, obj):
+        try:
+            empleado = Empleado.objects.get(persona=obj.persona)
+            if empleado.certificados:
+                request = self.context.get('request')
+                if request:
+                    return request.build_absolute_uri(empleado.certificados.url)
+                return empleado.certificados.url
+        except Empleado.DoesNotExist:
+            pass
+        return None
