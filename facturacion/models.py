@@ -17,7 +17,7 @@ class MetodoPago(models.TextChoices):
 class Factura(models.Model):
     factura_id = models.AutoField(primary_key=True)
     # Temporalmente usamos un CharField hasta que exista la app de clientes
-    cliente_id = models.CharField(max_length=50)
+    cliente_name = models.CharField(max_length=100,)
     fecha_emision = models.DateField(auto_now_add=True)
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     estado_pago = models.CharField(

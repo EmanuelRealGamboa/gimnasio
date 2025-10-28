@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
     console.log("Script inventario_auto_stock.js cargado correctamente");
 
-    // Buscar los campos
+  
     const productoSelect = document.querySelector('select[id*="producto"], select[name*="producto"]');
     const cantidadInput = document.querySelector('input[id*="cantidad_actual"], input[name*="cantidad_actual"]');
 
@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    // Cuando se seleccione un producto
+   
     productoSelect.addEventListener("change", function () {
         const productoId = this.value;
         if (!productoId) {
@@ -18,9 +18,9 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        console.log("📡 Consultando stock de producto:", productoId);
+        console.log(" Consultando stock de producto:", productoId);
 
-        // Llamada al backend
+      
         fetch(`/api/inventario/get_stock_producto/${productoId}/`)
             .then(response => response.json())
             .then(data => {
