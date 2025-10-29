@@ -28,8 +28,10 @@ urlpatterns = [
     path('api/', include('membresias.urls')),
     path('api/inventario/', include('inventario.urls')),
     path('api/facturacion/', include('facturacion.urls')),
+    path('api/ventas/', include('ventas.urls')),
     path('api/instalaciones/', include('instalaciones.urls')),
     path('api/gestion-equipos/', include('gestion_equipos.urls')),
+
 ]
 
 # Servir archivos media en desarrollo

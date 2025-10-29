@@ -16,8 +16,9 @@ class CategoriaProducto(models.Model):
 
 class Producto(models.Model):
     producto_id = models.AutoField(primary_key=True)
+    codigo = models.BigIntegerField(unique=True, blank=True, null=True)
     nombre = models.CharField(max_length=100)
-    categoria = models.ForeignKey(CategoriaProducto, on_delete=models.CASCADE)
+    categoria = models.ForeignKey('CategoriaProducto', on_delete=models.CASCADE)
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField(default=0)
 
@@ -27,7 +28,18 @@ class Producto(models.Model):
         verbose_name_plural = 'Productos'
 
     def __str__(self):
-        return f"{self.nombre} ({self.stock} disponibles)"
+       
+        return self.nombre
+
+    def save(self, *args, **kwargs):
+        if not self.codigo:
+            import random
+            while True:
+                nuevo_codigo = random.randint(100000000000, 999999999999)
+                if not Producto.objects.filter(codigo=nuevo_codigo).exists():
+                    self.codigo = nuevo_codigo
+                    break
+        super().save(*args, **kwargs)
 
 
 class Inventario(models.Model):
@@ -46,6 +58,6 @@ class Inventario(models.Model):
         return f"{self.producto.nombre} - {self.sede.nombre}"
 
     def save(self, *args, **kwargs):
-        # Al guardar, iguala la cantidad actual al stock del producto
+       
         self.cantidad_actual = self.producto.stock
         super().save(*args, **kwargs)
