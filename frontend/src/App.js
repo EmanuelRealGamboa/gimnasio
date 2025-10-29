@@ -128,17 +128,6 @@ function App() {
           />
 
           <Route
-            path="/employees/edit/:id"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <EmployeeFormWizard />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
             path="/employees/:id"
             element={
               <ProtectedRoute>

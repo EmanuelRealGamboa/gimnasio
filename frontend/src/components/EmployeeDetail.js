@@ -281,6 +281,24 @@ function EmployeeDetail() {
         </div>
 
         <div className="detail-section">
+          <h3>Asignación de Instalaciones</h3>
+          <div className="detail-grid">
+            <div className="detail-item">
+              <label>Sede Asignada:</label>
+              <span>{employee.sede_nombre || 'No asignada'}</span>
+            </div>
+            <div className="detail-item full-width">
+              <label>Espacios Asignados:</label>
+              <span>
+                {employee.espacios_nombres && employee.espacios_nombres.length > 0
+                  ? employee.espacios_nombres.join(', ')
+                  : 'No asignados'}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="detail-section">
           <h3>Documentos Adjuntos</h3>
           <div className="documents-grid">
             <div className="document-item">

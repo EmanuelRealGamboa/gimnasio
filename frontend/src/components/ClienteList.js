@@ -323,7 +323,7 @@ function ClienteList() {
                   </Link>
 
                   <Link
-                    to={`/clientes/editar/${cliente.id}`}
+                    to={`/clientes/edit/${cliente.id}`}
                     className="btn-action btn-action-edit"
                   >
                     <span className="action-icon">✏️</span>

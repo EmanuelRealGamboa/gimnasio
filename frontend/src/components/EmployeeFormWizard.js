@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import employeeService from '../services/employeeService';
 import roleService from '../services/roleService';
+import sedeService from '../services/sedeService';
+import espacioService from '../services/espacioService';
 import RoleSelector, { ROLES } from './RoleSelector';
 import WizardSteps from './WizardSteps';
 import './EmployeeForm.css';
@@ -16,9 +18,7 @@ const WIZARD_STEPS = [
 ];
 
 function EmployeeFormWizard() {
-  const { id } = useParams();
   const navigate = useNavigate();
-  const isEditMode = !!id;
 
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedRoleKey, setSelectedRoleKey] = useState('');
@@ -75,10 +75,7 @@ function EmployeeFormWizard() {
     fetchRoles();
     fetchSedes();
     fetchEspacios();
-    if (isEditMode) {
-      fetchEmployeeDetail();
-    }
-  }, [id]);
+  }, []);
 
   // Actualizar rol_id cuando se cargan los roles y ya hay un rol seleccionado
   useEffect(() => {
@@ -96,6 +93,22 @@ function EmployeeFormWizard() {
     }
   }, [roles, selectedRoleKey]);
 
+  // Filtrar espacios cuando cambia la sede seleccionada
+  useEffect(() => {
+    if (formData.sede_id) {
+      console.log('🔍 Filtrando espacios para la sede:', formData.sede_id);
+      fetchEspacios(formData.sede_id);
+      // Limpiar espacios seleccionados al cambiar de sede
+      setFormData(prev => ({
+        ...prev,
+        espacios: []
+      }));
+    } else {
+      // Si no hay sede seleccionada, cargar todos los espacios
+      fetchEspacios();
+    }
+  }, [formData.sede_id]);
+
   const fetchRoles = async () => {
     try {
       const response = await roleService.getRoles();
@@ -108,60 +121,27 @@ function EmployeeFormWizard() {
 
   const fetchSedes = async () => {
     try {
-      // TODO: Implementar servicio de sedes
-      setSedes([{ id: 1, nombre: 'Sede Principal' }]);
+      const response = await sedeService.getSedes();
+      console.log('🏢 Sedes cargadas desde el backend:', response.data);
+      setSedes(response.data);
     } catch (err) {
       console.error('Error al cargar sedes:', err);
+      setSedes([]);
     }
   };
 
-  const fetchEspacios = async () => {
+  const fetchEspacios = async (sedeId = null) => {
     try {
-      // TODO: Implementar servicio de espacios
-      setEspacios([
-        { id: 1, nombre: 'Gimnasio Principal' },
-        { id: 2, nombre: 'Sala de Cardio' },
-        { id: 3, nombre: 'Sala de Pesas' }
-      ]);
+      const response = await espacioService.getEspacios(sedeId);
+      console.log('🏋️ Espacios cargados desde el backend:', response.data);
+      setEspacios(response.data);
     } catch (err) {
       console.error('Error al cargar espacios:', err);
+      setEspacios([]);
     }
   };
 
-  const fetchEmployeeDetail = async () => {
-    try {
-      setLoading(true);
-      const response = await employeeService.getEmployee(id);
-      const data = response.data;
-      setFormData({
-        ...formData,
-        nombre: data.nombre || '',
-        apellido_paterno: data.apellido_paterno || '',
-        apellido_materno: data.apellido_materno || '',
-        fecha_nacimiento: data.fecha_nacimiento || '',
-        sexo: data.sexo || '',
-        direccion: data.direccion || '',
-        telefono: data.telefono || '',
-        email: data.email || '',
-        password: '',
-        puesto: data.puesto || '',
-        departamento: data.departamento || '',
-        fecha_contratacion: data.fecha_contratacion || '',
-        tipo_contrato: data.tipo_contrato || 'Indefinido',
-        salario: data.salario || '',
-        estado: data.estado || 'Activo',
-        rfc: data.rfc || '',
-        curp: data.curp || '',
-        nss: data.nss || '',
-        rol_id: data.rol_id || ''
-      });
-    } catch (err) {
-      setError('Error al cargar los datos del empleado');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Función removida - El wizard solo se usa para crear empleados
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -234,7 +214,7 @@ function EmployeeFormWizard() {
         }
         break;
       case 3:
-        if (!formData.email || (!isEditMode && !formData.password)) {
+        if (!formData.email || !formData.password) {
           setError('Completa todos los campos obligatorios');
           return false;
         }
@@ -289,16 +269,9 @@ function EmployeeFormWizard() {
 
       console.log('📤 Enviando datos con archivos...');
 
-      if (isEditMode) {
-        if (!formData.password) {
-          formDataToSend.delete('password');
-        }
-        await employeeService.updateEmployee(id, formDataToSend);
-        showSuccessMessage('Empleado actualizado exitosamente');
-      } else {
-        await employeeService.createEmployee(formDataToSend);
-        showSuccessMessage('Empleado creado exitosamente');
-      }
+      // Wizard solo para crear empleados nuevos
+      await employeeService.createEmployee(formDataToSend);
+      showSuccessMessage('Empleado creado exitosamente');
 
       // Esperar 2 segundos antes de redirigir para que el usuario vea el mensaje
       setTimeout(() => {
@@ -473,7 +446,7 @@ function EmployeeFormWizard() {
 
               <div className="form-group">
                 <label htmlFor="password">
-                  Contraseña {isEditMode ? '(dejar vacío para no cambiar)' : '*'}
+                  Contraseña *
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input
@@ -482,7 +455,7 @@ function EmployeeFormWizard() {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    required={!isEditMode}
+                    required
                     style={{ paddingRight: '40px' }}
                   />
                   <button
@@ -812,25 +785,33 @@ function EmployeeFormWizard() {
           <div className="form-group">
             <label>Espacios Asignados</label>
             <div className="checkbox-group">
-              {espacios.map(espacio => (
-                <label key={espacio.id} className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    value={espacio.id}
-                    checked={formData.espacios.includes(espacio.id)}
-                    onChange={(e) => {
-                      const espacioId = parseInt(e.target.value);
-                      setFormData(prev => ({
-                        ...prev,
-                        espacios: e.target.checked
-                          ? [...prev.espacios, espacioId]
-                          : prev.espacios.filter(id => id !== espacioId)
-                      }));
-                    }}
-                  />
-                  {espacio.nombre}
-                </label>
-              ))}
+              {espacios.length > 0 ? (
+                espacios.map(espacio => (
+                  <label key={espacio.id} className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      value={espacio.id}
+                      checked={formData.espacios.includes(espacio.id)}
+                      onChange={(e) => {
+                        const espacioId = parseInt(e.target.value);
+                        setFormData(prev => ({
+                          ...prev,
+                          espacios: e.target.checked
+                            ? [...prev.espacios, espacioId]
+                            : prev.espacios.filter(id => id !== espacioId)
+                        }));
+                      }}
+                    />
+                    {espacio.nombre}
+                  </label>
+                ))
+              ) : (
+                <p style={{ color: '#94a3b8', fontSize: '0.9rem', padding: '0.5rem' }}>
+                  {formData.sede_id
+                    ? 'No hay espacios disponibles para esta sede'
+                    : 'Selecciona una sede primero'}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -879,39 +860,43 @@ function EmployeeFormWizard() {
         <div className="form-group">
           <label>Espacios Asignados</label>
           <div className="checkbox-group">
-            {espacios.map(espacio => (
-              <label key={espacio.id} className="checkbox-label">
-                <input
-                  type="checkbox"
-                  value={espacio.id}
-                  checked={formData.espacios.includes(espacio.id)}
-                  onChange={(e) => {
-                    const espacioId = parseInt(e.target.value);
-                    setFormData(prev => ({
-                      ...prev,
-                      espacios: e.target.checked
-                        ? [...prev.espacios, espacioId]
-                        : prev.espacios.filter(id => id !== espacioId)
-                    }));
-                  }}
-                />
-                {espacio.nombre}
-              </label>
-            ))}
+            {espacios.length > 0 ? (
+              espacios.map(espacio => (
+                <label key={espacio.id} className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    value={espacio.id}
+                    checked={formData.espacios.includes(espacio.id)}
+                    onChange={(e) => {
+                      const espacioId = parseInt(e.target.value);
+                      setFormData(prev => ({
+                        ...prev,
+                        espacios: e.target.checked
+                          ? [...prev.espacios, espacioId]
+                          : prev.espacios.filter(id => id !== espacioId)
+                      }));
+                    }}
+                  />
+                  {espacio.nombre}
+                </label>
+              ))
+            ) : (
+              <p style={{ color: '#94a3b8', fontSize: '0.9rem', padding: '0.5rem' }}>
+                {formData.sede_id
+                  ? 'No hay espacios disponibles para esta sede'
+                  : 'Selecciona una sede primero'}
+              </p>
+            )}
           </div>
         </div>
       </div>
     );
   };
 
-  if (loading && isEditMode && !formData.email) {
-    return <div className="loading">Cargando datos del empleado...</div>;
-  }
-
   return (
     <div className="employee-form-container">
       <div className="form-card wizard-card">
-        <h2>{isEditMode ? 'Editar Empleado' : 'Nuevo Empleado'}</h2>
+        <h2>Nuevo Empleado</h2>
 
         <WizardSteps currentStep={currentStep} steps={WIZARD_STEPS} />
 
@@ -954,11 +939,7 @@ function EmployeeFormWizard() {
                 onClick={handleFinalSubmit}
                 disabled={loading}
               >
-                {loading
-                  ? 'Guardando...'
-                  : isEditMode
-                  ? 'Actualizar Empleado'
-                  : 'Crear Empleado'}
+                {loading ? 'Guardando...' : 'Crear Empleado'}
               </button>
             )}
           </div>

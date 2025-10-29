@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import employeeService from '../services/employeeService';
+import sedeService from '../services/sedeService';
+import roleService from '../services/roleService';
 import ConfirmModal from './ConfirmModal';
 import './EmployeeList.css';
 
@@ -30,17 +32,23 @@ function EmployeeList() {
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [sedeFilter, setSedeFilter] = useState('all');
+  const [rolFilter, setRolFilter] = useState('all');
+  const [sedes, setSedes] = useState([]);
+  const [roles, setRoles] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchEmployees();
+    fetchSedes();
+    fetchRoles();
   }, []);
 
   useEffect(() => {
     filterEmployees();
-  }, [employees, searchTerm, statusFilter]);
+  }, [employees, searchTerm, statusFilter, sedeFilter, rolFilter]);
 
   const fetchEmployees = async () => {
     try {
@@ -53,6 +61,26 @@ function EmployeeList() {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchSedes = async () => {
+    try {
+      const response = await sedeService.getSedes();
+      setSedes(response.data);
+    } catch (err) {
+      console.error('Error al cargar sedes:', err);
+      setSedes([]);
+    }
+  };
+
+  const fetchRoles = async () => {
+    try {
+      const response = await roleService.getRoles();
+      setRoles(response.data);
+    } catch (err) {
+      console.error('Error al cargar roles:', err);
+      setRoles([]);
     }
   };
 
@@ -73,6 +101,20 @@ function EmployeeList() {
       filtered = filtered.filter(emp => {
         const isActive = emp.estado && emp.estado.toLowerCase() === 'activo';
         return statusFilter === 'active' ? isActive : !isActive;
+      });
+    }
+
+    // Filter by sede
+    if (sedeFilter !== 'all') {
+      filtered = filtered.filter(emp => {
+        return emp.sede_id && emp.sede_id.toString() === sedeFilter;
+      });
+    }
+
+    // Filter by rol
+    if (rolFilter !== 'all') {
+      filtered = filtered.filter(emp => {
+        return emp.rol_id && emp.rol_id.toString() === rolFilter;
       });
     }
 
@@ -122,7 +164,7 @@ function EmployeeList() {
   };
 
   const handleEdit = (id) => {
-    navigate(`/employees/edit/${id}`);
+    navigate(`/employees/${id}`);
   };
 
   if (loading) {
@@ -176,6 +218,64 @@ function EmployeeList() {
             Inactivos
           </button>
         </div>
+
+        <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <div className="filter-sede">
+            <label htmlFor="sedeFilter" style={{ marginRight: '0.5rem', color: '#e2e8f0', fontWeight: '500' }}>
+              Filtrar por Sede:
+            </label>
+            <select
+              id="sedeFilter"
+              value={sedeFilter}
+              onChange={(e) => setSedeFilter(e.target.value)}
+              style={{
+                padding: '0.5rem 1rem',
+                borderRadius: '8px',
+                border: '1px solid #334155',
+                background: '#1e293b',
+                color: '#e2e8f0',
+                fontSize: '0.9rem',
+                cursor: 'pointer',
+                minWidth: '200px'
+              }}
+            >
+              <option value="all">Todas las sedes</option>
+              {sedes.map(sede => (
+                <option key={sede.id} value={sede.id}>
+                  {sede.nombre}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filter-rol">
+            <label htmlFor="rolFilter" style={{ marginRight: '0.5rem', color: '#e2e8f0', fontWeight: '500' }}>
+              Filtrar por Rol:
+            </label>
+            <select
+              id="rolFilter"
+              value={rolFilter}
+              onChange={(e) => setRolFilter(e.target.value)}
+              style={{
+                padding: '0.5rem 1rem',
+                borderRadius: '8px',
+                border: '1px solid #334155',
+                background: '#1e293b',
+                color: '#e2e8f0',
+                fontSize: '0.9rem',
+                cursor: 'pointer',
+                minWidth: '200px'
+              }}
+            >
+              <option value="all">Todos los roles</option>
+              {roles.filter(rol => rol.nombre !== 'Cliente').map(rol => (
+                <option key={rol.id} value={rol.id}>
+                  {rol.nombre}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
 
       <div className="table-container">
@@ -193,7 +293,7 @@ function EmployeeList() {
             {filteredEmployees.length === 0 ? (
               <tr>
                 <td colSpan="5" className="no-data">
-                  {searchTerm || statusFilter !== 'all'
+                  {searchTerm || statusFilter !== 'all' || sedeFilter !== 'all' || rolFilter !== 'all'
                     ? 'No se encontraron empleados con los filtros aplicados'
                     : 'No hay empleados registrados'}
                 </td>

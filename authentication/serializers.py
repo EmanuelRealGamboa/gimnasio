@@ -23,6 +23,9 @@ class UserListSerializer(serializers.Serializer):
     rol_id = serializers.SerializerMethodField()
     rol_nombre = serializers.SerializerMethodField()
     estado = serializers.SerializerMethodField()
+    sede_id = serializers.SerializerMethodField()
+    sede_nombre = serializers.SerializerMethodField()
+    espacios_nombres = serializers.SerializerMethodField()
 
     def get_nombre(self, obj):
         return obj.persona.nombre if obj.persona else None
@@ -55,6 +58,45 @@ class UserListSerializer(serializers.Serializer):
             return "Sin estado"
         except Exception:
             return "Sin estado"
+
+    def get_sede_id(self, obj):
+        try:
+            empleado = Empleado.objects.get(persona=obj.persona)
+            return empleado.sede.id if empleado.sede else None
+        except Empleado.DoesNotExist:
+            return None
+        except Exception:
+            return None
+
+    def get_sede_nombre(self, obj):
+        try:
+            empleado = Empleado.objects.get(persona=obj.persona)
+            return empleado.sede.nombre if empleado.sede else None
+        except Empleado.DoesNotExist:
+            return None
+        except Exception:
+            return None
+
+    def get_espacios_nombres(self, obj):
+        try:
+            empleado = Empleado.objects.get(persona=obj.persona)
+            # Buscar en los modelos especificos (Entrenador, Cajero, etc.)
+            espacios = []
+
+            if hasattr(empleado, 'entrenador'):
+                espacios = list(empleado.entrenador.espacio.values_list('nombre', flat=True))
+            elif hasattr(empleado, 'cajero'):
+                espacios = list(empleado.cajero.espacio.values_list('nombre', flat=True))
+            elif hasattr(empleado, 'personallimpieza'):
+                espacios = list(empleado.personallimpieza.espacio.values_list('nombre', flat=True))
+            elif hasattr(empleado, 'supervisorespacio'):
+                espacios = list(empleado.supervisorespacio.espacio.values_list('nombre', flat=True))
+
+            return espacios
+        except Empleado.DoesNotExist:
+            return []
+        except Exception:
+            return []
 
 class UserDetailSerializer(serializers.ModelSerializer):
     persona = PersonaSerializer()
