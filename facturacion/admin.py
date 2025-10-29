@@ -18,7 +18,6 @@ class FacturaAdmin(admin.ModelAdmin):
         if obj.cliente and obj.cliente.persona:
             return f"{obj.cliente.persona.nombre} {obj.cliente.persona.apellido_paterno}"
         return "Sin cliente"
-
     get_cliente_nombre.short_description = "Cliente"
 
     # === BOTONES DE ACCIÓN ===
@@ -37,7 +36,6 @@ class FacturaAdmin(admin.ModelAdmin):
             f'/admin/facturacion/factura/{obj.pk}/change/',
             f'/api/facturacion/facturas/{obj.factura_id}/generar_pdf/',
         )
-
     acciones.short_description = "Acciones"
     acciones.allow_tags = True
 
@@ -57,7 +55,6 @@ class DetalleFacturaAdmin(admin.ModelAdmin):
         if obj.factura and obj.factura.cliente and obj.factura.cliente.persona:
             return f"{obj.factura.cliente.persona.nombre} {obj.factura.cliente.persona.apellido_paterno}"
         return "Sin cliente"
-
     get_factura_cliente.short_description = "Cliente"
 
     # === BOTONES DE ACCIÓN ===
@@ -77,14 +74,14 @@ class DetalleFacturaAdmin(admin.ModelAdmin):
             f'/admin/facturacion/detallefactura/{obj.pk}/delete/',
             producto_link,
         )
-
     acciones.short_description = "Acciones"
     acciones.allow_tags = True
 
+    class Media:
+        js = ('admin/js/detallefactura_auto_precio.js',)
 
-# ======================================
-# 🔹 PAGO ADMIN (vista + imprimir PDF)
-# ======================================
+
+
 @admin.register(Pago)
 class PagoAdmin(admin.ModelAdmin):
     list_display = ('pago_id', 'get_cliente_nombre', 'factura', 'monto', 'metodo_pago', 'fecha_pago', 'acciones')
@@ -97,7 +94,6 @@ class PagoAdmin(admin.ModelAdmin):
         if obj.factura and obj.factura.cliente and obj.factura.cliente.persona:
             return f"{obj.factura.cliente.persona.nombre} {obj.factura.cliente.persona.apellido_paterno}"
         return "Sin cliente"
-
     get_cliente_nombre.short_description = "Cliente"
 
     # === BOTONES DE ACCIÓN ===
@@ -116,6 +112,5 @@ class PagoAdmin(admin.ModelAdmin):
             f'/admin/facturacion/pago/{obj.pk}/change/',
             f'/api/facturacion/facturas/{obj.factura.factura_id}/generar_pdf/',
         )
-
     acciones.short_description = "Acciones"
     acciones.allow_tags = True

@@ -54,11 +54,11 @@ class Factura(models.Model):
             return f"Factura #{self.factura_id} - {nombre} {apellido}"
         return f"Factura #{self.factura_id} - Sin cliente"
 
-    # ✅ Calcular total automáticamente
+    # ✅ Calcular total automáticamente al modificar detalles
     def actualizar_total(self):
         total = sum(detalle.subtotal() for detalle in self.detalles.all())
         self.total = total
-        self.save()
+        self.save(update_fields=['total'])
 
 
 # ===============================
@@ -66,8 +66,16 @@ class Factura(models.Model):
 # ===============================
 class DetalleFactura(models.Model):
     detalle_id = models.AutoField(primary_key=True)
-    factura = models.ForeignKey(Factura, on_delete=models.CASCADE, related_name='detalles')
-    producto = models.ForeignKey(Producto, on_delete=models.SET_NULL, null=True)
+    factura = models.ForeignKey(
+        Factura,
+        on_delete=models.CASCADE,
+        related_name='detalles'
+    )
+    producto = models.ForeignKey(
+        Producto,
+        on_delete=models.SET_NULL,
+        null=True
+    )
     cantidad = models.PositiveIntegerField()
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
 
@@ -95,9 +103,16 @@ class DetalleFactura(models.Model):
 # ===============================
 class Pago(models.Model):
     pago_id = models.AutoField(primary_key=True)
-    factura = models.ForeignKey(Factura, on_delete=models.CASCADE, related_name='pagos')
+    factura = models.ForeignKey(
+        Factura,
+        on_delete=models.CASCADE,
+        related_name='pagos'
+    )
     monto = models.DecimalField(max_digits=10, decimal_places=2)
-    metodo_pago = models.CharField(max_length=20, choices=MetodoPago.choices)
+    metodo_pago = models.CharField(
+        max_length=20,
+        choices=MetodoPago.choices
+    )
     fecha_pago = models.DateField(auto_now_add=True)
 
     class Meta:
@@ -117,4 +132,4 @@ class Pago(models.Model):
             self.factura.estado_pago = EstadoPago.PAGADA
         else:
             self.factura.estado_pago = EstadoPago.PENDIENTE
-        self.factura.save()
+        self.factura.save(update_fields=['estado_pago'])
