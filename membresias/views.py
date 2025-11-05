@@ -3,12 +3,16 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q, Count
+from django.utils import timezone
+from datetime import timedelta
 from .models import Membresia
 from .serializers import (
     MembresiaSerializer,
     MembresiaListSerializer,
     MembresiaCreateUpdateSerializer
 )
+from horarios.models import ClienteMembresia
+from clientes.models import Cliente
 
 
 class MembresiaViewSet(viewsets.ModelViewSet):
@@ -118,3 +122,117 @@ class MembresiaViewSet(viewsets.ModelViewSet):
         membresias = Membresia.objects.filter(activo=True)
         serializer = MembresiaListSerializer(membresias, many=True)
         return Response(serializer.data)
+
+    @action(detail=True, methods=['post'])
+    def adquirir(self, request, pk=None):
+        """
+        Endpoint para que un cliente adquiera una membresía
+        POST /api/membresias/{id}/adquirir/
+        Body: {
+            "metodo_pago": "efectivo|tarjeta|transferencia",
+            "meses_adicionales": 0  // opcional, para extender duración
+        }
+        """
+        try:
+            membresia = self.get_object()
+            
+            if not membresia.activo:
+                return Response(
+                    {'error': 'Esta membresía no está disponible'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Obtener cliente del usuario autenticado
+            try:
+                cliente = Cliente.objects.get(persona__usuario=request.user)
+            except Cliente.DoesNotExist:
+                return Response(
+                    {'error': 'Usuario no es un cliente registrado'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Verificar si ya tiene una membresía activa
+            membresia_activa = ClienteMembresia.objects.filter(
+                cliente=cliente,
+                estado='activa',
+                fecha_fin__gte=timezone.now().date()
+            ).first()
+
+            if membresia_activa:
+                return Response(
+                    {'error': 'Ya tienes una membresía activa. Expira el: ' + str(membresia_activa.fecha_fin)},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Calcular fechas
+            fecha_inicio = timezone.now().date()
+            meses_adicionales = request.data.get('meses_adicionales', 0)
+            duracion_total = membresia.duracion_dias + (meses_adicionales * 30)
+            fecha_fin = fecha_inicio + timedelta(days=duracion_total)
+
+            # Crear la membresía del cliente
+            cliente_membresia = ClienteMembresia.objects.create(
+                cliente=cliente,
+                membresia=membresia,
+                fecha_inicio=fecha_inicio,
+                fecha_fin=fecha_fin,
+                estado='activa'
+            )
+
+            # Aquí podrías integrar con sistema de pagos
+            # Por ahora solo registramos la adquisición
+
+            return Response({
+                'message': 'Membresía adquirida exitosamente',
+                'membresia_cliente_id': cliente_membresia.id,
+                'membresia': membresia.nombre_plan,
+                'fecha_inicio': fecha_inicio,
+                'fecha_fin': fecha_fin,
+                'precio': float(membresia.precio),
+                'duracion_dias': duracion_total
+            }, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response(
+                {'error': f'Error al adquirir membresía: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    @action(detail=False, methods=['get'])
+    def mis_membresias(self, request):
+        """
+        Endpoint para que un cliente vea sus membresías
+        GET /api/membresias/mis_membresias/
+        """
+        try:
+            cliente = Cliente.objects.get(persona__usuario=request.user)
+            
+            membresias_cliente = ClienteMembresia.objects.filter(
+                cliente=cliente
+            ).select_related('membresia').order_by('-fecha_inicio')
+
+            data = []
+            for cm in membresias_cliente:
+                data.append({
+                    'id': cm.id,
+                    'membresia': {
+                        'id': cm.membresia.id,
+                        'nombre_plan': cm.membresia.nombre_plan,
+                        'tipo': cm.membresia.get_tipo_display(),
+                        'precio': float(cm.membresia.precio),
+                        'beneficios': cm.membresia.beneficios
+                    },
+                    'fecha_inicio': cm.fecha_inicio,
+                    'fecha_fin': cm.fecha_fin,
+                    'estado': cm.get_estado_display(),
+                    'dias_restantes': (cm.fecha_fin - timezone.now().date()).days if cm.fecha_fin >= timezone.now().date() else 0,
+                    'activa': cm.estado == 'activa' and cm.fecha_fin >= timezone.now().date()
+                })
+
+            return Response(data)
+
+        except Cliente.DoesNotExist:
+            return Response(
+                {'error': 'Usuario no es un cliente registrado'},
+                status=status.HTTP_400_BAD_REQUEST
+            )

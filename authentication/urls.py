@@ -1,5 +1,5 @@
 from django.urls import path
-from authentication.views import EmpleadoUserCreateView, EmpleadoRegistroView
+from authentication.views import EmpleadoUserCreateView, EmpleadoRegistroView, ClienteRegistroView
 from authentication.dashboard_views import (
     dashboard_admin,
     dashboard_entrenador,
@@ -20,6 +20,9 @@ urlpatterns = [
     # Autenticación
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    
+    # Registro público de clientes (app móvil)
+    path('registro/cliente/', ClienteRegistroView.as_view(), name='registro_cliente'),
 
     # Dashboards por rol
     path('dashboard/admin/', dashboard_admin, name='dashboard_admin'),

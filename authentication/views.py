@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import AllowAny
 from .serializers import (
     EmpleadoUserCreateSerializer,
     EmpleadoRegistroSerializer,
@@ -8,7 +9,9 @@ from .serializers import (
     UserListSerializer
 )
 from .permissions import TienePermisoGestionarEmpleados
-from .models import User
+from .models import User, Persona
+from clientes.models import Cliente
+from django.db import transaction
 
 class EmpleadoUserCreateView(APIView):
     """
@@ -97,3 +100,89 @@ class EmpleadoRegistroView(APIView):
             user = serializer.save()
             return Response({'success': True, 'user_id': user.id, 'email': user.email}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ClienteRegistroView(APIView):
+    """
+    Endpoint público para que los clientes se registren desde la app móvil.
+    No requiere autenticación.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        """
+        Registrar un nuevo cliente desde la app móvil
+        POST /api/registro/cliente/
+        Body: {
+            "email": "cliente@email.com",
+            "password": "password123",
+            "nombre": "Juan",
+            "apellido_paterno": "Pérez",
+            "apellido_materno": "García",
+            "telefono": "5551234567",
+            "fecha_nacimiento": "1990-01-01",
+            "genero": "masculino",
+            "objetivo_fitness": "perder_peso",
+            "nivel_experiencia": "principiante"
+        }
+        """
+        try:
+            with transaction.atomic():
+                # Validar datos requeridos
+                required_fields = ['email', 'password', 'nombre', 'apellido_paterno', 'telefono']
+                for field in required_fields:
+                    if not request.data.get(field):
+                        return Response(
+                            {'error': f'El campo {field} es requerido'},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+
+                email = request.data.get('email')
+                
+                # Verificar si el email ya existe
+                if User.objects.filter(email=email).exists():
+                    return Response(
+                        {'error': 'Ya existe un usuario con este email'},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
+                # Crear usuario
+                user = User.objects.create_user(
+                    email=email,
+                    password=request.data.get('password')
+                )
+
+                # Crear persona (Persona no tiene campo 'usuario'; User tiene OneToOne a Persona)
+                persona = Persona.objects.create(
+                    nombre=request.data.get('nombre'),
+                    apellido_paterno=request.data.get('apellido_paterno'),
+                    apellido_materno=request.data.get('apellido_materno', ''),
+                    telefono=request.data.get('telefono'),
+                    fecha_nacimiento=request.data.get('fecha_nacimiento'),
+                    sexo=(request.data.get('sexo') or request.data.get('genero'))
+                )
+
+                # Asociar persona al usuario
+                user.persona = persona
+                user.save(update_fields=['persona'])
+
+                # Crear cliente
+                cliente = Cliente.objects.create(
+                    persona=persona,
+                    objetivo_fitness=request.data.get('objetivo_fitness', 'mantenimiento'),
+                    nivel_experiencia=request.data.get('nivel_experiencia', 'principiante'),
+                    estado='activo'
+                )
+
+                return Response({
+                    'message': 'Cliente registrado exitosamente',
+                    'cliente_id': cliente.id,
+                    'user_id': user.id,
+                    'email': user.email
+                }, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response(
+                {'error': f'Error al registrar cliente: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

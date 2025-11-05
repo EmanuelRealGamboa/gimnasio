@@ -27,7 +27,12 @@ SECRET_KEY = 'django-insecure-o-%)_h!czhhq7@@c^4a_u92z39m4)mbsb+xitq*iqz_bepu0ax
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '10.0.2.2',  # Android emulator host loopback
+    '192.168.1.71',  # IP LAN del backend
+]
 
 
 # Application definition
@@ -176,6 +181,8 @@ REST_FRAMEWORK = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:3001",
+    "http://10.0.2.2:8000",
+    "http://192.168.1.71:8000",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -205,6 +212,8 @@ CORS_ALLOW_METHODS = [
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:3001",
+    "http://10.0.2.2:8000",
+    "http://192.168.1.71:8000",
 ]
 
 # Eximir ciertos endpoints de CSRF (para APIs)
