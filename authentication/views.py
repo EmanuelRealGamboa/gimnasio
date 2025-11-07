@@ -153,13 +153,18 @@ class ClienteRegistroView(APIView):
                 )
 
                 # Crear persona (Persona no tiene campo 'usuario'; User tiene OneToOne a Persona)
+                # Manejar fecha_nacimiento: convertir string vacío a None
+                fecha_nacimiento = request.data.get('fecha_nacimiento')
+                if fecha_nacimiento == '' or fecha_nacimiento is None:
+                    fecha_nacimiento = None
+                
                 persona = Persona.objects.create(
                     nombre=request.data.get('nombre'),
                     apellido_paterno=request.data.get('apellido_paterno'),
                     apellido_materno=request.data.get('apellido_materno', ''),
                     telefono=request.data.get('telefono'),
-                    fecha_nacimiento=request.data.get('fecha_nacimiento'),
-                    sexo=(request.data.get('sexo') or request.data.get('genero'))
+                    fecha_nacimiento=fecha_nacimiento,
+                    sexo=(request.data.get('sexo') or request.data.get('genero') or None)
                 )
 
                 # Asociar persona al usuario
@@ -176,7 +181,7 @@ class ClienteRegistroView(APIView):
 
                 return Response({
                     'message': 'Cliente registrado exitosamente',
-                    'cliente_id': cliente.id,
+                    'cliente_persona_id': cliente.persona.id,  # Cliente usa persona como primary_key
                     'user_id': user.id,
                     'email': user.email
                 }, status=status.HTTP_201_CREATED)
