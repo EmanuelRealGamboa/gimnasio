@@ -1,3 +1,4 @@
+import re
 from rest_framework import serializers
 from .models import Membresia
 
@@ -5,20 +6,39 @@ from .models import Membresia
 class MembresiaSerializer(serializers.ModelSerializer):
     """Serializer completo para el modelo Membresia"""
     tipo_display = serializers.CharField(source='get_tipo_display', read_only=True)
+    beneficios_list = serializers.SerializerMethodField()
 
     class Meta:
         model = Membresia
         fields = '__all__'
         read_only_fields = ['fecha_creacion', 'fecha_actualizacion']
 
+    def get_beneficios_list(self, obj):
+        return parse_beneficios(obj.beneficios)
+
 
 class MembresiaListSerializer(serializers.ModelSerializer):
     """Serializer para listar membresías (vista resumida)"""
     tipo_display = serializers.CharField(source='get_tipo_display', read_only=True)
+    beneficios_list = serializers.SerializerMethodField()
 
     class Meta:
         model = Membresia
-        fields = ['id', 'nombre_plan', 'tipo', 'tipo_display', 'precio', 'activo', 'duracion_dias']
+        fields = [
+            'id',
+            'nombre_plan',
+            'tipo',
+            'tipo_display',
+            'precio',
+            'activo',
+            'duracion_dias',
+            'descripcion',
+            'beneficios',
+            'beneficios_list',
+        ]
+
+    def get_beneficios_list(self, obj):
+        return parse_beneficios(obj.beneficios)
 
 
 class MembresiaCreateUpdateSerializer(serializers.ModelSerializer):
@@ -51,3 +71,21 @@ class MembresiaCreateUpdateSerializer(serializers.ModelSerializer):
             if Membresia.objects.filter(nombre_plan=value).exists():
                 raise serializers.ValidationError("Ya existe una membresía con este nombre")
         return value
+
+
+def parse_beneficios(beneficios_raw):
+    """Convierte el texto plano de beneficios en una lista legible."""
+    if not beneficios_raw:
+        return []
+
+    # Normalizar saltos de línea y separadores
+    normalized = beneficios_raw.replace('\r', '\n')
+    parts = re.split(r'[\n;,]+', normalized)
+
+    beneficios = []
+    for part in parts:
+        cleaned = part.strip("•*- \t")
+        if cleaned:
+            beneficios.append(cleaned)
+
+    return beneficios

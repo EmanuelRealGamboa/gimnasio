@@ -223,6 +223,128 @@ class SesionCalendarioSerializer(serializers.ModelSerializer):
         return obj.espacio_efectivo.nombre
 
 
+class TipoActividadResumenSerializer(serializers.ModelSerializer):
+    """Resumen compacto de actividades para consumo móvil"""
+    sesiones_disponibles = serializers.IntegerField(read_only=True)
+    proxima_sesion = serializers.SerializerMethodField()
+    duracion_minutos = serializers.SerializerMethodField()
+
+    class Meta:
+        model = TipoActividad
+        fields = [
+            'id', 'nombre', 'descripcion', 'duracion_default', 'duracion_minutos',
+            'color_hex', 'sesiones_disponibles', 'proxima_sesion'
+        ]
+
+    def get_duracion_minutos(self, obj):
+        if not obj.duracion_default:
+            return None
+        return int(obj.duracion_default.total_seconds() // 60)
+
+    def get_proxima_sesion(self, obj):
+        sesion = getattr(obj, '_proxima_sesion', None)
+        if not sesion:
+            return None
+
+        entrenador = sesion.entrenador_efectivo.empleado.persona
+        espacio = sesion.espacio_efectivo
+        hora_inicio = sesion.hora_inicio_efectiva.strftime('%H:%M') if sesion.hora_inicio_efectiva else None
+        hora_fin = sesion.hora_fin_efectiva.strftime('%H:%M') if sesion.hora_fin_efectiva else None
+
+        return {
+            'id': sesion.id,
+            'fecha': sesion.fecha,
+            'hora_inicio': hora_inicio,
+            'hora_fin': hora_fin,
+            'lugares_disponibles': sesion.lugares_disponibles,
+            'estado': sesion.estado,
+            'entrenador': f"{entrenador.nombre} {entrenador.apellido_paterno}",
+            'espacio': espacio.nombre,
+        }
+
+
+class SesionClaseMobileSerializer(serializers.ModelSerializer):
+    """Serializer liviano para sesiones consumidas por la app móvil"""
+    actividad = serializers.SerializerMethodField()
+    entrenador = serializers.SerializerMethodField()
+    espacio = serializers.SerializerMethodField()
+    sede = serializers.SerializerMethodField()
+    hora_inicio = serializers.SerializerMethodField()
+    hora_fin = serializers.SerializerMethodField()
+    cupo_total = serializers.SerializerMethodField()
+    lugares_disponibles = serializers.SerializerMethodField()
+    puede_reservar = serializers.SerializerMethodField()
+    categoria = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SesionClase
+        fields = [
+            'id', 'fecha', 'estado', 'actividad', 'entrenador', 'espacio', 'sede',
+            'hora_inicio', 'hora_fin', 'cupo_total', 'lugares_disponibles',
+            'puede_reservar', 'categoria'
+        ]
+
+    def get_actividad(self, obj):
+        actividad = obj.horario.tipo_actividad
+        return {
+            'id': actividad.id,
+            'nombre': actividad.nombre,
+            'descripcion': actividad.descripcion,
+            'color': actividad.color_hex,
+            'duracion': actividad.duracion_default,
+        }
+
+    def get_entrenador(self, obj):
+        entrenador = obj.entrenador_efectivo
+        persona = entrenador.empleado.persona
+        return {
+            'id': entrenador.pk,
+            'empleado_id': entrenador.empleado_id,
+            'nombre': f"{persona.nombre} {persona.apellido_paterno}",
+            'especialidad': entrenador.especialidad,
+        }
+
+    def get_espacio(self, obj):
+        espacio = obj.espacio_efectivo
+        return {
+            'id': espacio.id,
+            'nombre': espacio.nombre,
+            'capacidad': espacio.capacidad,
+        }
+
+    def get_sede(self, obj):
+        sede = obj.espacio_efectivo.sede
+        return {
+            'id': sede.id,
+            'nombre': sede.nombre,
+        }
+
+    def get_hora_inicio(self, obj):
+        hora = obj.hora_inicio_efectiva
+        return hora.strftime('%H:%M') if hora else None
+
+    def get_hora_fin(self, obj):
+        hora = obj.hora_fin_efectiva
+        return hora.strftime('%H:%M') if hora else None
+
+    def get_cupo_total(self, obj):
+        return obj.cupo_efectivo
+
+    def get_lugares_disponibles(self, obj):
+        return obj.lugares_disponibles
+
+    def get_puede_reservar(self, obj):
+        hoy = timezone.now().date()
+        return obj.estado == 'programada' and obj.fecha >= hoy and not obj.esta_llena
+
+    def get_categoria(self, obj):
+        nombre = obj.horario.tipo_actividad.nombre.lower()
+        descripcion = (obj.horario.tipo_actividad.descripcion or '').lower()
+        if 'premium' in nombre or 'premium' in descripcion or 'intensivo' in nombre:
+            return 'premium'
+        return 'basico'
+
+
 class HorarioDisponibilidadSerializer(serializers.Serializer):
     """Serializer para consultar disponibilidad de horarios"""
     fecha_inicio = serializers.DateField()
