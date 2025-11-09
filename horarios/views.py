@@ -381,8 +381,28 @@ class SesionClaseViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if ReservaClase.objects.filter(cliente=cliente, sesion_clase=sesion).exists():
-            return Response({'mensaje': 'Ya tienes una reserva confirmada para esta sesión'}, status=status.HTTP_200_OK)
+        reserva_existente = ReservaClase.objects.filter(cliente=cliente, sesion_clase=sesion).first()
+
+        if reserva_existente:
+            if reserva_existente.estado in ['confirmada', 'pendiente', 'asistio']:
+                return Response({'mensaje': 'Ya tienes una reserva confirmada para esta sesión'}, status=status.HTTP_200_OK)
+
+            # Reactivar reserva cancelada
+            reserva_existente.estado = 'confirmada'
+            reserva_existente.observaciones = request.data.get('observaciones', '')
+            reserva_existente.fecha_reserva = timezone.now()
+            reserva_existente.fecha_cancelacion = None
+            reserva_existente.motivo_cancelacion = None
+            reserva_existente.save()
+
+            detalle = ReservaClaseSerializer(reserva_existente, context=self.get_serializer_context())
+            return Response(
+                {
+                    'mensaje': 'Reserva reactivada exitosamente',
+                    'reserva': detalle.data
+                },
+                status=status.HTTP_201_CREATED
+            )
 
         reserva_data = {
             'cliente': cliente.persona_id,
@@ -565,6 +585,27 @@ class ReservaClaseViewSet(viewsets.ModelViewSet):
                 {'error': 'Necesitas una membresía activa para crear reservas'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+        sesion_id = request.data.get('sesion_clase')
+        reserva_existente = None
+        if sesion_id:
+            reserva_existente = ReservaClase.objects.filter(cliente=cliente, sesion_clase_id=sesion_id).first()
+
+        if reserva_existente:
+            if reserva_existente.estado in ['confirmada', 'pendiente', 'asistio']:
+                detalle = ReservaClaseSerializer(reserva_existente, context=self.get_serializer_context())
+                return Response(detalle.data, status=status.HTTP_200_OK)
+
+            reserva_existente.estado = 'confirmada'
+            reserva_existente.observaciones = request.data.get('observaciones', '')
+            reserva_existente.fecha_reserva = timezone.now()
+            reserva_existente.fecha_cancelacion = None
+            reserva_existente.motivo_cancelacion = None
+            reserva_existente.save()
+
+            detalle = ReservaClaseSerializer(reserva_existente, context=self.get_serializer_context())
+            headers = self.get_success_headers(detalle.data)
+            return Response(detalle.data, status=status.HTTP_201_CREATED, headers=headers)
 
         data = request.data.copy()
         data['cliente'] = cliente.persona_id
