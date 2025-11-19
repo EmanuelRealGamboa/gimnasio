@@ -44,6 +44,12 @@ class EmployeeService {
   deleteEmployee(id) {
     return api.delete(`/admin/empleados/${id}/`);
   }
+
+  // Obtener estadísticas de empleados
+  getEstadisticas(sedeId = null) {
+    const params = sedeId ? { sede: sedeId } : {};
+    return api.get('/admin/empleados/estadisticas/', { params });
+  }
 }
 
 export default new EmployeeService();

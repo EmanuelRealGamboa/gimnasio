@@ -1,139 +1,425 @@
+/* ===================================
+   LOGIN - DISEÑO MINIMALISTA MODERNO
+   =================================== */
+
 .login-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
   min-height: 100vh;
   background-color: var(--bg-primary);
-  padding: var(--spacing-md);
+  overflow: hidden;
 }
 
-.login-card {
-  background-color: var(--bg-secondary);
-  padding: var(--spacing-2xl);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xl);
+.login-content {
+  display: flex;
   width: 100%;
-  max-width: 420px;
-  border: 1px solid var(--border-color);
+  min-height: 100vh;
 }
 
-.login-logo {
-  text-align: center;
+/* ===================================
+   PANEL IZQUIERDO - MARCA
+   =================================== */
+
+.login-brand {
+  flex: 1;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-brand::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.brand-content {
+  max-width: 500px;
+  z-index: 1;
+  animation: fadeInLeft 0.8s ease;
+}
+
+.brand-icon {
   margin-bottom: var(--spacing-xl);
 }
 
-.logo-box {
+.icon-gym {
+  font-size: 5rem;
+  display: inline-block;
+  animation: float 3s ease-in-out infinite;
+}
+
+.brand-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  margin-bottom: var(--spacing-md);
+  letter-spacing: 0.05em;
+}
+
+.brand-subtitle {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: var(--spacing-2xl);
+  font-weight: 300;
+}
+
+.brand-features {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-2xl);
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  animation: fadeIn 1s ease;
+}
+
+.feature-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-  border-radius: var(--radius-lg);
+  width: 24px;
+  height: 24px;
+  background-color: var(--success);
+  color: #ffffff;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ===================================
+   PANEL DERECHO - FORMULARIO
+   =================================== */
+
+.login-form-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+  background-color: var(--bg-primary);
+}
+
+.login-form-container {
+  width: 100%;
+  max-width: 440px;
+  animation: fadeInRight 0.8s ease;
+}
+
+.login-header {
+  margin-bottom: var(--spacing-2xl);
+  text-align: center;
+}
+
+.login-header h2 {
   font-size: 2rem;
   font-weight: 700;
-  color: white;
-  margin-bottom: var(--spacing-md);
-}
-
-.login-card h2 {
-  text-align: center;
   color: var(--text-primary);
+  margin: 0;
   margin-bottom: var(--spacing-sm);
-  font-size: 1.75rem;
-  font-weight: 700;
 }
 
-.login-card h3 {
-  text-align: center;
-  color: var(--text-secondary);
-  margin-bottom: var(--spacing-xl);
+.login-header p {
   font-size: 1rem;
-  font-weight: 400;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ===================================
+   MENSAJE DE ERROR
+   =================================== */
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background-color: var(--danger-bg);
+  color: var(--danger);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border-left: 4px solid var(--danger);
+  margin-bottom: var(--spacing-lg);
+  font-size: 0.9rem;
+  animation: shake 0.5s ease;
+}
+
+.error-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* ===================================
+   FORMULARIO
+   =================================== */
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
 }
 
 .form-group {
-  margin-bottom: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
 }
 
 .form-group label {
-  display: block;
-  margin-bottom: var(--spacing-sm);
-  color: var(--text-primary);
-  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
   font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
-.form-group input {
+.label-icon {
+  font-size: 1rem;
+}
+
+.form-input {
   width: 100%;
-  padding: 0.875rem;
-  background-color: var(--bg-tertiary);
-  border: 1px solid var(--border-color);
+  padding: 1rem;
+  background-color: var(--bg-secondary);
+  border: 2px solid var(--border-color);
   border-radius: var(--radius-md);
   font-size: 1rem;
   color: var(--text-primary);
-  transition: all var(--transition-fast);
+  transition: all var(--transition-normal);
   box-sizing: border-box;
 }
 
-.form-group input::placeholder {
+.form-input::placeholder {
   color: var(--text-tertiary);
 }
 
-.form-group input:focus {
+.form-input:focus {
   outline: none;
   border-color: var(--accent-primary);
-  background-color: var(--bg-hover);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background-color: var(--bg-primary);
+  box-shadow: 0 0 0 4px rgba(26, 26, 26, 0.1);
 }
 
-button[type="submit"] {
+/* ===================================
+   BOTÓN LOGIN
+   =================================== */
+
+.btn-login {
   width: 100%;
-  padding: 0.875rem;
-  background-color: var(--accent-primary);
-  color: white;
+  padding: 1rem;
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-hover) 100%);
+  color: #ffffff;
   border: none;
   border-radius: var(--radius-md);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all var(--transition-normal);
   margin-top: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  position: relative;
+  overflow: hidden;
 }
 
-button[type="submit"]:hover:not(:disabled) {
-  background-color: var(--accent-primary-hover);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+.btn-login::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
 }
 
-button[type="submit"]:active:not(:disabled) {
+.btn-login:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.btn-login:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.btn-login:active:not(:disabled) {
   transform: translateY(0);
 }
 
-button[type="submit"]:disabled {
-  opacity: 0.5;
+.btn-login:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
-.error-message {
-  background-color: var(--danger-bg);
-  color: var(--danger);
-  padding: var(--spacing-md);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--spacing-md);
-  border: 1px solid var(--danger);
-  font-size: 0.9rem;
-  text-align: center;
+.btn-arrow {
+  font-size: 1.25rem;
+  font-weight: 700;
+  transition: transform var(--transition-fast);
 }
 
-/* Responsive */
-@media (max-width: 480px) {
-  .login-card {
+.btn-login:hover:not(:disabled) .btn-arrow {
+  transform: translateX(4px);
+}
+
+/* ===================================
+   SPINNER DE CARGA
+   =================================== */
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* ===================================
+   FOOTER
+   =================================== */
+
+.login-footer {
+  margin-top: var(--spacing-2xl);
+  text-align: center;
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--border-color);
+}
+
+.login-footer p {
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+
+/* ===================================
+   ANIMACIONES
+   =================================== */
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===================================
+   RESPONSIVE DESIGN
+   =================================== */
+
+@media (max-width: 1024px) {
+  .login-brand {
+    display: none;
+  }
+
+  .login-form-panel {
+    flex: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-form-panel {
     padding: var(--spacing-xl);
   }
 
-  .login-card h2 {
+  .login-header h2 {
+    font-size: 1.75rem;
+  }
+
+  .brand-title {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-form-panel {
+    padding: var(--spacing-lg);
+  }
+
+  .login-header h2 {
     font-size: 1.5rem;
+  }
+
+  .login-header p {
+    font-size: 0.9rem;
+  }
+
+  .form-input {
+    padding: 0.875rem;
+  }
+
+  .btn-login {
+    padding: 0.875rem;
   }
 }

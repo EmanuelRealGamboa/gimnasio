@@ -62,7 +62,22 @@ class UserListSerializer(serializers.Serializer):
     def get_sede_id(self, obj):
         try:
             empleado = Empleado.objects.get(persona=obj.persona)
-            return empleado.sede.id if empleado.sede else None
+
+            # Primero verificar si tiene sede en Empleado
+            if empleado.sede:
+                return empleado.sede.id
+
+            # Si no tiene sede en Empleado, buscar en modelos específicos
+            if hasattr(empleado, 'entrenador') and empleado.entrenador.sede:
+                return empleado.entrenador.sede.id
+            elif hasattr(empleado, 'cajero') and empleado.cajero.sede:
+                return empleado.cajero.sede.id
+            elif hasattr(empleado, 'personallimpieza') and empleado.personallimpieza.sede:
+                return empleado.personallimpieza.sede.id
+            elif hasattr(empleado, 'supervisorespacio') and empleado.supervisorespacio.sede:
+                return empleado.supervisorespacio.sede.id
+
+            return None
         except Empleado.DoesNotExist:
             return None
         except Exception:
@@ -71,7 +86,22 @@ class UserListSerializer(serializers.Serializer):
     def get_sede_nombre(self, obj):
         try:
             empleado = Empleado.objects.get(persona=obj.persona)
-            return empleado.sede.nombre if empleado.sede else None
+
+            # Primero verificar si tiene sede en Empleado
+            if empleado.sede:
+                return empleado.sede.nombre
+
+            # Si no tiene sede en Empleado, buscar en modelos específicos
+            if hasattr(empleado, 'entrenador') and empleado.entrenador.sede:
+                return empleado.entrenador.sede.nombre
+            elif hasattr(empleado, 'cajero') and empleado.cajero.sede:
+                return empleado.cajero.sede.nombre
+            elif hasattr(empleado, 'personallimpieza') and empleado.personallimpieza.sede:
+                return empleado.personallimpieza.sede.nombre
+            elif hasattr(empleado, 'supervisorespacio') and empleado.supervisorespacio.sede:
+                return empleado.supervisorespacio.sede.nombre
+
+            return None
         except Empleado.DoesNotExist:
             return None
         except Exception:
@@ -135,6 +165,9 @@ class EmpleadoUserCreateSerializer(serializers.Serializer):
     rfc = serializers.CharField(max_length=13)
     # Rol
     rol_id = serializers.IntegerField()
+    # Instalaciones
+    sede_id = serializers.IntegerField(required=False, allow_null=True)
+    espacios = serializers.CharField(required=False, allow_blank=True)  # JSON string de IDs
     # Documentos (archivos)
     identificacion = serializers.FileField(required=False, allow_null=True)
     comprobante = serializers.FileField(required=False, allow_null=True)
@@ -166,9 +199,15 @@ class EmpleadoUserCreateSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
-        # Extraer archivos antes de crear los objetos
+        import json
+        from empleados.models import Entrenador, Cajero, PersonalLimpieza, SupervisorEspacio
+        from instalaciones.models import Sede, Espacio
+
+        # Extraer archivos y datos de instalaciones antes de crear los objetos
         identificacion = validated_data.pop('identificacion', None)
         comprobante = validated_data.pop('comprobante', None)
+        sede_id = validated_data.pop('sede_id', None)
+        espacios_str = validated_data.pop('espacios', None)
 
         # 1. Crear Persona
         persona = Persona.objects.create(
@@ -186,7 +225,16 @@ class EmpleadoUserCreateSerializer(serializers.Serializer):
             password=validated_data['password'],
             persona=persona
         )
-        # 3. Crear Empleado con archivos
+
+        # Obtener sede si se proporcionó
+        sede = None
+        if sede_id:
+            try:
+                sede = Sede.objects.get(pk=sede_id)
+            except Sede.DoesNotExist:
+                pass
+
+        # 3. Crear Empleado con archivos y sede
         empleado = Empleado.objects.create(
             persona=persona,
             puesto=validated_data['puesto'],
@@ -198,10 +246,70 @@ class EmpleadoUserCreateSerializer(serializers.Serializer):
             rfc=validated_data['rfc'],
             identificacion=identificacion,
             comprobante_domicilio=comprobante,
+            sede=sede
         )
+
         # 4. Asignar Rol
         rol = Rol.objects.get(pk=validated_data['rol_id'])
         PersonaRol.objects.create(persona=persona, rol=rol)
+
+        # 5. Crear registro específico del rol con sede y espacios
+        rol_nombre = rol.nombre.lower()
+
+        if sede:  # Solo crear registro específico si hay sede asignada
+            if 'entrenador' in rol_nombre:
+                entrenador = Entrenador.objects.create(
+                    empleado=empleado,
+                    sede=sede
+                )
+                # Asignar espacios si se proporcionaron
+                if espacios_str:
+                    try:
+                        espacios_ids = json.loads(espacios_str) if isinstance(espacios_str, str) else espacios_str
+                        espacios = Espacio.objects.filter(id__in=espacios_ids)
+                        entrenador.espacio.set(espacios)
+                    except:
+                        pass
+
+            elif 'cajero' in rol_nombre:
+                cajero = Cajero.objects.create(
+                    empleado=empleado,
+                    sede=sede
+                )
+                if espacios_str:
+                    try:
+                        espacios_ids = json.loads(espacios_str) if isinstance(espacios_str, str) else espacios_str
+                        espacios = Espacio.objects.filter(id__in=espacios_ids)
+                        cajero.espacio.set(espacios)
+                    except:
+                        pass
+
+            elif 'limpieza' in rol_nombre:
+                personal = PersonalLimpieza.objects.create(
+                    empleado=empleado,
+                    sede=sede
+                )
+                if espacios_str:
+                    try:
+                        espacios_ids = json.loads(espacios_str) if isinstance(espacios_str, str) else espacios_str
+                        espacios = Espacio.objects.filter(id__in=espacios_ids)
+                        personal.espacio.set(espacios)
+                    except:
+                        pass
+
+            elif 'supervisor' in rol_nombre:
+                supervisor = SupervisorEspacio.objects.create(
+                    empleado=empleado,
+                    sede=sede
+                )
+                if espacios_str:
+                    try:
+                        espacios_ids = json.loads(espacios_str) if isinstance(espacios_str, str) else espacios_str
+                        espacios = Espacio.objects.filter(id__in=espacios_ids)
+                        supervisor.espacio.set(espacios)
+                    except:
+                        pass
+
         return user
 
     def update(self, instance, validated_data):
@@ -271,6 +379,10 @@ class EmpleadoUserDetailSerializer(serializers.Serializer):
     rfc = serializers.CharField(source='persona.empleado.rfc')
     rol_id = serializers.SerializerMethodField()
     rol_nombre = serializers.SerializerMethodField()
+    # Instalaciones
+    sede_id = serializers.SerializerMethodField()
+    sede_nombre = serializers.SerializerMethodField()
+    espacios_nombres = serializers.SerializerMethodField()
     # Documentos
     identificacion_url = serializers.SerializerMethodField()
     comprobante_url = serializers.SerializerMethodField()
@@ -283,6 +395,75 @@ class EmpleadoUserDetailSerializer(serializers.Serializer):
     def get_rol_nombre(self, obj):
         persona_rol = PersonaRol.objects.filter(persona=obj.persona).first()
         return persona_rol.rol.nombre if persona_rol else None
+
+    def get_sede_id(self, obj):
+        try:
+            empleado = Empleado.objects.get(persona=obj.persona)
+
+            # Primero verificar si tiene sede en Empleado
+            if empleado.sede:
+                return empleado.sede.id
+
+            # Si no tiene sede en Empleado, buscar en modelos específicos
+            if hasattr(empleado, 'entrenador') and empleado.entrenador.sede:
+                return empleado.entrenador.sede.id
+            elif hasattr(empleado, 'cajero') and empleado.cajero.sede:
+                return empleado.cajero.sede.id
+            elif hasattr(empleado, 'personallimpieza') and empleado.personallimpieza.sede:
+                return empleado.personallimpieza.sede.id
+            elif hasattr(empleado, 'supervisorespacio') and empleado.supervisorespacio.sede:
+                return empleado.supervisorespacio.sede.id
+
+            return None
+        except Empleado.DoesNotExist:
+            return None
+        except Exception:
+            return None
+
+    def get_sede_nombre(self, obj):
+        try:
+            empleado = Empleado.objects.get(persona=obj.persona)
+
+            # Primero verificar si tiene sede en Empleado
+            if empleado.sede:
+                return empleado.sede.nombre
+
+            # Si no tiene sede en Empleado, buscar en modelos específicos
+            if hasattr(empleado, 'entrenador') and empleado.entrenador.sede:
+                return empleado.entrenador.sede.nombre
+            elif hasattr(empleado, 'cajero') and empleado.cajero.sede:
+                return empleado.cajero.sede.nombre
+            elif hasattr(empleado, 'personallimpieza') and empleado.personallimpieza.sede:
+                return empleado.personallimpieza.sede.nombre
+            elif hasattr(empleado, 'supervisorespacio') and empleado.supervisorespacio.sede:
+                return empleado.supervisorespacio.sede.nombre
+
+            return None
+        except Empleado.DoesNotExist:
+            return None
+        except Exception:
+            return None
+
+    def get_espacios_nombres(self, obj):
+        try:
+            empleado = Empleado.objects.get(persona=obj.persona)
+            # Buscar en los modelos especificos (Entrenador, Cajero, etc.)
+            espacios = []
+
+            if hasattr(empleado, 'entrenador'):
+                espacios = list(empleado.entrenador.espacio.values_list('nombre', flat=True))
+            elif hasattr(empleado, 'cajero'):
+                espacios = list(empleado.cajero.espacio.values_list('nombre', flat=True))
+            elif hasattr(empleado, 'personallimpieza'):
+                espacios = list(empleado.personallimpieza.espacio.values_list('nombre', flat=True))
+            elif hasattr(empleado, 'supervisorespacio'):
+                espacios = list(empleado.supervisorespacio.espacio.values_list('nombre', flat=True))
+
+            return espacios
+        except Empleado.DoesNotExist:
+            return []
+        except Exception:
+            return []
 
     def get_identificacion_url(self, obj):
         try:

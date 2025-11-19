@@ -4,61 +4,77 @@ from rest_framework.response import Response
 from django.db.models import Q
 from .models import CategoriaProducto, Producto, Inventario
 from .serializers import CategoriaProductoSerializer, ProductoSerializer, InventarioSerializer
+from .permissions import EsAdministradorOCajero
 
 
 # -------------------------------
 # CATEGORÍA PRODUCTO
 # -------------------------------
 class CategoriaProductoViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para gestionar categorías de productos.
+    Solo accesible por Administrador y Cajero.
+    """
     queryset = CategoriaProducto.objects.all().order_by('nombre')
     serializer_class = CategoriaProductoSerializer
+    permission_classes = [EsAdministradorOCajero]
 
 
 # -------------------------------
 # PRODUCTOS
 # -------------------------------
 class ProductoViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para gestionar productos.
+    Solo accesible por Administrador y Cajero.
+    """
     queryset = Producto.objects.all().order_by('nombre')
     serializer_class = ProductoSerializer
+    permission_classes = [EsAdministradorOCajero]
 
     def perform_update(self, serializer):
         """
-        Cuando se actualiza un producto, sincroniza el inventario relacionado.
+        Actualiza un producto sin modificar inventarios.
+        El stock se gestiona desde el modelo Inventario por sede.
         """
         producto = serializer.save()
-
-        try:
-            inventario = Inventario.objects.get(producto=producto)
-            inventario.cantidad_actual = producto.stock
-            inventario.save(update_fields=['cantidad_actual'])
-            print(f"✅ Inventario sincronizado desde API: {producto.nombre} → {producto.stock}")
-        except Inventario.DoesNotExist:
-            Inventario.objects.create(
-                producto=producto,
-                cantidad_actual=producto.stock,
-                minimo=5
-            )
-            print(f"🆕 Inventario creado automáticamente para {producto.nombre}")
+        print(f"✅ Producto actualizado: {producto.nombre}")
 
     def perform_create(self, serializer):
         """
-        Cuando se crea un nuevo producto, también crea su inventario automáticamente.
+        Crea un producto. El serializer se encarga de crear el inventario inicial.
         """
         producto = serializer.save()
-        Inventario.objects.create(
-            producto=producto,
-            cantidad_actual=producto.stock,
-            minimo=5
-        )
-        print(f"🆕 Inventario creado automáticamente (API): {producto.nombre}")
+        print(f"🆕 Producto creado: {producto.nombre}")
+
+    def perform_destroy(self, instance):
+        """
+        Elimina un producto. Si tiene ventas asociadas, retorna error claro.
+        """
+        from django.db.models import ProtectedError
+        from rest_framework.exceptions import ValidationError
+
+        try:
+            instance.delete()
+            print(f"🗑️ Producto eliminado: {instance.nombre}")
+        except ProtectedError:
+            raise ValidationError({
+                'detail': 'No se puede eliminar este producto porque tiene ventas asociadas. '
+                         'Puedes desactivarlo editándolo y cambiando su estado a "Inactivo".'
+            })
 
 
 # -------------------------------
 # INVENTARIO
 # -------------------------------
 class InventarioViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para gestionar inventario.
+    Solo accesible por Administrador y Cajero.
+    """
     queryset = Inventario.objects.select_related('producto', 'sede').all().order_by('producto__nombre')
     serializer_class = InventarioSerializer
+    permission_classes = [EsAdministradorOCajero]
 
     @action(detail=False, methods=['get'])
     def filtrar(self, request):

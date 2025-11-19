@@ -1,40 +1,44 @@
 :root {
-  /* Colores principales - Tema Oscuro */
-  --bg-primary: #0a0a0a;
-  --bg-secondary: #1a1a1a;
-  --bg-tertiary: #2a2a2a;
-  --bg-card: #1e1e1e;
-  --bg-hover: #2d2d2d;
+  /* Colores principales - Tema Minimalista Fondo Blanco */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary: #e8e8e8;
+  --bg-card: #fafafa;
+  --bg-hover: #f0f0f0;
 
   /* Textos */
-  --text-primary: #ffffff;
-  --text-secondary: #a0a0a0;
-  --text-tertiary: #6b7280;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
 
   /* Acentos */
-  --accent-primary: #3b82f6;
-  --accent-primary-hover: #2563eb;
-  --accent-secondary: #8b5cf6;
+  --accent-primary: #2a2a2a;
+  --accent-primary-hover: #1a1a1a;
+  --accent-secondary: #4a4a4a;
 
-  /* Estados */
-  --success: #10b981;
-  --success-bg: #064e3b;
+  /* Estados - Colores Funcionales */
+  --success: #22c55e;
+  --success-bg: #f0fdf4;
+  --success-hover: #16a34a;
   --danger: #ef4444;
-  --danger-bg: #7f1d1d;
+  --danger-bg: #fef2f2;
+  --danger-hover: #dc2626;
   --warning: #f59e0b;
-  --warning-bg: #78350f;
+  --warning-bg: #fffbeb;
+  --warning-hover: #d97706;
   --info: #3b82f6;
-  --info-bg: #1e3a8a;
+  --info-bg: #eff6ff;
 
   /* Bordes */
-  --border-color: #333333;
-  --border-color-light: #404040;
+  --border-color: #e0e0e0;
+  --border-color-light: #d0d0d0;
+  --border-color-dark: #b0b0b0;
 
   /* Sombras */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.7);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.8);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 
   /* Espaciado */
   --spacing-xs: 0.25rem;
@@ -93,10 +97,10 @@ code {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--bg-tertiary);
+  background: var(--border-color-light);
   border-radius: var(--radius-md);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--border-color-light);
+  background: var(--border-color-dark);
 }

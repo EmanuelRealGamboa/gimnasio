@@ -32,10 +32,15 @@ class ClienteViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Permite filtrar clientes por estado, nombre, email, etc.
-        Parámetros de query: estado, search
+        Permite filtrar clientes por estado, nombre, email, sede, etc.
+        Parámetros de query: estado, search, sede
         """
-        queryset = Cliente.objects.all().select_related('persona')
+        queryset = Cliente.objects.all().select_related('persona', 'sede')
+
+        # Filtrar por sede
+        sede = self.request.query_params.get('sede', None)
+        if sede:
+            queryset = queryset.filter(sede_id=sede)
 
         # Filtrar por estado
         estado = self.request.query_params.get('estado', None)
@@ -118,19 +123,33 @@ class ClienteViewSet(viewsets.ModelViewSet):
     def estadisticas(self, request):
         """
         Endpoint para obtener estadísticas de clientes
-        GET /api/clientes/estadisticas/
+        GET /api/clientes/estadisticas/?sede={id}
         """
-        total_clientes = Cliente.objects.count()
-        activos = Cliente.objects.filter(estado='activo').count()
-        inactivos = Cliente.objects.filter(estado='inactivo').count()
-        suspendidos = Cliente.objects.filter(estado='suspendido').count()
+        # Filtrar por sede si se proporciona
+        queryset = Cliente.objects.all()
+        sede = request.query_params.get('sede', None)
+        if sede:
+            queryset = queryset.filter(sede_id=sede)
+
+        total_clientes = queryset.count()
+        activos = queryset.filter(estado='activo').count()
+        inactivos = queryset.filter(estado='inactivo').count()
+        suspendidos = queryset.filter(estado='suspendido').count()
 
         # Estadísticas por nivel de experiencia
-        principiantes = Cliente.objects.filter(nivel_experiencia='principiante').count()
-        intermedios = Cliente.objects.filter(nivel_experiencia='intermedio').count()
-        avanzados = Cliente.objects.filter(nivel_experiencia='avanzado').count()
+        principiantes = queryset.filter(nivel_experiencia='principiante').count()
+        intermedios = queryset.filter(nivel_experiencia='intermedio').count()
+        avanzados = queryset.filter(nivel_experiencia='avanzado').count()
 
-        return Response({
+        # Estadísticas por sede (si no se filtra por sede específica)
+        por_sede = []
+        if not sede:
+            from django.db.models import Count
+            por_sede = list(Cliente.objects.values('sede__nombre').annotate(
+                total=Count('persona')
+            ).order_by('-total'))
+
+        response_data = {
             'total_clientes': total_clientes,
             'por_estado': {
                 'activos': activos,
@@ -142,4 +161,9 @@ class ClienteViewSet(viewsets.ModelViewSet):
                 'intermedios': intermedios,
                 'avanzados': avanzados,
             }
-        })
+        }
+
+        if not sede:
+            response_data['por_sede'] = por_sede
+
+        return Response(response_data)

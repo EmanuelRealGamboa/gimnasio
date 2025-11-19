@@ -23,6 +23,9 @@ class ClienteListSerializer(serializers.Serializer):
     estado = serializers.CharField()
     fecha_registro = serializers.DateField()
     objetivo_fitness = serializers.CharField()
+    sede = serializers.IntegerField(source='sede.id')
+    sede_nombre = serializers.CharField(source='sede.nombre')
+    tiene_membresia_activa = serializers.SerializerMethodField()
 
     def get_email(self, obj):
         try:
@@ -30,6 +33,14 @@ class ClienteListSerializer(serializers.Serializer):
             return user.email
         except User.DoesNotExist:
             return None
+
+    def get_tiene_membresia_activa(self, obj):
+        """Verificar si el cliente tiene una membresía activa"""
+        from membresias.models import SuscripcionMembresia
+        return SuscripcionMembresia.objects.filter(
+            cliente=obj,
+            estado='activa'
+        ).exists()
 
 
 class ClienteCreateSerializer(serializers.Serializer):
@@ -48,6 +59,7 @@ class ClienteCreateSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True, min_length=6, required=False, allow_blank=True)
 
     # Datos de cliente (Cliente)
+    sede = serializers.IntegerField(help_text="ID de la sede del cliente")
     objetivo_fitness = serializers.CharField(max_length=255, required=False, allow_blank=True)
     nivel_experiencia = serializers.ChoiceField(
         choices=Cliente.NIVEL_EXPERIENCIA_CHOICES,
@@ -86,6 +98,9 @@ class ClienteCreateSerializer(serializers.Serializer):
         telefono_contacto = validated_data.pop('telefono_contacto', None)
         parentesco = validated_data.pop('parentesco', None)
 
+        # Extraer sede
+        sede_id = validated_data.pop('sede')
+
         # 1. Crear Persona
         persona = Persona.objects.create(
             nombre=validated_data['nombre'],
@@ -104,9 +119,14 @@ class ClienteCreateSerializer(serializers.Serializer):
             persona=persona
         )
 
-        # 3. Crear Cliente
+        # 3. Obtener sede
+        from instalaciones.models import Sede
+        sede = Sede.objects.get(pk=sede_id)
+
+        # 4. Crear Cliente
         cliente = Cliente.objects.create(
             persona=persona,
+            sede=sede,
             objetivo_fitness=validated_data.get('objetivo_fitness', ''),
             nivel_experiencia=validated_data.get('nivel_experiencia', 'principiante'),
             estado=validated_data.get('estado', 'activo'),
@@ -138,6 +158,9 @@ class ClienteCreateSerializer(serializers.Serializer):
         telefono_contacto = validated_data.pop('telefono_contacto', None)
         parentesco = validated_data.pop('parentesco', None)
 
+        # Extraer sede si viene
+        sede_id = validated_data.pop('sede', None)
+
         # Actualizar Persona
         persona = instance.persona
         for field in ['nombre', 'apellido_paterno', 'apellido_materno', 'fecha_nacimiento', 'sexo', 'direccion', 'telefono']:
@@ -155,6 +178,11 @@ class ClienteCreateSerializer(serializers.Serializer):
             user.save()
         except User.DoesNotExist:
             pass
+
+        # Actualizar sede si viene
+        if sede_id:
+            from instalaciones.models import Sede
+            instance.sede = Sede.objects.get(pk=sede_id)
 
         # Actualizar Cliente
         for field in ['objetivo_fitness', 'nivel_experiencia', 'estado']:
@@ -192,6 +220,8 @@ class ClienteDetailSerializer(serializers.Serializer):
     email = serializers.SerializerMethodField()
 
     # Datos de Cliente
+    sede = serializers.IntegerField(source='sede.id')
+    sede_nombre = serializers.CharField(source='sede.nombre')
     objetivo_fitness = serializers.CharField()
     nivel_experiencia = serializers.CharField()
     estado = serializers.CharField()

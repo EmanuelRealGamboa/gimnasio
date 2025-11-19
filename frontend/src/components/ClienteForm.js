@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import clienteService from '../services/clienteService';
+import sedeService from '../services/sedeService';
 import './ClienteForm.css';
 
 function ClienteForm() {
@@ -18,6 +19,7 @@ function ClienteForm() {
     telefono: '',
     email: '',
     password: '',
+    sede: '',
     objetivo_fitness: '',
     nivel_experiencia: 'principiante',
     estado: 'activo',
@@ -26,15 +28,26 @@ function ClienteForm() {
     parentesco: ''
   });
 
+  const [sedes, setSedes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
+    fetchSedes();
     if (isEditMode) {
       fetchCliente();
     }
   }, [id]);
+
+  const fetchSedes = async () => {
+    try {
+      const response = await sedeService.getSedes();
+      setSedes(response.data);
+    } catch (err) {
+      console.error('Error al cargar sedes:', err);
+    }
+  };
 
   const fetchCliente = async () => {
     try {
@@ -52,6 +65,7 @@ function ClienteForm() {
         telefono: cliente.telefono || '',
         email: cliente.email || '',
         password: '', // No cargar password en edición
+        sede: cliente.sede || '',
         objetivo_fitness: cliente.objetivo_fitness || '',
         nivel_experiencia: cliente.nivel_experiencia || 'principiante',
         estado: cliente.estado || 'activo',
@@ -93,6 +107,11 @@ function ClienteForm() {
       newErrors.password = 'La contraseña es requerida';
     } else if (formData.password && formData.password.length < 6) {
       newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
+    }
+
+    // Sede es requerida
+    if (!formData.sede) {
+      newErrors.sede = 'La sede es requerida';
     }
 
     setErrors(newErrors);
@@ -364,6 +383,31 @@ function ClienteForm() {
                 <option value="inactivo">Inactivo</option>
                 <option value="suspendido">Suspendido</option>
               </select>
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="sede">
+                Sede <span className="required">*</span>
+              </label>
+              <select
+                id="sede"
+                name="sede"
+                value={formData.sede}
+                onChange={handleChange}
+                className={errors.sede ? 'error' : ''}
+              >
+                <option value="">Selecciona una sede</option>
+                {sedes.map(sede => (
+                  <option key={sede.id} value={sede.id}>
+                    {sede.nombre}
+                  </option>
+                ))}
+              </select>
+              {errors.sede && (
+                <span className="error-message">{errors.sede}</span>
+              )}
             </div>
           </div>
 

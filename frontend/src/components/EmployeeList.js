@@ -8,21 +8,21 @@ import './EmployeeList.css';
 
 // Función para obtener el badge del rol
 const getRoleBadge = (rolNombre) => {
-  if (!rolNombre) return { color: '#6b7280', icon: '👤' };
+  if (!rolNombre) return { color: '#666666', icon: '👤' };
 
   // Normalizar el nombre del rol para hacer la comparación
   const rolNormalizado = rolNombre.toLowerCase().trim();
 
   const roleMap = {
-    'administrador': { color: '#ef4444', icon: '👑' },
-    'entrenador': { color: '#10b981', icon: '💪' },
-    'recepcionista': { color: '#ec4899', icon: '🎫' },
-    'cajero': { color: '#3b82f6', icon: '💰' },
-    'supervisor de espacio': { color: '#8b5cf6', icon: '🏗️' },
-    'personal de limpieza': { color: '#06b6d4', icon: '🧹' }
+    'administrador': { color: '#2a2a2a', icon: '👑' },
+    'entrenador': { color: '#22c55e', icon: '💪' },
+    'recepcionista': { color: '#f59e0b', icon: '🎫' },
+    'cajero': { color: '#2a2a2a', icon: '💰' },
+    'supervisor de espacio': { color: '#666666', icon: '🏗️' },
+    'personal de limpieza': { color: '#999999', icon: '🧹' }
   };
 
-  return roleMap[rolNormalizado] || { color: '#6b7280', icon: '👤' };
+  return roleMap[rolNormalizado] || { color: '#666666', icon: '👤' };
 };
 
 function EmployeeList() {
@@ -38,12 +38,14 @@ function EmployeeList() {
   const [roles, setRoles] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
+  const [estadisticas, setEstadisticas] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchEmployees();
     fetchSedes();
     fetchRoles();
+    fetchEstadisticas();
   }, []);
 
   useEffect(() => {
@@ -81,6 +83,15 @@ function EmployeeList() {
     } catch (err) {
       console.error('Error al cargar roles:', err);
       setRoles([]);
+    }
+  };
+
+  const fetchEstadisticas = async () => {
+    try {
+      const response = await employeeService.getEstadisticas();
+      setEstadisticas(response.data);
+    } catch (err) {
+      console.error('Error al cargar estadísticas:', err);
     }
   };
 
@@ -186,6 +197,218 @@ function EmployeeList() {
 
       {error && <div className="error-message">{error}</div>}
 
+      {/* Estadísticas */}
+      {estadisticas && (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+          gap: '0.5rem',
+          marginBottom: '0.5rem'
+        }}>
+          {/* Total Empleados */}
+          <div style={{
+            background: 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)',
+            padding: '1rem 1.25rem',
+            borderRadius: '12px',
+            border: '1px solid #e8e8e8',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1rem'
+          }}>
+            <div style={{
+              width: '50px',
+              height: '50px',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.5rem',
+              boxShadow: '0 2px 6px rgba(42, 42, 42, 0.4)',
+              flexShrink: 0
+            }}>
+              👥
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{
+                color: '#1a1a1a',
+                fontSize: '1.75rem',
+                fontWeight: '700',
+                lineHeight: '1',
+                marginBottom: '0.25rem'
+              }}>
+                {estadisticas.total_empleados || 0}
+              </div>
+              <div style={{
+                color: '#666666',
+                fontSize: '0.75rem',
+                fontWeight: '500',
+                textTransform: 'capitalize'
+              }}>
+                Total Empleados
+              </div>
+            </div>
+          </div>
+
+          {/* Activos */}
+          <div style={{
+            background: 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)',
+            padding: '1rem 1.25rem',
+            borderRadius: '12px',
+            border: '1px solid #e8e8e8',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1rem'
+          }}>
+            <div style={{
+              width: '50px',
+              height: '50px',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.5rem',
+              boxShadow: '0 2px 6px rgba(34, 197, 94, 0.4)',
+              flexShrink: 0
+            }}>
+              ✓
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{
+                color: '#22c55e',
+                fontSize: '1.75rem',
+                fontWeight: '700',
+                lineHeight: '1',
+                marginBottom: '0.25rem'
+              }}>
+                {estadisticas.por_estado?.activos || 0}
+              </div>
+              <div style={{
+                color: '#666666',
+                fontSize: '0.75rem',
+                fontWeight: '500',
+                textTransform: 'capitalize'
+              }}>
+                Activos
+              </div>
+            </div>
+          </div>
+
+          {/* Inactivos */}
+          <div style={{
+            background: 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)',
+            padding: '1rem 1.25rem',
+            borderRadius: '12px',
+            border: '1px solid #e8e8e8',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1rem'
+          }}>
+            <div style={{
+              width: '50px',
+              height: '50px',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '1.5rem',
+              boxShadow: '0 2px 6px rgba(239, 68, 68, 0.4)',
+              flexShrink: 0
+            }}>
+              ⏸️
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{
+                color: '#ef4444',
+                fontSize: '1.75rem',
+                fontWeight: '700',
+                lineHeight: '1',
+                marginBottom: '0.25rem'
+              }}>
+                {estadisticas.por_estado?.inactivos || 0}
+              </div>
+              <div style={{
+                color: '#666666',
+                fontSize: '0.75rem',
+                fontWeight: '500',
+                textTransform: 'capitalize'
+              }}>
+                Inactivos
+              </div>
+            </div>
+          </div>
+
+          {/* Empleados por Sede */}
+          {estadisticas.por_sede && estadisticas.por_sede.length > 0 && (
+            <div style={{
+              background: 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)',
+              padding: '1.5rem',
+              borderRadius: '16px',
+              border: '1px solid #e8e8e8',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              gridColumn: estadisticas.por_sede.length > 2 ? 'span 1' : 'span 1'
+            }}>
+              <div style={{
+                marginBottom: '1.25rem',
+                color: '#1a1a1a',
+                fontSize: '1rem',
+                fontWeight: '600',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                <span style={{ fontSize: '1.5rem' }}>🏢</span>
+                Empleados por Sede
+              </div>
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.75rem',
+                maxHeight: '200px',
+                overflowY: 'auto'
+              }}>
+                {estadisticas.por_sede.map((sede, index) => (
+                  <div key={index} style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '0.75rem 1rem',
+                    background: '#fafafa',
+                    borderRadius: '10px',
+                    border: '1px solid #e8e8e8'
+                  }}>
+                    <span style={{
+                      color: '#1a1a1a',
+                      fontSize: '0.95rem',
+                      fontWeight: '500'
+                    }}>
+                      {sede.sede__nombre || 'Sin sede'}
+                    </span>
+                    <span style={{
+                      background: 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)',
+                      color: '#ffffff',
+                      fontWeight: '700',
+                      fontSize: '1rem',
+                      padding: '0.25rem 0.75rem',
+                      borderRadius: '8px',
+                      minWidth: '45px',
+                      textAlign: 'center'
+                    }}>
+                      {sede.total}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="filters-container">
         <div className="search-box">
           <span className="search-icon">🔍</span>
@@ -221,7 +444,7 @@ function EmployeeList() {
 
         <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
           <div className="filter-sede">
-            <label htmlFor="sedeFilter" style={{ marginRight: '0.5rem', color: '#e2e8f0', fontWeight: '500' }}>
+            <label htmlFor="sedeFilter" style={{ marginRight: '0.5rem', color: '#1a1a1a', fontWeight: '600' }}>
               Filtrar por Sede:
             </label>
             <select
@@ -249,7 +472,7 @@ function EmployeeList() {
           </div>
 
           <div className="filter-rol">
-            <label htmlFor="rolFilter" style={{ marginRight: '0.5rem', color: '#e2e8f0', fontWeight: '500' }}>
+            <label htmlFor="rolFilter" style={{ marginRight: '0.5rem', color: '#1a1a1a', fontWeight: '600' }}>
               Filtrar por Rol:
             </label>
             <select

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import membresiaService from '../services/membresiaService';
+import instalacionesService from '../services/instalacionesService';
 import './ClienteForm.css'; // Reutilizamos estilos
 
 function MembresiaForm() {
@@ -15,9 +16,14 @@ function MembresiaForm() {
     descripcion: '',
     duracion_dias: '',
     beneficios: '',
-    activo: true
+    activo: true,
+    sede: '',
+    espacios_incluidos: [],
+    permite_todas_sedes: false
   });
 
+  const [sedes, setSedes] = useState([]);
+  const [espacios, setEspacios] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [errors, setErrors] = useState({});
@@ -32,10 +38,37 @@ function MembresiaForm() {
   ];
 
   useEffect(() => {
+    fetchSedes();
     if (isEditMode) {
       fetchMembresia();
     }
   }, [id]);
+
+  useEffect(() => {
+    if (formData.sede && !formData.permite_todas_sedes) {
+      fetchEspaciosBySede(formData.sede);
+    } else {
+      setEspacios([]);
+    }
+  }, [formData.sede, formData.permite_todas_sedes]);
+
+  const fetchSedes = async () => {
+    try {
+      const response = await instalacionesService.getSedes();
+      setSedes(response.data.results || response.data);
+    } catch (err) {
+      console.error('Error al cargar sedes:', err);
+    }
+  };
+
+  const fetchEspaciosBySede = async (sedeId) => {
+    try {
+      const response = await instalacionesService.getEspaciosBySede(sedeId);
+      setEspacios(response.data.results || response.data);
+    } catch (err) {
+      console.error('Error al cargar espacios:', err);
+    }
+  };
 
   const fetchMembresia = async () => {
     try {
@@ -49,7 +82,10 @@ function MembresiaForm() {
         descripcion: membresia.descripcion || '',
         duracion_dias: membresia.duracion_dias || '',
         beneficios: membresia.beneficios || '',
-        activo: membresia.activo !== undefined ? membresia.activo : true
+        activo: membresia.activo !== undefined ? membresia.activo : true,
+        sede: membresia.sede || '',
+        espacios_incluidos: membresia.espacios_incluidos || [],
+        permite_todas_sedes: membresia.permite_todas_sedes || false
       });
     } catch (err) {
       setError('Error al cargar la membresía');
@@ -74,6 +110,10 @@ function MembresiaForm() {
       newErrors.duracion_dias = 'La duración debe ser mayor a 0';
     }
 
+    if (!formData.permite_todas_sedes && !formData.sede) {
+      newErrors.sede = 'Debe seleccionar una sede o marcar como membresía multi-sede';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -84,6 +124,17 @@ function MembresiaForm() {
     let newValue = value;
     if (type === 'checkbox') {
       newValue = checked;
+
+      // Si se marca permite_todas_sedes, limpiar sede y espacios
+      if (name === 'permite_todas_sedes' && checked) {
+        setFormData(prev => ({
+          ...prev,
+          permite_todas_sedes: true,
+          sede: '',
+          espacios_incluidos: []
+        }));
+        return;
+      }
     } else if (name === 'tipo') {
       // Auto-completar duración según el tipo
       const tipoSeleccionado = tiposMembresia.find(t => t.value === value);
@@ -95,6 +146,14 @@ function MembresiaForm() {
         }));
         return;
       }
+    } else if (name === 'sede') {
+      // Limpiar espacios al cambiar de sede
+      setFormData(prev => ({
+        ...prev,
+        sede: value,
+        espacios_incluidos: []
+      }));
+      return;
     }
 
     setFormData(prev => ({
@@ -108,6 +167,18 @@ function MembresiaForm() {
         [name]: ''
       }));
     }
+  };
+
+  const handleEspacioToggle = (espacioId) => {
+    setFormData(prev => {
+      const isSelected = prev.espacios_incluidos.includes(espacioId);
+      return {
+        ...prev,
+        espacios_incluidos: isSelected
+          ? prev.espacios_incluidos.filter(id => id !== espacioId)
+          : [...prev.espacios_incluidos, espacioId]
+      };
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -269,6 +340,65 @@ function MembresiaForm() {
               </label>
             </div>
           </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="permite_todas_sedes" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  id="permite_todas_sedes"
+                  name="permite_todas_sedes"
+                  checked={formData.permite_todas_sedes}
+                  onChange={handleChange}
+                  style={{ width: 'auto', cursor: 'pointer' }}
+                />
+                Membresía Multi-Sede (Acceso a todas las sedes)
+              </label>
+            </div>
+          </div>
+
+          {!formData.permite_todas_sedes && (
+            <>
+              <div className="form-group">
+                <label htmlFor="sede">
+                  Sede {!formData.permite_todas_sedes && <span className="required">*</span>}
+                </label>
+                <select
+                  id="sede"
+                  name="sede"
+                  value={formData.sede}
+                  onChange={handleChange}
+                  className={errors.sede ? 'error' : ''}
+                >
+                  <option value="">Selecciona una sede...</option>
+                  {sedes.map((sede) => (
+                    <option key={sede.id} value={sede.id}>{sede.nombre}</option>
+                  ))}
+                </select>
+                {errors.sede && <span className="error-text">{errors.sede}</span>}
+              </div>
+
+              {formData.sede && espacios.length > 0 && (
+                <div className="form-group">
+                  <label>Espacios Incluidos (Opcional)</label>
+                  <div className="espacios-selector">
+                    {espacios.map((espacio) => (
+                      <div key={espacio.id} className="espacio-checkbox">
+                        <label>
+                          <input
+                            type="checkbox"
+                            checked={formData.espacios_incluidos.includes(espacio.id)}
+                            onChange={() => handleEspacioToggle(espacio.id)}
+                          />
+                          <span>{espacio.nombre}</span>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
 
           <div className="form-group">
             <label htmlFor="descripcion">

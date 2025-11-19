@@ -5,8 +5,28 @@ const API_URL = 'http://localhost:8000/api/gestion-equipos/';
 // Función auxiliar para obtener el token
 const getAuthHeader = () => {
   const token = localStorage.getItem('access_token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  if (!token) {
+    // Si no hay token, redirigir al login
+    window.location.href = '/login';
+    return {};
+  }
+  return { Authorization: `Bearer ${token}` };
 };
+
+// Interceptor para manejar errores 401
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expirado o inválido
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
 
 // ==================== CATEGORÍAS DE ACTIVOS ====================
 

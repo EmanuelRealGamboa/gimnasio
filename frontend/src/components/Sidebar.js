@@ -7,6 +7,7 @@ function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [expandedMenu, setExpandedMenu] = useState(null);
   const userData = authService.getUserData();
 
   // Determinar si el usuario es administrador
@@ -55,6 +56,41 @@ function Sidebar() {
       adminOnly: true,
     },
     {
+      id: 'inventario',
+      label: 'Inventario',
+      icon: '📦',
+      path: '/inventario',
+      adminOnly: true,
+    },
+    {
+      id: 'ventas',
+      label: 'Ventas',
+      icon: '💰',
+      submenu: [
+        {
+          id: 'ventas-servicios',
+          label: 'Servicios',
+          path: '/ventas/servicios',
+        },
+        {
+          id: 'ventas-productos',
+          label: 'Productos',
+          path: '/ventas/productos',
+        },
+        {
+          id: 'ventas-historial',
+          label: 'Historial',
+          path: '/ventas/historial',
+        },
+        {
+          id: 'ventas-suscripciones',
+          label: 'Suscripciones',
+          path: '/ventas/suscripciones',
+        },
+      ],
+      adminOnly: false,
+    },
+    {
       id: 'accesos',
       label: 'Accesos',
       icon: '🔐',
@@ -69,6 +105,10 @@ function Sidebar() {
 
   const isActive = (path) => {
     return location.pathname === path || location.pathname.startsWith(path + '/');
+  };
+
+  const toggleSubmenu = (itemId) => {
+    setExpandedMenu(expandedMenu === itemId ? null : itemId);
   };
 
   return (
@@ -89,14 +129,45 @@ function Sidebar() {
 
       <nav className="sidebar-nav">
         {menuItems.map((item) => (
-          <button
-            key={item.id}
-            className={`nav-item ${isActive(item.path) ? 'active' : ''}`}
-            onClick={() => navigate(item.path)}
-          >
-            <span className="nav-icon">{item.icon}</span>
-            {!isCollapsed && <span className="nav-label">{item.label}</span>}
-          </button>
+          <div key={item.id}>
+            {item.submenu ? (
+              <>
+                <button
+                  className={`nav-item ${item.submenu.some(sub => isActive(sub.path)) ? 'active' : ''}`}
+                  onClick={() => toggleSubmenu(item.id)}
+                >
+                  <span className="nav-icon">{item.icon}</span>
+                  {!isCollapsed && (
+                    <>
+                      <span className="nav-label">{item.label}</span>
+                      <span className="submenu-arrow">{expandedMenu === item.id ? '▼' : '▶'}</span>
+                    </>
+                  )}
+                </button>
+                {!isCollapsed && expandedMenu === item.id && (
+                  <div className="submenu">
+                    {item.submenu.map((subItem) => (
+                      <button
+                        key={subItem.id}
+                        className={`submenu-item ${isActive(subItem.path) ? 'active' : ''}`}
+                        onClick={() => navigate(subItem.path)}
+                      >
+                        <span className="submenu-label">{subItem.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <button
+                className={`nav-item ${isActive(item.path) ? 'active' : ''}`}
+                onClick={() => navigate(item.path)}
+              >
+                <span className="nav-icon">{item.icon}</span>
+                {!isCollapsed && <span className="nav-label">{item.label}</span>}
+              </button>
+            )}
+          </div>
         ))}
       </nav>
 

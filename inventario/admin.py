@@ -3,6 +3,7 @@ from django import forms
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from .models import CategoriaProducto, Producto, Inventario
+from instalaciones.models import Sede
 
 
 # -------------------------------
@@ -66,32 +67,77 @@ class CategoriaProductoAdmin(admin.ModelAdmin):
 
 
 # -------------------------------
+# FORMULARIO PRODUCTO
+# -------------------------------
+class ProductoForm(forms.ModelForm):
+    """Formulario personalizado para Producto que incluye campo de sede"""
+    sede = forms.ModelChoiceField(
+        queryset=Sede.objects.all(),
+        required=True,
+        label="Sede para Inventario",
+        help_text="Selecciona la sede donde se registrará este producto en inventario"
+    )
+
+    class Meta:
+        model = Producto
+        fields = '__all__'
+
+
+# -------------------------------
 # PRODUCTO ADMIN
 # -------------------------------
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
-    list_display = ('producto_id', 'codigo', 'nombre', 'categoria', 'precio_unitario', 'stock', 'acciones')
+    form = ProductoForm
+    list_display = ('producto_id', 'codigo', 'nombre', 'categoria', 'precio_unitario', 'stock_total_display', 'activo', 'acciones')
     search_fields = ('nombre', 'codigo')
-    list_filter = (StockFilter,)
+    list_filter = ('activo', 'categoria')
+
+    def stock_total_display(self, obj):
+        """Muestra el stock total sumando todas las sedes"""
+        stock = obj.stock_total
+        if stock == 0:
+            return format_html('<span style="color: red;">0</span>')
+        elif stock < 10:
+            return format_html('<span style="color: orange;">{}</span>', stock)
+        return stock
+    stock_total_display.short_description = 'Stock Total'
+
+    def get_form(self, request, obj=None, **kwargs):
+        """Pre-llena el campo sede con la sede actual del inventario al editar"""
+        form = super().get_form(request, obj, **kwargs)
+        if obj:  # Si estamos editando (no creando)
+            try:
+                # Obtener el primer inventario asociado a este producto
+                inventario = Inventario.objects.filter(producto=obj).first()
+                if inventario:
+                    form.base_fields['sede'].initial = inventario.sede
+                    form.base_fields['sede'].help_text = f"Sede actual: {inventario.sede.nombre}. Cambiar solo si deseas mover el producto."
+            except Exception as e:
+                pass
+        return form
 
     def save_model(self, request, obj, form, change):
         """
-        ✅ Sincroniza el inventario automáticamente cuando se crea o edita un producto.
+        Crea el inventario automáticamente cuando se crea un producto.
         """
         super().save_model(request, obj, form, change)
 
-        try:
-            inventario = Inventario.objects.get(producto=obj)
-            inventario.cantidad_actual = obj.stock  # 🔄 Sincroniza stock
-            inventario.save(update_fields=['cantidad_actual'])
-            print(f"✅ Inventario actualizado desde admin: {obj.nombre} → {obj.stock}")
-        except Inventario.DoesNotExist:
-            Inventario.objects.create(
+        # Obtener la sede del formulario
+        sede = form.cleaned_data.get('sede')
+
+        if not change and sede:
+            # Si es creación, crea el inventario para la sede seleccionada con cantidad 0
+            Inventario.objects.get_or_create(
                 producto=obj,
-                cantidad_actual=obj.stock,
-                minimo=5
+                sede=sede,
+                defaults={
+                    'cantidad_actual': 0,
+                    'cantidad_minima': 5,
+                    'cantidad_maxima': 1000
+                }
             )
-            print(f"🆕 Inventario creado automáticamente desde admin: {obj.nombre}")
+            print(f"🆕 Inventario creado automáticamente para sede '{sede.nombre}': {obj.nombre}")
 
     def acciones(self, obj):
         return format_html(
@@ -111,9 +157,26 @@ class ProductoAdmin(admin.ModelAdmin):
 @admin.register(Inventario)
 class InventarioAdmin(admin.ModelAdmin):
     form = InventarioForm
-    list_display = ('inventario_id', 'get_codigo_producto', 'producto', 'sede', 'cantidad_actual', 'minimo', 'acciones')
-    list_filter = (StockFilter,)
-    search_fields = ('producto__nombre', 'producto__codigo')
+    list_display = ('inventario_id', 'get_codigo_producto', 'producto', 'sede', 'cantidad_actual', 'cantidad_minima', 'estado_stock_display', 'acciones')
+    list_filter = ('sede', StockFilter)
+    search_fields = ('producto__nombre', 'producto__codigo', 'sede__nombre')
+
+    def estado_stock_display(self, obj):
+        """Muestra el estado del stock con colores"""
+        estado = obj.estado_stock
+        colores = {
+            'agotado': 'red',
+            'critico': 'orange',
+            'bajo': 'yellow',
+            'normal': 'green',
+            'excedido': 'blue'
+        }
+        return format_html(
+            '<span style="color: {}; font-weight: bold;">{}</span>',
+            colores.get(estado, 'black'),
+            estado.upper()
+        )
+    estado_stock_display.short_description = 'Estado'
 
     def get_codigo_producto(self, obj):
         return obj.producto.codigo or "-"

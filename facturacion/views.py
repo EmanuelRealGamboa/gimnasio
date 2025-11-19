@@ -9,6 +9,7 @@ import io
 
 from .models import Factura, DetalleFactura, Pago
 from .serializers import FacturaSerializer, DetalleFacturaSerializer, PagoSerializer
+from .permissions import EsAdministradorOCajero
 
 
 # ====================================================
@@ -26,8 +27,13 @@ class FacturaFilter(FilterSet):
 # 🔹 FACTURA VIEWSET
 # ====================================================
 class FacturaViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para gestionar facturas.
+    Solo accesible por Administrador y Cajero.
+    """
     queryset = Factura.objects.all().order_by('-fecha_emision')
     serializer_class = FacturaSerializer
+    permission_classes = [EsAdministradorOCajero]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_class = FacturaFilter
     search_fields = ['cliente__persona__nombre', 'cliente__persona__apellido_paterno']
@@ -99,8 +105,13 @@ class FacturaViewSet(viewsets.ModelViewSet):
 # 🔹 DETALLE FACTURA VIEWSET
 # ====================================================
 class DetalleFacturaViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para gestionar detalles de facturas.
+    Solo accesible por Administrador y Cajero.
+    """
     queryset = DetalleFactura.objects.all().order_by('-factura__fecha_emision')
     serializer_class = DetalleFacturaSerializer
+    permission_classes = [EsAdministradorOCajero]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['factura', 'producto']
     search_fields = [
@@ -114,8 +125,13 @@ class DetalleFacturaViewSet(viewsets.ModelViewSet):
 # 🔹 PAGO VIEWSET
 # ====================================================
 class PagoViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para gestionar pagos.
+    Solo accesible por Administrador y Cajero.
+    """
     queryset = Pago.objects.all().order_by('-fecha_pago')
     serializer_class = PagoSerializer
+    permission_classes = [EsAdministradorOCajero]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['metodo_pago', 'fecha_pago', 'factura']
     search_fields = ['factura__cliente__persona__nombre', 'factura__cliente__persona__apellido_paterno']

@@ -86,6 +86,7 @@ function ClienteDetail() {
         <button
           className="btn-edit"
           onClick={() => navigate(`/clientes/edit/${id}`)}
+          style={{ color: '#ffffff' }}
         >
           ✏️ Editar Cliente
         </button>

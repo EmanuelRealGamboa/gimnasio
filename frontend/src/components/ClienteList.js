@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import clienteService from '../services/clienteService';
+import sedeService from '../services/sedeService';
 import './GestionEquipos.css';
 import './ClienteList.css';
 
@@ -11,17 +12,20 @@ function ClienteList() {
   const [searchTerm, setSearchTerm] = useState('');
   const [estadoFilter, setEstadoFilter] = useState('');
   const [nivelFilter, setNivelFilter] = useState('');
+  const [sedeFilter, setSedeFilter] = useState('');
+  const [sedes, setSedes] = useState([]);
   const [estadisticas, setEstadisticas] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchClientes();
     fetchEstadisticas();
+    fetchSedes();
   }, []);
 
   useEffect(() => {
     filterClientes();
-  }, [clientes, searchTerm, estadoFilter, nivelFilter]);
+  }, [clientes, searchTerm, estadoFilter, nivelFilter, sedeFilter]);
 
   const fetchClientes = async () => {
     try {
@@ -45,8 +49,21 @@ function ClienteList() {
     }
   };
 
+  const fetchSedes = async () => {
+    try {
+      const response = await sedeService.getSedes();
+      setSedes(response.data);
+    } catch (err) {
+      console.error('Error al cargar sedes:', err);
+    }
+  };
+
   const filterClientes = () => {
     let filtered = [...clientes];
+
+    if (sedeFilter) {
+      filtered = filtered.filter(cliente => cliente.sede === parseInt(sedeFilter));
+    }
 
     if (estadoFilter) {
       filtered = filtered.filter(cliente => cliente.estado === estadoFilter);
@@ -86,20 +103,20 @@ function ClienteList() {
 
   const getEstadoColor = (estado) => {
     const colors = {
-      'activo': '#10b981',
-      'inactivo': '#6b7280',
-      'suspendido': '#ef4444'
+      'activo': '#22c55e',
+      'inactivo': '#ef4444',
+      'suspendido': '#f59e0b'
     };
-    return colors[estado] || '#6b7280';
+    return colors[estado] || '#999999';
   };
 
   const getNivelColor = (nivel) => {
     const colors = {
-      'principiante': '#60a5fa',
+      'principiante': '#22c55e',
       'intermedio': '#f59e0b',
-      'avanzado': '#a78bfa'
+      'avanzado': '#2a2a2a'
     };
-    return colors[nivel] || '#60a5fa';
+    return colors[nivel] || '#999999';
   };
 
   const getNivelIcon = (nivel) => {
@@ -128,7 +145,7 @@ function ClienteList() {
       {estadisticas && (
         <div className="stats-grid">
           <div className="stat-card">
-            <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}>
+            <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)' }}>
               👥
             </div>
             <div className="stat-content">
@@ -138,7 +155,7 @@ function ClienteList() {
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
+            <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }}>
               ✓
             </div>
             <div className="stat-content">
@@ -148,7 +165,7 @@ function ClienteList() {
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)' }}>
+            <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }}>
               🏁
             </div>
             <div className="stat-content">
@@ -158,7 +175,7 @@ function ClienteList() {
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%)' }}>
+            <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)' }}>
               🎯
             </div>
             <div className="stat-content">
@@ -217,11 +234,31 @@ function ClienteList() {
             </select>
           </div>
 
+          <div className="filter-group">
+            <label className="filter-label">
+              <span className="filter-icon">🏢</span>
+              Sede
+            </label>
+            <select
+              value={sedeFilter}
+              onChange={(e) => setSedeFilter(e.target.value)}
+              className="filter-select"
+            >
+              <option value="">Todas las sedes</option>
+              {sedes.map(sede => (
+                <option key={sede.id} value={sede.id}>
+                  {sede.nombre}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <button
             onClick={() => {
               setSearchTerm('');
               setEstadoFilter('');
               setNivelFilter('');
+              setSedeFilter('');
             }}
             className="btn-clear-filters"
           >
@@ -271,6 +308,13 @@ function ClienteList() {
                   </h3>
 
                   <div className="cliente-detalles">
+                    {cliente.sede_nombre && (
+                      <div className="detalle-item">
+                        <span className="detalle-icon">🏢</span>
+                        <span className="detalle-text">{cliente.sede_nombre}</span>
+                      </div>
+                    )}
+
                     <div className="detalle-item">
                       <span className="detalle-icon">📞</span>
                       <span className="detalle-text">{cliente.telefono || 'Sin teléfono'}</span>

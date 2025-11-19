@@ -28,6 +28,17 @@ import DashboardEntrenador from './components/DashboardEntrenador';
 import DashboardRecepcion from './components/DashboardRecepcion';
 import DashboardSupervisor from './components/DashboardSupervisor';
 import DashboardLimpieza from './components/DashboardLimpieza';
+import CategoriaProductoList from './components/CategoriaProductoList';
+import CategoriaProductoForm from './components/CategoriaProductoForm';
+import ProductoList from './components/ProductoList';
+import ProductoForm from './components/ProductoForm';
+import InventarioList from './components/InventarioList';
+import ClientesMembresiaList from './components/ClientesMembresiaList';
+import ClienteMembresiaDetail from './components/ClienteMembresiaDetail';
+import VentaProductos from './components/VentaProductos';
+import VentasHistorial from './components/VentasHistorial';
+import SuscripcionesHistorial from './components/SuscripcionesHistorial';
+import ControlAccesos from './components/ControlAccesos';
 import ProtectedRoute from './components/ProtectedRoute';
 import authService from './services/authService';
 import './App.css';
@@ -426,6 +437,157 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <ProveedorForm />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Rutas de gestión de inventario */}
+          {/* Categorías de Productos */}
+          <Route
+            path="/inventario/categorias"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <CategoriaProductoList />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/inventario/categorias/new"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <CategoriaProductoForm />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/inventario/categorias/edit/:id"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <CategoriaProductoForm />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Productos */}
+          <Route
+            path="/inventario/productos"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <ProductoList />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/inventario/productos/new"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <ProductoForm />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/inventario/productos/edit/:id"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <ProductoForm />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Inventario */}
+          <Route
+            path="/inventario"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <InventarioList />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Ventas - Servicios (Membresías) */}
+          <Route
+            path="/ventas/servicios"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <ClientesMembresiaList />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ventas/servicios/cliente/:clienteId"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <ClienteMembresiaDetail />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Ventas - Productos (Punto de Venta) */}
+          <Route
+            path="/ventas/productos"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <VentaProductos />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Ventas - Historial */}
+          <Route
+            path="/ventas/historial"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <VentasHistorial />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Ventas - Suscripciones Historial */}
+          <Route
+            path="/ventas/suscripciones"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <SuscripcionesHistorial />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Accesos - Control */}
+          <Route
+            path="/accesos"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <ControlAccesos />
                 </Layout>
               </ProtectedRoute>
             }

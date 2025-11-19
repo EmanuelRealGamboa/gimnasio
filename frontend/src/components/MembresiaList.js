@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import membresiaService from '../services/membresiaService';
+import instalacionesService from '../services/instalacionesService';
 import ConfirmModal from './ConfirmModal';
 import './MembresiaList.css';
 
@@ -12,6 +13,8 @@ function MembresiaList() {
   const [searchTerm, setSearchTerm] = useState('');
   const [tipoFilter, setTipoFilter] = useState('');
   const [activoFilter, setActivoFilter] = useState('');
+  const [sedeFilter, setSedeFilter] = useState('');
+  const [sedes, setSedes] = useState([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [membresiaToDelete, setMembresiaToDelete] = useState(null);
   const [estadisticas, setEstadisticas] = useState(null);
@@ -27,13 +30,23 @@ function MembresiaList() {
   ];
 
   useEffect(() => {
+    fetchSedes();
     fetchMembresias();
     fetchEstadisticas();
   }, []);
 
   useEffect(() => {
     filterMembresias();
-  }, [membresias, searchTerm, tipoFilter, activoFilter]);
+  }, [membresias, searchTerm, tipoFilter, activoFilter, sedeFilter]);
+
+  const fetchSedes = async () => {
+    try {
+      const response = await instalacionesService.getSedes();
+      setSedes(response.data.results || response.data);
+    } catch (err) {
+      console.error('Error al cargar sedes:', err);
+    }
+  };
 
   const fetchMembresias = async () => {
     try {
@@ -68,6 +81,13 @@ function MembresiaList() {
     if (activoFilter !== '') {
       const isActivo = activoFilter === 'true';
       filtered = filtered.filter(m => m.activo === isActivo);
+    }
+
+    if (sedeFilter) {
+      filtered = filtered.filter(m => {
+        // Mostrar membresías multi-sede o de la sede seleccionada
+        return m.permite_todas_sedes || m.sede === parseInt(sedeFilter);
+      });
     }
 
     if (searchTerm) {
@@ -162,7 +182,7 @@ function MembresiaList() {
       {estadisticas && (
         <div className="stats-grid">
           <div className="stat-card">
-            <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}>
+            <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)' }}>
               📋
             </div>
             <div className="stat-content">
@@ -171,7 +191,7 @@ function MembresiaList() {
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
+            <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }}>
               ✓
             </div>
             <div className="stat-content">
@@ -189,7 +209,7 @@ function MembresiaList() {
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' }}>
+            <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)' }}>
               💎
             </div>
             <div className="stat-content">
@@ -208,6 +228,17 @@ function MembresiaList() {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+        </div>
+        <div className="filter-select">
+          <select
+            value={sedeFilter}
+            onChange={(e) => setSedeFilter(e.target.value)}
+          >
+            <option value="">Todas las sedes</option>
+            {sedes.map(sede => (
+              <option key={sede.id} value={sede.id}>{sede.nombre}</option>
+            ))}
+          </select>
         </div>
         <div className="filter-select">
           <select
@@ -232,72 +263,106 @@ function MembresiaList() {
         </div>
       </div>
 
-      <div className="table-container">
-        <table className="membresia-table">
-          <thead>
-            <tr>
-              <th>Nombre del Plan</th>
-              <th>Tipo</th>
-              <th>Precio</th>
-              <th>Duración</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredMembresias.length === 0 ? (
-              <tr>
-                <td colSpan="6" className="no-data">
-                  No se encontraron membresías
-                </td>
-              </tr>
-            ) : (
-              filteredMembresias.map((membresia) => (
-                <tr key={membresia.id}>
-                  <td className="membresia-nombre">{membresia.nombre_plan}</td>
-                  <td>
-                    <span className="badge-tipo">
-                      {membresia.tipo_display}
-                    </span>
-                  </td>
-                  <td style={{ fontWeight: '600', color: '#10b981' }}>
-                    {formatPrecio(membresia.precio)}
-                  </td>
-                  <td>{membresia.duracion_dias ? `${membresia.duracion_dias} días` : 'N/A'}</td>
-                  <td>
-                    <span className={`badge-estado ${membresia.activo ? 'badge-activo' : 'badge-inactivo'}`}>
-                      {membresia.activo ? 'Activa' : 'Inactiva'}
-                    </span>
-                  </td>
-                  <td className="actions">
-                    <button
-                      className="btn-action btn-view"
-                      onClick={() => handleToggleActivo(membresia)}
-                      title={membresia.activo ? 'Desactivar' : 'Activar'}
-                    >
-                      {membresia.activo ? '🔒' : '🔓'}
-                    </button>
-                    <button
-                      className="btn-action btn-edit"
-                      onClick={() => navigate(`/membresias/edit/${membresia.id}`)}
-                      title="Editar"
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      className="btn-action btn-delete"
-                      onClick={() => handleDeleteClick(membresia)}
-                      title="Eliminar"
-                    >
-                      🗑️
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      {filteredMembresias.length === 0 ? (
+        <div className="no-data-container">
+          <div className="no-data-icon">🎫</div>
+          <p>No se encontraron membresías</p>
+        </div>
+      ) : (
+        <div className="membresias-grid">
+          {filteredMembresias.map((membresia) => (
+            <div key={membresia.id} className="membresia-card">
+              {/* Header: Icono y Badge de Estado */}
+              <div className="membresia-card-header">
+                <div className="membresia-avatar">
+                  <span className="avatar-icon">💳</span>
+                </div>
+                <span className={`badge-estado-top ${membresia.activo ? 'badge-activo' : 'badge-inactivo'}`}>
+                  {membresia.activo ? '✓ ACTIVO' : 'INACTIVO'}
+                </span>
+              </div>
+
+              {/* Título del Plan */}
+              <div className="membresia-card-title">
+                <h3>{membresia.nombre_plan}</h3>
+              </div>
+
+              {/* Información con Iconos */}
+              <div className="membresia-card-info">
+                <div className="info-row">
+                  <span className="info-icon">🏢</span>
+                  <div className="info-content">
+                    {membresia.permite_todas_sedes ? (
+                      <span className="badge-multi-sede">⭐ Todas las sedes</span>
+                    ) : (
+                      <span>{membresia.sede_nombre || 'N/A'}</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="info-row">
+                  <span className="info-icon">💰</span>
+                  <div className="info-content">
+                    <span className="info-value-highlight">{formatPrecio(membresia.precio)}</span>
+                  </div>
+                </div>
+
+                <div className="info-row">
+                  <span className="info-icon">📅</span>
+                  <div className="info-content">
+                    <span>Duración: {membresia.duracion_dias ? `${membresia.duracion_dias} días` : 'N/A'}</span>
+                  </div>
+                </div>
+
+                <div className="info-row">
+                  <span className="info-icon">🎯</span>
+                  <div className="info-content">
+                    <span>Espacios: {membresia.espacios_count || 0}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Badge de Tipo */}
+              <div className="membresia-card-type">
+                <span className="badge-tipo-plan">{membresia.tipo_display}</span>
+              </div>
+
+              {/* Separador */}
+              <div className="card-divider"></div>
+
+              {/* Botones de Acción */}
+              <div className="membresia-card-actions">
+                <button
+                  className="btn-action-detailed btn-view"
+                  onClick={() => handleToggleActivo(membresia)}
+                  title={membresia.activo ? 'Desactivar' : 'Activar'}
+                >
+                  <span className="btn-icon">{membresia.activo ? '🔒' : '🔓'}</span>
+                  <span className="btn-text">{membresia.activo ? 'Desactivar' : 'Activar'}</span>
+                </button>
+
+                <button
+                  className="btn-action-detailed btn-edit"
+                  onClick={() => navigate(`/membresias/edit/${membresia.id}`)}
+                  title="Editar"
+                >
+                  <span className="btn-icon">✏️</span>
+                  <span className="btn-text">Editar</span>
+                </button>
+
+                <button
+                  className="btn-action-detailed btn-delete"
+                  onClick={() => handleDeleteClick(membresia)}
+                  title="Eliminar"
+                >
+                  <span className="btn-icon">🗑️</span>
+                  <span className="btn-text">Eliminar</span>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <ConfirmModal
         isOpen={showDeleteModal}

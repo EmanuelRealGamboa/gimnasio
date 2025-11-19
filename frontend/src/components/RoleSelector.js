@@ -2,12 +2,20 @@ import './RoleSelector.css';
 
 const ROLES = [
   {
+    id: 'administrador',
+    nombre: 'Administrador',
+    nombreDB: 'Administrador',
+    icon: '👑',
+    descripcion: 'Gestión completa del sistema y supervisión',
+    color: '#2a2a2a'
+  },
+  {
     id: 'entrenador',
     nombre: 'Entrenador',
     nombreDB: 'Entrenador',
     icon: '💪',
     descripcion: 'Gestión de entrenamientos y rutinas',
-    color: '#10b981'
+    color: '#22c55e'
   },
   {
     id: 'cajero',
@@ -15,7 +23,7 @@ const ROLES = [
     nombreDB: 'Recepcionista',
     icon: '💰',
     descripcion: 'Gestión de pagos y transacciones',
-    color: '#ec4899'
+    color: '#f59e0b'
   },
   {
     id: 'limpieza',
@@ -23,7 +31,7 @@ const ROLES = [
     nombreDB: 'Personal de Limpieza',
     icon: '🧹',
     descripcion: 'Gestión de tareas de limpieza',
-    color: '#06b6d4'
+    color: '#666666'
   },
   {
     id: 'supervisor',
@@ -31,7 +39,7 @@ const ROLES = [
     nombreDB: 'Supervisor de Instalaciones',
     icon: '🏗️',
     descripcion: 'Supervisión de instalaciones y equipamiento',
-    color: '#8b5cf6'
+    color: '#666666'
   }
 ];
 

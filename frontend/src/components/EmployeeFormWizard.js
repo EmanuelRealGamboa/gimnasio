@@ -176,7 +176,8 @@ function EmployeeFormWizard() {
       ...prev,
       rol_id: rolId,
       puesto: roleData?.nombre || '',
-      departamento: roleKey === 'entrenador' ? 'Entrenamiento' :
+      departamento: roleKey === 'administrador' ? 'Administración' :
+                   roleKey === 'entrenador' ? 'Entrenamiento' :
                    roleKey === 'cajero' ? 'Caja' :
                    roleKey === 'supervisor' ? 'Instalaciones' :
                    roleKey === 'limpieza' ? 'Limpieza' :
@@ -439,7 +440,7 @@ function EmployeeFormWizard() {
                   required
                   placeholder="ejemplo@gmail.com"
                 />
-                <small style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '0.25rem', display: 'block' }}>
+                <small style={{ color: '#666666', fontSize: '0.875rem', marginTop: '0.25rem', display: 'block' }}>
                   * El email debe terminar con @gmail.com
                 </small>
               </div>
@@ -471,7 +472,7 @@ function EmployeeFormWizard() {
                       cursor: 'pointer',
                       fontSize: '1.2rem',
                       padding: '5px',
-                      color: '#6b7280'
+                      color: '#666666'
                     }}
                     title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                   >
@@ -637,7 +638,7 @@ function EmployeeFormWizard() {
                 }}
               />
               {files.identificacion && (
-                <small style={{ color: '#10b981', display: 'block', marginTop: '5px' }}>
+                <small style={{ color: '#22c55e', display: 'block', marginTop: '5px' }}>
                   ✓ {files.identificacion.name}
                 </small>
               )}
@@ -657,7 +658,7 @@ function EmployeeFormWizard() {
                 }}
               />
               {files.comprobante && (
-                <small style={{ color: '#10b981', display: 'block', marginTop: '5px' }}>
+                <small style={{ color: '#22c55e', display: 'block', marginTop: '5px' }}>
                   ✓ {files.comprobante.name}
                 </small>
               )}
@@ -678,7 +679,7 @@ function EmployeeFormWizard() {
                 }}
               />
               {files.certificados.length > 0 && (
-                <small style={{ color: '#10b981', display: 'block', marginTop: '5px' }}>
+                <small style={{ color: '#22c55e', display: 'block', marginTop: '5px' }}>
                   ✓ {files.certificados.length} archivo(s) seleccionado(s)
                 </small>
               )}
@@ -687,11 +688,11 @@ function EmployeeFormWizard() {
             <div style={{
               marginTop: '30px',
               padding: '15px',
-              background: 'rgba(59, 130, 246, 0.1)',
+              background: 'rgba(34, 197, 94, 0.1)',
               borderRadius: '8px',
-              border: '1px solid rgba(59, 130, 246, 0.3)'
+              border: '1px solid rgba(34, 197, 94, 0.3)'
             }}>
-              <p style={{ margin: 0, fontSize: '0.9rem', color: '#93c5fd' }}>
+              <p style={{ margin: 0, fontSize: '0.9rem', color: '#666666' }}>
                 ℹ️ Revisa que toda la información sea correcta antes de continuar.
                 Al hacer clic en "Crear Empleado" se registrará el empleado en el sistema.
               </p>
@@ -709,9 +710,29 @@ function EmployeeFormWizard() {
       return (
         <div className="step-content">
           <h3>Datos Específicos - Administrador</h3>
-          <p className="text-secondary">
-            El rol de administrador no requiere campos adicionales.
+          <p className="text-secondary" style={{ marginBottom: '20px' }}>
+            Asigna la sede que administrará este usuario
           </p>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="sede_id">Sede Asignada *</label>
+              <select
+                id="sede_id"
+                name="sede_id"
+                value={formData.sede_id}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Selecciona una sede</option>
+                {sedes.map(sede => (
+                  <option key={sede.id} value={sede.id}>
+                    {sede.nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
       );
     }
@@ -881,7 +902,7 @@ function EmployeeFormWizard() {
                 </label>
               ))
             ) : (
-              <p style={{ color: '#94a3b8', fontSize: '0.9rem', padding: '0.5rem' }}>
+              <p style={{ color: '#666666', fontSize: '0.9rem', padding: '0.5rem' }}>
                 {formData.sede_id
                   ? 'No hay espacios disponibles para esta sede'
                   : 'Selecciona una sede primero'}

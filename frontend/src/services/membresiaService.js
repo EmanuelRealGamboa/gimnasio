@@ -7,8 +7,19 @@ class MembresiaService {
   }
 
   // Obtener solo membresías activas
-  getMembresiasActivas() {
-    return api.get('/membresias/activas/');
+  getMembresiasActivas(sedeId = null) {
+    const params = {};
+    if (sedeId) {
+      params.sede = sedeId;
+    }
+    return api.get('/membresias/activas/', { params });
+  }
+
+  // Obtener membresías por sede
+  getMembresiasBySede(sedeId) {
+    return api.get('/membresias/', {
+      params: { sede: sedeId, activo: true }
+    });
   }
 
   // Obtener una membresía por ID
@@ -48,6 +59,58 @@ class MembresiaService {
     if (tipo) params.tipo = tipo;
     if (activo !== null) params.activo = activo;
     return api.get('/membresias/', { params });
+  }
+
+  // ========== SUSCRIPCIONES ==========
+
+  // Obtener todas las suscripciones
+  getSuscripciones(params = {}) {
+    return api.get('/suscripciones/', { params });
+  }
+
+  // Obtener una suscripción por ID
+  getSuscripcion(id) {
+    return api.get(`/suscripciones/${id}/`);
+  }
+
+  // Crear una nueva suscripción
+  createSuscripcion(data) {
+    return api.post('/suscripciones/', data);
+  }
+
+  // Actualizar una suscripción
+  updateSuscripcion(id, data) {
+    return api.put(`/suscripciones/${id}/`, data);
+  }
+
+  // Eliminar una suscripción
+  deleteSuscripcion(id) {
+    return api.delete(`/suscripciones/${id}/`);
+  }
+
+  // Cancelar una suscripción
+  cancelarSuscripcion(id) {
+    return api.post(`/suscripciones/${id}/cancelar/`);
+  }
+
+  // Renovar una suscripción
+  renovarSuscripcion(id, metodo_pago = 'efectivo') {
+    return api.post(`/suscripciones/${id}/renovar/`, { metodo_pago });
+  }
+
+  // Obtener clientes con membresía activa
+  getClientesConMembresia() {
+    return api.get('/suscripciones/clientes_con_membresia/');
+  }
+
+  // Obtener estadísticas de suscripciones
+  getEstadisticasSuscripciones() {
+    return api.get('/suscripciones/estadisticas/');
+  }
+
+  // Buscar suscripciones por cliente
+  getSuscripcionesByCliente(clienteId) {
+    return api.get('/suscripciones/', { params: { cliente: clienteId } });
   }
 }
 

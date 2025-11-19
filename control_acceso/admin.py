@@ -9,6 +9,12 @@ class CredencialAdmin(admin.ModelAdmin):
 
 @admin.register(RegistroAcceso)
 class RegistroAccesoAdmin(admin.ModelAdmin):
-	list_display = ("id", "credencial", "fecha_hora", "autorizado", "espacio")
-	search_fields = ("credencial__identificador",)
-	list_filter = ("autorizado", "espacio")
+	list_display = ("id", "cliente", "sede", "fecha_hora_entrada", "autorizado", "membresia_nombre")
+	search_fields = ("cliente__persona__nombre", "cliente__persona__apellido_paterno", "cliente__persona__apellido_materno")
+	list_filter = ("autorizado", "sede", "fecha_hora_entrada")
+	readonly_fields = ("fecha_hora_entrada", "tiempo_permanencia")
+
+	def tiempo_permanencia(self, obj):
+		"""Muestra el tiempo de permanencia en el admin"""
+		return f"{obj.tiempo_permanencia} minutos" if obj.tiempo_permanencia else "Aún en instalaciones"
+	tiempo_permanencia.short_description = "Tiempo de Permanencia"

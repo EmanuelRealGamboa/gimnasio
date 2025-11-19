@@ -50,44 +50,104 @@ function Login() {
 
   return (
     <div className="login-container">
-      <div className="login-card">
-        <div className="login-logo">
-          <div className="logo-box">G</div>
+      <div className="login-content">
+        {/* Panel izquierdo - Marca */}
+        <div className="login-brand">
+          <div className="brand-content">
+            <div className="brand-icon">
+              <span className="icon-gym">🏋️</span>
+            </div>
+            <h1 className="brand-title">GIMNASIO</h1>
+            <p className="brand-subtitle">Sistema de Gestión Integral</p>
+            <div className="brand-features">
+              <div className="feature-item">
+                <span className="feature-icon">✓</span>
+                <span>Gestión de Clientes</span>
+              </div>
+              <div className="feature-item">
+                <span className="feature-icon">✓</span>
+                <span>Control de Accesos</span>
+              </div>
+              <div className="feature-item">
+                <span className="feature-icon">✓</span>
+                <span>Inventario y Ventas</span>
+              </div>
+              <div className="feature-item">
+                <span className="feature-icon">✓</span>
+                <span>Gestión de Personal</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <h3>Inicia Sesión</h3>
+        {/* Panel derecho - Formulario */}
+        <div className="login-form-panel">
+          <div className="login-form-container">
+            <div className="login-header">
+              <h2>Bienvenido</h2>
+              <p>Ingresa tus credenciales para continuar</p>
+            </div>
 
-        {error && <div className="error-message">{error}</div>}
+            {error && (
+              <div className="error-message">
+                <span className="error-icon">⚠</span>
+                <span>{error}</span>
+              </div>
+            )}
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="email">Correo</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="correo@ejemplo.com"
-            />
+            <form onSubmit={handleSubmit} className="login-form">
+              <div className="form-group">
+                <label htmlFor="email">
+                  <span className="label-icon">📧</span>
+                  Correo Electrónico
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="correo@ejemplo.com"
+                  className="form-input"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="password">
+                  <span className="label-icon">🔒</span>
+                  Contraseña
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  placeholder="••••••••"
+                  className="form-input"
+                />
+              </div>
+
+              <button type="submit" className="btn-login" disabled={loading}>
+                {loading ? (
+                  <>
+                    <span className="spinner"></span>
+                    <span>Iniciando sesión...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Ingresar</span>
+                    <span className="btn-arrow">→</span>
+                  </>
+                )}
+              </button>
+            </form>
+
+            <div className="login-footer">
+              <p>© 2025 Gimnasio. Todos los derechos reservados.</p>
+            </div>
           </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Contraseña</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="••••••••"
-            />
-          </div>
-
-          <button type="submit" disabled={loading}>
-            {loading ? 'Iniciando sesión...' : 'Ingresar'}
-          </button>
-        </form>
+        </div>
       </div>
     </div>
   );

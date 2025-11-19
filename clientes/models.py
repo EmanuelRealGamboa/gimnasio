@@ -1,5 +1,6 @@
 from django.db import models
 from authentication.models import Persona
+from instalaciones.models import Sede
 
 # Create your models here.
 
@@ -7,6 +8,7 @@ class Cliente(models.Model):
     """
     Modelo para gestionar los clientes del gimnasio.
     Hereda la información de Persona y añade campos específicos de clientes.
+    Cada cliente está asociado a una sede principal.
     """
     NIVEL_EXPERIENCIA_CHOICES = [
         ('principiante', 'Principiante'),
@@ -25,6 +27,12 @@ class Cliente(models.Model):
         on_delete=models.CASCADE,
         primary_key=True,
         related_name='cliente'
+    )
+    sede = models.ForeignKey(
+        Sede,
+        on_delete=models.PROTECT,
+        related_name='clientes',
+        help_text="Sede principal del cliente"
     )
     objetivo_fitness = models.CharField(max_length=255, blank=True, null=True)
     nivel_experiencia = models.CharField(

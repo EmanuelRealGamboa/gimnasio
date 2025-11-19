@@ -1,5 +1,5 @@
 from django.urls import path
-from authentication.views import EmpleadoUserCreateView, EmpleadoRegistroView
+from authentication.views import EmpleadoUserCreateView, EmpleadoRegistroView, EmpleadoEstadisticasView
 from authentication.dashboard_views import (
     dashboard_admin,
     dashboard_entrenador,
@@ -14,6 +14,7 @@ urlpatterns = [
     # Gestión de empleados
     path('admin/empleados/', EmpleadoUserCreateView.as_view(), name='admin_crear_empleado'),
     path('admin/empleados/registro/', EmpleadoRegistroView.as_view(), name='admin_registro_empleado'),
+    path('admin/empleados/estadisticas/', EmpleadoEstadisticasView.as_view(), name='admin_empleado_estadisticas'),
     path('admin/empleados/<int:pk>/', EmpleadoUserCreateView.as_view(), name='admin_usuario_operacion'),
     path('admin/empleados/<int:pk>/detalle', EmpleadoUserCreateView.as_view(), name='admin_usuario_detalle'),
 
