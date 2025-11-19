@@ -32,6 +32,7 @@ urlpatterns = [
     path('api/instalaciones/', include('instalaciones.urls')),
     path('api/gestion-equipos/', include('gestion_equipos.urls')),
     path('api/accesos/', include('control_acceso.urls')),
+    path('api/horarios/', include('horarios.urls')),  # App de reservas y horarios
 
 ]
 

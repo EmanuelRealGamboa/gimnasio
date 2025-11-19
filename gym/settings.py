@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'membresias',
     'control_acceso',
     'instalaciones',
+    'horarios',  # App de gestión de horarios y reservas
     'gestion_equipos',
     'rest_framework',
     'rest_framework_simplejwt',
