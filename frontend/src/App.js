@@ -39,6 +39,7 @@ import VentaProductos from './components/VentaProductos';
 import VentasHistorial from './components/VentasHistorial';
 import SuscripcionesHistorial from './components/SuscripcionesHistorial';
 import ControlAccesos from './components/ControlAccesos';
+import HorariosList from './components/HorariosList';
 import ProtectedRoute from './components/ProtectedRoute';
 import authService from './services/authService';
 import './App.css';
@@ -303,6 +304,18 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <MembresiaForm />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Rutas de gestión de horarios y reservas */}
+          <Route
+            path="/horarios"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <HorariosList />
                 </Layout>
               </ProtectedRoute>
             }

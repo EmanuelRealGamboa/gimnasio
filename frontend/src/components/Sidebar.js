@@ -56,6 +56,13 @@ function Sidebar() {
       adminOnly: true,
     },
     {
+      id: 'horarios',
+      label: 'Horarios y Reservas',
+      icon: '📅',
+      path: '/horarios',
+      adminOnly: true,
+    },
+    {
       id: 'inventario',
       label: 'Inventario',
       icon: '📦',

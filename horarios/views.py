@@ -8,7 +8,7 @@ from django.db.models import Q, Count, Prefetch
 from datetime import datetime, timedelta
 from .models import (
     TipoActividad, Horario, SesionClase, BloqueoHorario,
-    EquipoActividad, ClienteMembresia, ReservaClase, 
+    EquipoActividad, ClienteMembresia, ReservaClase,
     ReservaEquipo, ReservaEntrenador
 )
 from .serializers import (
@@ -17,6 +17,7 @@ from .serializers import (
     HorarioCalendarioSerializer, SesionCalendarioSerializer,
     HorarioDisponibilidadSerializer
 )
+from .permissions import EsAdministradorOSupervisor, PuedeGestionarHorarios, PuedeHacerReservas
 from clientes.models import Cliente
 from gestion_equipos.models import Activo
 from empleados.models import Entrenador
@@ -28,7 +29,7 @@ class TipoActividadViewSet(viewsets.ModelViewSet):
     """
     queryset = TipoActividad.objects.all()
     serializer_class = TipoActividadSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [PuedeGestionarHorarios]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['activo']
     search_fields = ['nombre', 'descripcion']
@@ -55,11 +56,13 @@ class TipoActividadViewSet(viewsets.ModelViewSet):
 class HorarioViewSet(viewsets.ModelViewSet):
     """
     ViewSet para gestionar horarios base
+    Permisos: Admin y Supervisor pueden crear/editar, otros solo leer
+    Filtrado automático por sede para supervisores
     """
     queryset = Horario.objects.select_related(
         'tipo_actividad', 'entrenador__empleado__persona', 'espacio__sede'
     ).all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = [PuedeGestionarHorarios]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = [
         'estado', 'dia_semana', 'tipo_actividad', 'entrenador', 'espacio', 'espacio__sede'
