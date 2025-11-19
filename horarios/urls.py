@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     TipoActividadViewSet, HorarioViewSet, SesionClaseViewSet, BloqueoHorarioViewSet,
     ReservaClaseViewSet, ReservaEquipoViewSet, ReservaEntrenadorViewSet,
-    EstadisticasHorariosViewSet, ActividadesDisponiblesView
+    EstadisticasHorariosViewSet
 )
 
 # Crear router para los ViewSets
@@ -22,7 +22,6 @@ app_name = 'horarios'
 urlpatterns = [
     # Incluir todas las rutas del router
     path('api/', include(router.urls)),
-    path('api/actividades/disponibles/', ActividadesDisponiblesView.as_view(), name='actividades_disponibles'),
     
     # URLs adicionales específicas si necesitas
     # path('api/calendario/', CalendarioView.as_view(), name='calendario'),

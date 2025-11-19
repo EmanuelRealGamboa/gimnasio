@@ -2,10 +2,9 @@ from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils import timezone
-from django.db.models import Q, Count, Prefetch, F
+from django.db.models import Q, Count, Prefetch
 from datetime import datetime, timedelta
 from .models import (
     TipoActividad, Horario, SesionClase, BloqueoHorario,
@@ -16,8 +15,7 @@ from .serializers import (
     TipoActividadSerializer, HorarioSerializer, HorarioCreateSerializer,
     SesionClaseSerializer, SesionClaseCreateSerializer, BloqueoHorarioSerializer,
     HorarioCalendarioSerializer, SesionCalendarioSerializer,
-    HorarioDisponibilidadSerializer, TipoActividadResumenSerializer,
-    SesionClaseMobileSerializer, ReservaClaseSerializer, ReservaClaseCreateSerializer
+    HorarioDisponibilidadSerializer
 )
 from clientes.models import Cliente
 from gestion_equipos.models import Activo
@@ -52,70 +50,6 @@ class TipoActividadViewSet(viewsets.ModelViewSet):
                 'obligatorio': equipo_actividad.obligatorio
             })
         return Response(data)
-
-
-class ActividadesDisponiblesView(APIView):
-    """Listado optimizado de actividades con sesiones disponibles para la app móvil"""
-
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        hoy = timezone.now().date()
-
-        disponibles_qs = TipoActividad.objects.filter(activo=True).annotate(
-            sesiones_disponibles=Count(
-                'horarios__sesiones',
-                filter=(
-                    Q(horarios__sesiones__estado='programada') &
-                    Q(horarios__sesiones__fecha__gte=hoy) & (
-                        Q(
-                            horarios__sesiones__cupo_override__isnull=True,
-                            horarios__sesiones__asistentes_registrados__lt=F('horarios__cupo_maximo')
-                        ) |
-                        Q(
-                            horarios__sesiones__cupo_override__isnull=False,
-                            horarios__sesiones__asistentes_registrados__lt=F('horarios__sesiones__cupo_override')
-                        )
-                    )
-                )
-            )
-        ).filter(sesiones_disponibles__gt=0)
-
-        actividades = list(disponibles_qs)
-
-        if not actividades:
-            serializer = TipoActividadResumenSerializer(actividades, many=True)
-            return Response(serializer.data)
-
-        actividad_ids = [actividad.id for actividad in actividades]
-
-        sesiones = (
-            SesionClase.objects.filter(
-                horario__tipo_actividad_id__in=actividad_ids,
-                estado='programada',
-                fecha__gte=hoy
-            )
-            .select_related(
-                'horario__tipo_actividad',
-                'horario__entrenador__empleado__persona',
-                'horario__espacio__sede',
-                'entrenador_override__empleado__persona',
-                'espacio_override__sede'
-            )
-            .order_by('fecha', 'hora_inicio_override', 'horario__hora_inicio')
-        )
-
-        proxima_por_actividad = {}
-        for sesion in sesiones:
-            tipo_id = sesion.horario.tipo_actividad_id
-            if tipo_id not in proxima_por_actividad:
-                proxima_por_actividad[tipo_id] = sesion
-
-        for actividad in actividades:
-            actividad._proxima_sesion = proxima_por_actividad.get(actividad.id)
-
-        serializer = TipoActividadResumenSerializer(actividades, many=True)
-        return Response(serializer.data)
 
 
 class HorarioViewSet(viewsets.ModelViewSet):
@@ -252,15 +186,11 @@ class SesionClaseViewSet(viewsets.ModelViewSet):
         'entrenador_override__empleado__persona',
         'espacio_override__sede'
     ).prefetch_related('reservas__cliente__persona').all()
-    serializer_class = SesionClaseSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = {
-        'estado': ['exact'],
-        'fecha': ['exact', 'gte', 'lte'],
-        'horario__tipo_actividad': ['exact'],
-        'horario__espacio__sede': ['exact']
-    }
+    filterset_fields = [
+        'estado', 'fecha', 'horario__tipo_actividad', 'horario__espacio__sede'
+    ]
     search_fields = [
         'horario__tipo_actividad__nombre',
         'horario__entrenador__empleado__persona__nombre'
@@ -271,8 +201,6 @@ class SesionClaseViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
             return SesionClaseCreateSerializer
-        if self.action in ['disponibles', 'reservar']:
-            return SesionClaseMobileSerializer if self.action == 'disponibles' else SesionClaseSerializer
         return SesionClaseSerializer
 
     @action(detail=False, methods=['get'])
@@ -308,120 +236,6 @@ class SesionClaseViewSet(viewsets.ModelViewSet):
         
         serializer = SesionCalendarioSerializer(queryset, many=True)
         return Response(serializer.data)
-
-    @action(detail=False, methods=['get'], url_path='disponibles')
-    def disponibles(self, request):
-        """Sesiones disponibles para la app móvil"""
-        hoy = timezone.now().date()
-
-        queryset = self.get_queryset().filter(
-            estado='programada',
-            fecha__gte=hoy
-        )
-
-        tipo_id = request.query_params.get('tipo_actividad')
-        if tipo_id:
-            queryset = queryset.filter(horario__tipo_actividad_id=tipo_id)
-
-        sede_id = request.query_params.get('sede_id')
-        if sede_id:
-            queryset = queryset.filter(horario__espacio__sede_id=sede_id)
-
-        fecha_desde = request.query_params.get('fecha_desde')
-        if fecha_desde:
-            queryset = queryset.filter(fecha__gte=fecha_desde)
-
-        fecha_hasta = request.query_params.get('fecha_hasta')
-        if fecha_hasta:
-            queryset = queryset.filter(fecha__lte=fecha_hasta)
-
-        solo_disponibles = request.query_params.get('solo_disponibles')
-        if solo_disponibles and solo_disponibles.lower() in ['1', 'true', 'sí', 'si']:
-            queryset = queryset.filter(
-                Q(cupo_override__isnull=True, asistentes_registrados__lt=F('horario__cupo_maximo')) |
-                Q(cupo_override__isnull=False, asistentes_registrados__lt=F('cupo_override'))
-            )
-
-        queryset = queryset.order_by('fecha', 'hora_inicio_override', 'horario__hora_inicio')
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = SesionClaseMobileSerializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = SesionClaseMobileSerializer(queryset, many=True)
-        return Response(serializer.data)
-
-    @action(detail=True, methods=['post'])
-    def reservar(self, request, pk=None):
-        """Permite a un cliente reservar una sesión"""
-        sesion = self.get_object()
-
-        if sesion.estado != 'programada':
-            return Response({'error': 'La sesión no está disponible para reservas'}, status=status.HTTP_400_BAD_REQUEST)
-
-        if sesion.fecha < timezone.now().date():
-            return Response({'error': 'No puedes reservar sesiones pasadas'}, status=status.HTTP_400_BAD_REQUEST)
-
-        if sesion.esta_llena:
-            return Response({'error': 'La sesión ya está llena'}, status=status.HTTP_400_BAD_REQUEST)
-
-        if not hasattr(request.user, 'persona') or not hasattr(request.user.persona, 'cliente'):
-            return Response({'error': 'El usuario autenticado no está registrado como cliente'}, status=status.HTTP_403_FORBIDDEN)
-
-        cliente = request.user.persona.cliente
-
-        if not cliente.membresias.filter(
-            estado='activa',
-            fecha_inicio__lte=timezone.now().date(),
-            fecha_fin__gte=timezone.now().date()
-        ).exists():
-            return Response(
-                {'error': 'Necesitas una membresía activa para reservar esta sesión'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        reserva_existente = ReservaClase.objects.filter(cliente=cliente, sesion_clase=sesion).first()
-
-        if reserva_existente:
-            if reserva_existente.estado in ['confirmada', 'pendiente', 'asistio']:
-                return Response({'mensaje': 'Ya tienes una reserva confirmada para esta sesión'}, status=status.HTTP_200_OK)
-
-            # Reactivar reserva cancelada
-            reserva_existente.estado = 'confirmada'
-            reserva_existente.observaciones = request.data.get('observaciones', '')
-            reserva_existente.fecha_reserva = timezone.now()
-            reserva_existente.fecha_cancelacion = None
-            reserva_existente.motivo_cancelacion = None
-            reserva_existente.save()
-
-            detalle = ReservaClaseSerializer(reserva_existente, context=self.get_serializer_context())
-            return Response(
-                {
-                    'mensaje': 'Reserva reactivada exitosamente',
-                    'reserva': detalle.data
-                },
-                status=status.HTTP_201_CREATED
-            )
-
-        reserva_data = {
-            'cliente': cliente.persona_id,
-            'sesion_clase': sesion.id,
-            'observaciones': request.data.get('observaciones', '')
-        }
-
-        serializer = ReservaClaseCreateSerializer(data=reserva_data)
-        serializer.is_valid(raise_exception=True)
-        reserva = serializer.save()
-
-        detalle = ReservaClaseSerializer(reserva, context=self.get_serializer_context())
-        return Response(
-            {
-                'mensaje': 'Reserva realizada exitosamente',
-                'reserva': detalle.data
-            },
-            status=status.HTTP_201_CREATED
-        )
 
     @action(detail=True, methods=['get'])
     def reservas(self, request, pk=None):
@@ -511,7 +325,6 @@ class ReservaClaseViewSet(viewsets.ModelViewSet):
         'sesion_clase__horario__tipo_actividad',
         'sesion_clase__horario__entrenador__empleado__persona'
     ).all()
-    serializer_class = ReservaClaseSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = [
@@ -525,11 +338,6 @@ class ReservaClaseViewSet(viewsets.ModelViewSet):
     ]
     ordering_fields = ['fecha_reserva', 'sesion_clase__fecha']
     ordering = ['-fecha_reserva']
-
-    def get_serializer_class(self):
-        if self.action in ['create']:
-            return ReservaClaseCreateSerializer
-        return ReservaClaseSerializer
 
     def get_queryset(self):
         """Filtrar reservas según el usuario"""
@@ -566,57 +374,6 @@ class ReservaClaseViewSet(viewsets.ModelViewSet):
         
         serializer = self.get_serializer(reservas, many=True)
         return Response(serializer.data)
-
-    def create(self, request, *args, **kwargs):
-        if not hasattr(request.user, 'persona') or not hasattr(request.user.persona, 'cliente'):
-            return Response(
-                {'error': 'El usuario autenticado no está registrado como cliente'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-
-        cliente = request.user.persona.cliente
-
-        if not cliente.membresias.filter(
-            estado='activa',
-            fecha_inicio__lte=timezone.now().date(),
-            fecha_fin__gte=timezone.now().date()
-        ).exists():
-            return Response(
-                {'error': 'Necesitas una membresía activa para crear reservas'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        sesion_id = request.data.get('sesion_clase')
-        reserva_existente = None
-        if sesion_id:
-            reserva_existente = ReservaClase.objects.filter(cliente=cliente, sesion_clase_id=sesion_id).first()
-
-        if reserva_existente:
-            if reserva_existente.estado in ['confirmada', 'pendiente', 'asistio']:
-                detalle = ReservaClaseSerializer(reserva_existente, context=self.get_serializer_context())
-                return Response(detalle.data, status=status.HTTP_200_OK)
-
-            reserva_existente.estado = 'confirmada'
-            reserva_existente.observaciones = request.data.get('observaciones', '')
-            reserva_existente.fecha_reserva = timezone.now()
-            reserva_existente.fecha_cancelacion = None
-            reserva_existente.motivo_cancelacion = None
-            reserva_existente.save()
-
-            detalle = ReservaClaseSerializer(reserva_existente, context=self.get_serializer_context())
-            headers = self.get_success_headers(detalle.data)
-            return Response(detalle.data, status=status.HTTP_201_CREATED, headers=headers)
-
-        data = request.data.copy()
-        data['cliente'] = cliente.persona_id
-
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        reserva = serializer.save()
-
-        detalle = ReservaClaseSerializer(reserva, context=self.get_serializer_context())
-        headers = self.get_success_headers(detalle.data)
-        return Response(detalle.data, status=status.HTTP_201_CREATED, headers=headers)
 
     @action(detail=True, methods=['post'])
     def cancelar(self, request, pk=None):
