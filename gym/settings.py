@@ -212,3 +212,6 @@ CSRF_TRUSTED_ORIGINS = [
 # Eximir ciertos endpoints de CSRF (para APIs)
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SAMESITE = 'Lax'
+
+STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
