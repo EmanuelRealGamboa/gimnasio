@@ -25,11 +25,18 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-o-%)_h!czhhq7@@c^4a_u92z39m4)mbsb+xitq*iqz_bepu0ax')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+#DEBUG = os.getenv('DEBUG', 'True') == 'True'
+#ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '*').split(',')  # Permite conexiones desde cualquier host (desarrollo)
+#CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '*').split(',')  # Permite conexiones desde cualquier host (desarrollo)
-CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
+ALLOWED_HOSTS = [
+    "carefree-fulfillment-production.up.railway.app",
+]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://carefree-fulfillment-production.up.railway.app",
+]
 # Application definition
 
 INSTALLED_APPS = [
