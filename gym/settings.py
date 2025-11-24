@@ -28,7 +28,9 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-o-%)_h!czhhq7@@c^4a
 #DEBUG = os.getenv('DEBUG', 'True') == 'True'
 #ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '*').split(',')  # Permite conexiones desde cualquier host (desarrollo)
 #CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+#DEBUG = os.getenv('DEBUG', 'False') == 'True'
+DEBUG = True
+
 
 ALLOWED_HOSTS = [
     "carefree-fulfillment-production.up.railway.app",
@@ -37,6 +39,15 @@ ALLOWED_HOSTS = [
 CSRF_TRUSTED_ORIGINS = [
     "https://carefree-fulfillment-production.up.railway.app",
 ]
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+CSRF_COOKIE_SECURE = False      # temporal para descartar problemas de cookie
+SESSION_COOKIE_SECURE = False   # temporal también
+CSRF_COOKIE_SAMESITE = "Lax"
+
+
+
 # Application definition
 
 INSTALLED_APPS = [
