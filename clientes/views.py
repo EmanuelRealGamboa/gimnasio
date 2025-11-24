@@ -32,15 +32,36 @@ class ClienteViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Permite filtrar clientes por estado, nombre, email, sede, etc.
-        Parámetros de query: estado, search, sede
+        Filtra clientes por estado, nombre, email, sede, etc.
+        Si el usuario es cajero (recepcionista), solo devuelve los clientes de su sede.
         """
         queryset = Cliente.objects.all().select_related('persona', 'sede')
 
-        # Filtrar por sede
-        sede = self.request.query_params.get('sede', None)
-        if sede:
-            queryset = queryset.filter(sede_id=sede)
+        user = self.request.user
+        persona = getattr(user, 'persona', None)
+        # Verificar si el usuario es cajero (rol Recepcionista)
+        es_cajero = False
+        sede_cajero = None
+        if persona:
+            # Buscar si tiene el rol de Recepcionista
+            if persona.roles.filter(rol__nombre__iexact='Recepcionista').exists():
+                es_cajero = True
+                # Obtener sede del cajero
+                try:
+                    from empleados.models import Cajero
+                    cajero = Cajero.objects.get(empleado__persona=persona)
+                    sede_cajero = cajero.sede_id
+                except Exception:
+                    sede_cajero = None
+
+        # Si es cajero, filtrar por su sede y no permitir ver otros
+        if es_cajero and sede_cajero:
+            queryset = queryset.filter(sede_id=sede_cajero)
+        else:
+            # Filtrar por sede si se proporciona (solo para admin/supervisor)
+            sede = self.request.query_params.get('sede', None)
+            if sede:
+                queryset = queryset.filter(sede_id=sede)
 
         # Filtrar por estado
         estado = self.request.query_params.get('estado', None)
@@ -96,6 +117,47 @@ class ClienteViewSet(viewsets.ModelViewSet):
             {"message": "Cliente eliminado exitosamente"},
             status=status.HTTP_200_OK
         )
+
+    @action(detail=False, methods=['get'])
+    def mi_perfil(self, request):
+        """
+        Obtener el perfil del cliente autenticado
+        GET /api/clientes/mi_perfil/
+        """
+        if not hasattr(request.user, 'persona') or not hasattr(request.user.persona, 'cliente'):
+            return Response(
+                {'error': 'Usuario no es un cliente'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        cliente = request.user.persona.cliente
+        serializer = ClienteDetailSerializer(cliente, context={'request': request})
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['put', 'patch'])
+    def actualizar_perfil(self, request):
+        """
+        Actualizar el perfil del cliente autenticado
+        PUT/PATCH /api/clientes/actualizar_perfil/
+        """
+        if not hasattr(request.user, 'persona') or not hasattr(request.user.persona, 'cliente'):
+            return Response(
+                {'error': 'Usuario no es un cliente'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        cliente = request.user.persona.cliente
+        partial = request.method == 'PATCH'
+        serializer = ClienteCreateSerializer(cliente, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        cliente = serializer.save()
+
+        # Retornar los datos actualizados
+        detail_serializer = ClienteDetailSerializer(cliente, context={'request': request})
+        return Response({
+            'message': 'Perfil actualizado exitosamente',
+            'data': detail_serializer.data
+        })
 
     @action(detail=True, methods=['post'])
     def cambiar_estado(self, request, pk=None):

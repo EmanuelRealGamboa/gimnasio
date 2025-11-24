@@ -8,6 +8,7 @@ function DashboardRecepcion() {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const userData = JSON.parse(localStorage.getItem('user_data'));
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -39,7 +40,9 @@ function DashboardRecepcion() {
   return (
     <div className="dashboard-container">
         <div className="dashboard-header">
-          <h2>{dashboardData?.mensaje}</h2>
+          <h2>
+            Bienvenido cajero{userData?.nombre ? `, ${userData.nombre}` : ''}!
+          </h2>
           <p className="dashboard-subtitle">Panel de {dashboardData?.dashboard}</p>
         </div>
 

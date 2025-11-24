@@ -10,10 +10,18 @@ function Sidebar() {
   const [expandedMenu, setExpandedMenu] = useState(null);
   const userData = authService.getUserData();
 
+
   // Determinar si el usuario es administrador
   const isAdmin = userData?.dashboard === 'Administrador' || userData?.permisos?.includes('gestionar_empleados');
 
-  const menuItems = [
+  // Determinar si el usuario es cajero (solo puede ver ventas y accesos)
+  const isCajero = (
+    userData?.dashboard === 'Recepción' ||
+    (userData?.permisos?.includes('gestionar_ventas') || userData?.permisos?.includes('gestionar_acceso')) &&
+    !isAdmin
+  );
+
+  let menuItems = [
     {
       id: 'dashboard',
       label: 'Principal',
@@ -57,9 +65,30 @@ function Sidebar() {
     },
     {
       id: 'horarios',
-      label: 'Horarios y Reservas',
+      label: 'Horarios',
       icon: '📅',
-      path: '/horarios',
+      submenu: [
+        {
+          id: 'tipos-actividad',
+          label: 'Tipos de Actividad',
+          path: '/horarios/tipos-actividad',
+        },
+        {
+          id: 'horarios-list',
+          label: 'Gestión de Horarios',
+          path: '/horarios',
+        },
+        {
+          id: 'generar-sesiones',
+          label: 'Generar Sesiones',
+          path: '/horarios/sesiones',
+        },
+        {
+          id: 'reservas-clases',
+          label: 'Reservas de Clases',
+          path: '/reservas-clases',
+        },
+      ],
       adminOnly: true,
     },
     {
@@ -101,9 +130,37 @@ function Sidebar() {
       id: 'accesos',
       label: 'Accesos',
       icon: '🔐',
-      path: '/accesos',
+      submenu: [
+        {
+          label: 'Control de Accesos',
+          path: '/accesos',
+        },
+        {
+          label: 'Monitor en Tiempo Real',
+          path: '/accesos/monitor',
+        },
+      ],
+      adminOnly: false,
     },
-  ].filter(item => !item.adminOnly || isAdmin);
+    {
+      id: 'limpieza',
+      label: 'Limpieza',
+      icon: '🧹',
+      path: '/limpieza',
+      adminOnly: true,
+    },
+  ];
+
+  // Filtrar menú según el rol
+  if (isAdmin) {
+    menuItems = menuItems.filter(item => true); // Admin ve todo
+  } else if (isCajero) {
+    // Cajero solo ve ventas y accesos
+    menuItems = menuItems.filter(item => ['ventas', 'accesos', 'dashboard'].includes(item.id));
+  } else {
+    // Otros roles: solo dashboard
+    menuItems = menuItems.filter(item => item.id === 'dashboard');
+  }
 
   const handleLogout = () => {
     authService.logout();

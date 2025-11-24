@@ -57,6 +57,17 @@ const accesosService = {
     }
   },
 
+  // Listar registros de acceso (para monitor)
+  listarRegistros: async (params = {}) => {
+    try {
+      const response = await api.get(BASE_URL, { params });
+      return response;
+    } catch (error) {
+      console.error('Error al listar registros:', error);
+      throw error;
+    }
+  },
+
   // Obtener un registro específico
   getRegistroById: async (id) => {
     try {

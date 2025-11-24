@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-o-%)_h!czhhq7@@c^4a_u92z39m4)mbsb+xitq*iqz_bepu0ax
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']  # Permite conexiones desde cualquier host (desarrollo)
 
 
 # Application definition
@@ -171,6 +171,10 @@ REST_FRAMEWORK = {
 }
 
 # CORS Configuration
+# Para desarrollo móvil, permitir todos los orígenes
+CORS_ALLOW_ALL_ORIGINS = True  # Desarrollo: permite cualquier origen
+
+# También mantener las configuraciones específicas por si se necesitan
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:3001",

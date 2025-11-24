@@ -3,7 +3,10 @@ from authentication.views import (
     EmpleadoUserCreateView,
     EmpleadoRegistroView,
     EmpleadoEstadisticasView,
-    ClienteRegistroView
+    ClienteRegistroView,
+    SedesDisponiblesView,
+    UsuarioActualView,
+    DashboardStatsView
 )
 from authentication.dashboard_views import (
     dashboard_admin,
@@ -30,6 +33,12 @@ urlpatterns = [
     # Registro público para clientes (app móvil)
     path('registro/cliente/', ClienteRegistroView.as_view(), name='registro_cliente'),
 
+    # Endpoints públicos para app móvil
+    path('sedes-disponibles/', SedesDisponiblesView.as_view(), name='sedes_disponibles'),
+
+    # Endpoints autenticados para app móvil
+    path('auth/me/', UsuarioActualView.as_view(), name='usuario_actual'),
+
     # Dashboards por rol
     path('dashboard/admin/', dashboard_admin, name='dashboard_admin'),
     path('dashboard/entrenador/', dashboard_entrenador, name='dashboard_entrenador'),
@@ -37,4 +46,7 @@ urlpatterns = [
     path('dashboard/supervisor/', dashboard_supervisor, name='dashboard_supervisor'),
     path('dashboard/limpieza/', dashboard_limpieza, name='dashboard_limpieza'),
     path('dashboard/', dashboard_default, name='dashboard_default'),
+
+    # Estadísticas del dashboard
+    path('dashboard/stats/', DashboardStatsView.as_view(), name='dashboard_stats'),
 ]

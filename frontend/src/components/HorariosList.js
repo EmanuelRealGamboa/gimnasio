@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import horariosService from '../services/horariosService';
 import instalacionesService from '../services/instalacionesService';
+import ConfirmModal from './ConfirmModal';
 import './HorariosList.css';
 
 const HorariosList = () => {
@@ -11,6 +12,7 @@ const HorariosList = () => {
   const [tiposActividad, setTiposActividad] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Filtros
   const [sedeFilter, setSedeFilter] = useState('');
@@ -25,6 +27,20 @@ const HorariosList = () => {
     activos: 0,
     por_dia: {},
   });
+
+  // Modal de generar sesiones
+  const [showGenerarModal, setShowGenerarModal] = useState(false);
+  const [horarioSeleccionado, setHorarioSeleccionado] = useState(null);
+  const [fechaInicio, setFechaInicio] = useState('');
+  const [fechaFin, setFechaFin] = useState('');
+
+  // Modales de confirmación
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [horarioToDelete, setHorarioToDelete] = useState(null);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorModalMessage, setErrorModalMessage] = useState('');
+  const [showValidationModal, setShowValidationModal] = useState(false);
+  const [validationMessage, setValidationMessage] = useState('');
 
   const DIAS_SEMANA = [
     { value: 'lunes', label: 'Lunes' },
@@ -103,18 +119,27 @@ const HorariosList = () => {
     setEstadisticas({ total_horarios: total, activos, por_dia: porDia });
   };
 
-  const eliminarHorario = async (id) => {
-    if (!window.confirm('¿Está seguro de eliminar este horario? Esto eliminará también todas las sesiones asociadas.')) {
-      return;
-    }
+  const confirmarEliminarHorario = (id) => {
+    setHorarioToDelete(id);
+    setShowDeleteModal(true);
+  };
 
+  const eliminarHorario = async () => {
     try {
-      await horariosService.deleteHorario(id);
-      alert('Horario eliminado exitosamente');
+      await horariosService.deleteHorario(horarioToDelete);
+
+      // Mostrar mensaje de éxito con animación
+      setSuccessMessage('✓ Horario eliminado exitosamente');
+      setTimeout(() => setSuccessMessage(''), 3000);
+
+      setShowDeleteModal(false);
+      setHorarioToDelete(null);
       await cargarHorarios();
     } catch (error) {
       console.error('Error al eliminar horario:', error);
-      alert('Error al eliminar el horario: ' + (error.response?.data?.error || error.message));
+      setShowDeleteModal(false);
+      setErrorModalMessage(error.response?.data?.error || error.message || 'Error al eliminar el horario');
+      setShowErrorModal(true);
     }
   };
 
@@ -124,6 +149,64 @@ const HorariosList = () => {
     setDiaFilter('');
     setTipoActividadFilter('');
     setSearchTerm('');
+  };
+
+  const abrirModalGenerarSesiones = (horario) => {
+    setHorarioSeleccionado(horario);
+    // Establecer fecha de inicio como hoy
+    const hoy = new Date().toISOString().split('T')[0];
+    setFechaInicio(hoy);
+    // Establecer fecha fin como 30 días después
+    const fechaFinDefault = new Date();
+    fechaFinDefault.setDate(fechaFinDefault.getDate() + 30);
+    setFechaFin(fechaFinDefault.toISOString().split('T')[0]);
+    setShowGenerarModal(true);
+  };
+
+  const cerrarModalGenerarSesiones = () => {
+    setShowGenerarModal(false);
+    setHorarioSeleccionado(null);
+    setFechaInicio('');
+    setFechaFin('');
+  };
+
+  const handleGenerarSesiones = async (e) => {
+    e.preventDefault();
+
+    if (!fechaInicio || !fechaFin) {
+      setValidationMessage('Por favor, selecciona ambas fechas');
+      setShowValidationModal(true);
+      return;
+    }
+
+    if (new Date(fechaInicio) > new Date(fechaFin)) {
+      setValidationMessage('La fecha de inicio debe ser anterior a la fecha de fin');
+      setShowValidationModal(true);
+      return;
+    }
+
+    try {
+      const resultado = await horariosService.generarSesiones(
+        horarioSeleccionado.id,
+        fechaInicio,
+        fechaFin
+      );
+
+      // Mostrar mensaje de éxito con animación
+      setSuccessMessage(
+        `✓ ${resultado.mensaje || 'Sesiones generadas exitosamente'} - ` +
+        `${resultado.sesiones_creadas} sesiones creadas`
+      );
+      setTimeout(() => setSuccessMessage(''), 4000);
+
+      cerrarModalGenerarSesiones();
+      await cargarHorarios();
+    } catch (error) {
+      console.error('Error al generar sesiones:', error);
+      cerrarModalGenerarSesiones();
+      setErrorModalMessage(error.response?.data?.error || error.message || 'Error al generar sesiones');
+      setShowErrorModal(true);
+    }
   };
 
   const horariosFiltrados = horarios.filter((horario) => {
@@ -279,6 +362,16 @@ const HorariosList = () => {
         </div>
       )}
 
+      {/* Mensaje de Éxito */}
+      {successMessage && (
+        <div className="alert alert-success">
+          <span>{successMessage}</span>
+          <span className="alert-icon" onClick={() => setSuccessMessage('')}>
+            ✕
+          </span>
+        </div>
+      )}
+
       {/* Tabla de Horarios */}
       {loading ? (
         <div className="loading-spinner">
@@ -341,9 +434,18 @@ const HorariosList = () => {
                       ✏️
                     </button>
                     {horario.estado === 'activo' && (
-                      <button className="btn-accion btn-eliminar" onClick={() => eliminarHorario(horario.id)} title="Eliminar">
-                        🗑️
-                      </button>
+                      <>
+                        <button
+                          className="btn-accion btn-generar"
+                          onClick={() => abrirModalGenerarSesiones(horario)}
+                          title="Generar Sesiones"
+                        >
+                          🔄
+                        </button>
+                        <button className="btn-accion btn-eliminar" onClick={() => confirmarEliminarHorario(horario.id)} title="Eliminar">
+                          🗑️
+                        </button>
+                      </>
                     )}
                   </td>
                 </tr>
@@ -352,6 +454,127 @@ const HorariosList = () => {
           </table>
         </div>
       )}
+
+      {/* Modal de Generar Sesiones */}
+      {showGenerarModal && horarioSeleccionado && (
+        <div className="modal-overlay" onClick={cerrarModalGenerarSesiones}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>🔄 Generar Sesiones</h3>
+              <button className="modal-close" onClick={cerrarModalGenerarSesiones}>
+                ✕
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <div className="horario-info">
+                <p>
+                  <strong>Actividad:</strong> {horarioSeleccionado.tipo_actividad_nombre}
+                </p>
+                <p>
+                  <strong>Día:</strong>{' '}
+                  {horarioSeleccionado.dia_semana?.charAt(0).toUpperCase() +
+                    horarioSeleccionado.dia_semana?.slice(1)}
+                </p>
+                <p>
+                  <strong>Horario:</strong> {formatHora(horarioSeleccionado.hora_inicio)} -{' '}
+                  {formatHora(horarioSeleccionado.hora_fin)}
+                </p>
+                <p>
+                  <strong>Entrenador:</strong> {horarioSeleccionado.entrenador_nombre}
+                </p>
+                <p>
+                  <strong>Espacio:</strong> {horarioSeleccionado.espacio_nombre}
+                </p>
+              </div>
+
+              <form onSubmit={handleGenerarSesiones}>
+                <div className="form-group">
+                  <label>Fecha de Inicio *</label>
+                  <input
+                    type="date"
+                    value={fechaInicio}
+                    onChange={(e) => setFechaInicio(e.target.value)}
+                    required
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Fecha de Fin *</label>
+                  <input
+                    type="date"
+                    value={fechaFin}
+                    onChange={(e) => setFechaFin(e.target.value)}
+                    required
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="info-message">
+                  <span className="info-icon">ℹ️</span>
+                  <p>
+                    Se crearán sesiones automáticamente para todos los{' '}
+                    <strong>
+                      {horarioSeleccionado.dia_semana?.charAt(0).toUpperCase() +
+                        horarioSeleccionado.dia_semana?.slice(1)}
+                    </strong>{' '}
+                    entre las fechas seleccionadas.
+                  </p>
+                </div>
+
+                <div className="modal-actions">
+                  <button type="button" className="btn-cancelar" onClick={cerrarModalGenerarSesiones}>
+                    Cancelar
+                  </button>
+                  <button type="submit" className="btn-primary">
+                    🔄 Generar Sesiones
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Confirmación de Eliminación */}
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setHorarioToDelete(null);
+        }}
+        onConfirm={eliminarHorario}
+        title="Eliminar Horario"
+        message="¿Está seguro de eliminar este horario? Esto eliminará también todas las sesiones asociadas. Esta acción no se puede deshacer."
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        type="danger"
+      />
+
+      {/* Modal de Error */}
+      <ConfirmModal
+        isOpen={showErrorModal}
+        onClose={() => setShowErrorModal(false)}
+        onConfirm={() => setShowErrorModal(false)}
+        title="Error"
+        message={errorModalMessage}
+        confirmText="Entendido"
+        cancelText=""
+        type="danger"
+      />
+
+      {/* Modal de Validación */}
+      <ConfirmModal
+        isOpen={showValidationModal}
+        onClose={() => setShowValidationModal(false)}
+        onConfirm={() => setShowValidationModal(false)}
+        title="Validación"
+        message={validationMessage}
+        confirmText="Entendido"
+        cancelText=""
+        type="warning"
+      />
     </div>
   );
 };

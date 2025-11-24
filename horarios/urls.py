@@ -20,12 +20,12 @@ router.register(r'estadisticas', EstadisticasHorariosViewSet, basename='estadist
 app_name = 'horarios'
 
 urlpatterns = [
-    # Incluir todas las rutas del router
-    path('api/', include(router.urls)),
-    
+    # Incluir todas las rutas del router (sin 'api/' porque ya está en gym/urls.py)
+    path('', include(router.urls)),
+
     # URLs adicionales específicas si necesitas
-    # path('api/calendario/', CalendarioView.as_view(), name='calendario'),
-    # path('api/disponibilidad/', DisponibilidadView.as_view(), name='disponibilidad'),
+    # path('calendario/', CalendarioView.as_view(), name='calendario'),
+    # path('disponibilidad/', DisponibilidadView.as_view(), name='disponibilidad'),
 ]
 
 # Documentación de endpoints disponibles:

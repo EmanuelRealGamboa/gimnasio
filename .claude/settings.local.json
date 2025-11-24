@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(python manage.py:*)",
+      "Bash(python -m pip:*)"
     ],
     "deny": [],
     "ask": []

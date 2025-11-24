@@ -42,12 +42,14 @@ function ConfirmModal({
         <h2 className="confirm-title">{title}</h2>
         <p className="confirm-message">{message}</p>
         <div className="confirm-actions">
-          <button
-            className="btn btn-secondary"
-            onClick={onClose}
-          >
-            {cancelText}
-          </button>
+          {cancelText && (
+            <button
+              className="btn btn-secondary"
+              onClick={onClose}
+            >
+              {cancelText}
+            </button>
+          )}
           <button
             className={`btn btn-${type}`}
             onClick={onConfirm}

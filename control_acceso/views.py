@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from .permissions import EsAdministradorOCajeroAcceso
 from django.db.models import Q, Count
 from django.utils import timezone
 from datetime import timedelta
@@ -18,7 +19,7 @@ from instalaciones.models import Sede
 
 
 @api_view(['POST'])
-@permission_classes([])  # TEMPORALMENTE sin autenticación para debug
+@permission_classes([EsAdministradorOCajeroAcceso])
 def validar_acceso(request):
     """
     Endpoint para validar si un cliente puede acceder.
@@ -92,7 +93,7 @@ def validar_acceso(request):
 
 
 @api_view(['POST'])
-@permission_classes([])  # TEMPORALMENTE sin autenticación
+@permission_classes([EsAdministradorOCajeroAcceso])
 def registrar_acceso(request):
     """
     Endpoint para registrar el acceso de un cliente.
@@ -166,7 +167,7 @@ def registrar_acceso(request):
 
 
 @api_view(['GET'])
-@permission_classes([])
+@permission_classes([EsAdministradorOCajeroAcceso])
 def estadisticas_acceso(request):
     """
     Endpoint para obtener estadísticas de accesos.
@@ -178,14 +179,13 @@ def estadisticas_acceso(request):
     if sede_id:
         queryset = queryset.filter(sede_id=sede_id)
 
-    # Estadísticas generales
-    total_accesos = queryset.count()
-    autorizados = queryset.filter(autorizado=True).count()
-    denegados = queryset.filter(autorizado=False).count()
-
     # Accesos de hoy
     hoy = timezone.now().date()
-    accesos_hoy = queryset.filter(fecha_hora_entrada__date=hoy).count()
+    queryset_hoy = queryset.filter(fecha_hora_entrada__date=hoy)
+
+    accesos_hoy = queryset_hoy.count()
+    autorizados = queryset_hoy.filter(autorizado=True).count()
+    denegados = queryset_hoy.filter(autorizado=False).count()
 
     # Accesos del mes
     inicio_mes = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -197,17 +197,16 @@ def estadisticas_acceso(request):
     ).values('cliente').distinct().count()
 
     return Response({
-        'total_accesos': total_accesos,
+        'accesos_hoy': accesos_hoy,
         'autorizados': autorizados,
         'denegados': denegados,
-        'accesos_hoy': accesos_hoy,
         'accesos_mes': accesos_mes,
         'clientes_unicos_mes': clientes_unicos_mes,
     })
 
 
 @api_view(['GET'])
-@permission_classes([])
+@permission_classes([EsAdministradorOCajeroAcceso])
 def listar_registros(request):
     """
     Endpoint para listar registros de acceso.
@@ -219,10 +218,21 @@ def listar_registros(request):
         'sede'
     ).all()
 
-    # Filtrar por sede
-    sede_id = request.query_params.get('sede', None)
-    if sede_id:
-        queryset = queryset.filter(sede_id=sede_id)
+    user = request.user
+    from roles.models import PersonaRol
+    roles = PersonaRol.objects.filter(persona=user.persona).values_list('rol__nombre', flat=True)
+    if 'Cajero' in roles:
+        try:
+            cajero_sede = getattr(user.persona.empleado.cajero, 'sede', None)
+            if cajero_sede:
+                queryset = queryset.filter(sede=cajero_sede)
+        except Exception:
+            queryset = queryset.none()
+    else:
+        # Filtrar por sede (solo admins pueden ver otras sedes)
+        sede_id = request.query_params.get('sede', None)
+        if sede_id:
+            queryset = queryset.filter(sede_id=sede_id)
 
     # Filtrar por cliente
     cliente_id = request.query_params.get('cliente', None)
@@ -234,6 +244,19 @@ def listar_registros(request):
     if autorizado is not None:
         autorizado_bool = autorizado.lower() in ['true', '1', 'yes']
         queryset = queryset.filter(autorizado=autorizado_bool)
+
+    # Filtrar por fecha (opcional) - por defecto solo accesos del día
+    fecha = request.query_params.get('fecha', None)
+    if fecha:
+        queryset = queryset.filter(fecha_hora_entrada__date=fecha)
+    else:
+        # Por defecto mostrar solo accesos de hoy
+        hoy = timezone.now().date()
+        queryset = queryset.filter(fecha_hora_entrada__date=hoy)
+
+    # Limitar resultados y ordenar por más recientes
+    limit = request.query_params.get('limit', 50)
+    queryset = queryset.order_by('-fecha_hora_entrada')[:int(limit)]
 
     serializer = RegistroAccesoSerializer(queryset, many=True)
     return Response(serializer.data)

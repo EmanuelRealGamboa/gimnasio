@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Cliente
 from authentication.models import Persona, User, ContactoEmergencia
 from roles.models import Rol, PersonaRol
+from django.contrib.auth.hashers import make_password
 
 
 class ClienteSerializer(serializers.ModelSerializer):

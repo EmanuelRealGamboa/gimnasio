@@ -2,19 +2,24 @@ from rest_framework import serializers
 from django.utils import timezone
 from .models import (
     TipoActividad, Horario, SesionClase, BloqueoHorario,
-    EquipoActividad, ClienteMembresia, ReservaClase, 
+    EquipoActividad, ClienteMembresia, ReservaClase,
     ReservaEquipo, ReservaEntrenador
 )
 from empleados.models import Entrenador
 from instalaciones.models import Espacio
 from clientes.models import Cliente
 from gestion_equipos.models import Activo
+from membresias.models import SuscripcionMembresia
 
 
 class TipoActividadSerializer(serializers.ModelSerializer):
+    sede_nombre = serializers.CharField(source='sede.nombre', read_only=True, allow_null=True)
+    duracion_horas = serializers.ReadOnlyField()
+    duracion_texto = serializers.ReadOnlyField()
+
     class Meta:
         model = TipoActividad
-        fields = '__all__'
+        fields = ['id', 'nombre', 'descripcion', 'duracion_default', 'color_hex', 'activo', 'sede', 'sede_nombre', 'duracion_horas', 'duracion_texto']
 
 
 class EntrenadorBasicSerializer(serializers.ModelSerializer):
@@ -47,6 +52,11 @@ class HorarioSerializer(serializers.ModelSerializer):
     duracion = serializers.ReadOnlyField()
     sede_nombre = serializers.CharField(source='espacio.sede.nombre', read_only=True)
     
+    # Campos simples para el frontend
+    tipo_actividad_nombre = serializers.CharField(source='tipo_actividad.nombre', read_only=True)
+    entrenador_nombre = serializers.SerializerMethodField()
+    espacio_nombre = serializers.CharField(source='espacio.nombre', read_only=True)
+    
     class Meta:
         model = Horario
         fields = [
@@ -56,9 +66,17 @@ class HorarioSerializer(serializers.ModelSerializer):
             'observaciones', 'fecha_creacion', 'fecha_modificacion',
             # Campos calculados y relacionados
             'tipo_actividad_detalle', 'entrenador_detalle', 'espacio_detalle',
-            'duracion', 'sede_nombre'
+            'duracion', 'sede_nombre',
+            # Campos simples para tablas
+            'tipo_actividad_nombre', 'entrenador_nombre', 'espacio_nombre'
         ]
         read_only_fields = ['fecha_creacion', 'fecha_modificacion']
+    
+    def get_entrenador_nombre(self, obj):
+        if obj.entrenador and obj.entrenador.empleado and obj.entrenador.empleado.persona:
+            persona = obj.entrenador.empleado.persona
+            return f"{persona.nombre} {persona.apellido_paterno} {persona.apellido_materno}"
+        return ""
     
     def validate(self, data):
         """Validaciones personalizadas"""
@@ -205,7 +223,7 @@ class SesionCalendarioSerializer(serializers.ModelSerializer):
     color = serializers.CharField(source='horario.tipo_actividad.color_hex', read_only=True)
     entrenador_nombre = serializers.SerializerMethodField()
     espacio_nombre = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = SesionClase
         fields = [
@@ -213,14 +231,80 @@ class SesionCalendarioSerializer(serializers.ModelSerializer):
             'hora_inicio_efectiva', 'hora_fin_efectiva', 'cupo_efectivo',
             'titulo', 'color', 'entrenador_nombre', 'espacio_nombre'
         ]
-    
+
     def get_entrenador_nombre(self, obj):
         entrenador = obj.entrenador_efectivo
         persona = entrenador.empleado.persona
         return f"{persona.nombre} {persona.apellido_paterno}"
-    
+
     def get_espacio_nombre(self, obj):
         return obj.espacio_efectivo.nombre
+
+
+class SesionDisponibleSerializer(serializers.ModelSerializer):
+    """Serializer completo para sesiones disponibles para reservar"""
+    actividad = serializers.SerializerMethodField()
+    entrenador = serializers.SerializerMethodField()
+    espacio = serializers.SerializerMethodField()
+    sede = serializers.SerializerMethodField()
+    hora_inicio = serializers.TimeField(source='hora_inicio_efectiva', read_only=True)
+    hora_fin = serializers.TimeField(source='hora_fin_efectiva', read_only=True)
+    cupo_total = serializers.IntegerField(source='cupo_efectivo', read_only=True)
+    lugares_disponibles = serializers.SerializerMethodField()
+    puede_reservar = serializers.SerializerMethodField()
+    categoria = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SesionClase
+        fields = [
+            'id', 'fecha', 'estado', 'actividad', 'entrenador', 'espacio', 'sede',
+            'hora_inicio', 'hora_fin', 'cupo_total', 'lugares_disponibles',
+            'puede_reservar', 'categoria'
+        ]
+
+    def get_actividad(self, obj):
+        tipo = obj.horario.tipo_actividad
+        return {
+            'id': tipo.id,
+            'nombre': tipo.nombre,
+            'descripcion': tipo.descripcion,
+            'color': tipo.color_hex,
+            'duracion': str(tipo.duracion_default) if tipo.duracion_default else None
+        }
+
+    def get_entrenador(self, obj):
+        entrenador = obj.entrenador_efectivo
+        persona = entrenador.empleado.persona
+        return {
+            'id': entrenador.empleado_id,
+            'nombre': f"{persona.nombre} {persona.apellido_paterno} {persona.apellido_materno}",
+            'especialidad': entrenador.especialidad
+        }
+
+    def get_espacio(self, obj):
+        espacio = obj.espacio_efectivo
+        return {
+            'id': espacio.id,
+            'nombre': espacio.nombre,
+            'capacidad': espacio.capacidad
+        }
+
+    def get_sede(self, obj):
+        sede = obj.horario.espacio.sede
+        return {
+            'id': sede.id,
+            'nombre': sede.nombre
+        }
+
+    def get_lugares_disponibles(self, obj):
+        return obj.cupo_efectivo - obj.asistentes_registrados
+
+    def get_puede_reservar(self, obj):
+        return obj.estado == 'programada' and obj.asistentes_registrados < obj.cupo_efectivo
+
+    def get_categoria(self, obj):
+        # Por defecto todas las sesiones son "basico", podríamos agregar lógica aquí
+        return 'basico'
 
 
 class HorarioDisponibilidadSerializer(serializers.Serializer):
@@ -291,39 +375,66 @@ class ClienteMembresiaSerializer(serializers.ModelSerializer):
 class ReservaClaseSerializer(serializers.ModelSerializer):
     cliente_detalle = ClienteBasicSerializer(source='cliente', read_only=True)
     sesion_detalle = SesionClaseSerializer(source='sesion_clase', read_only=True)
-    actividad_nombre = serializers.CharField(source='sesion_clase.horario.tipo_actividad.nombre', read_only=True)
-    fecha_sesion = serializers.DateField(source='sesion_clase.fecha', read_only=True)
-    hora_inicio = serializers.TimeField(source='sesion_clase.hora_inicio_efectiva', read_only=True)
-    hora_fin = serializers.TimeField(source='sesion_clase.hora_fin_efectiva', read_only=True)
-    
+
+    # Campos simples para frontend (cards)
+    codigo_reserva = serializers.ReadOnlyField()
+    cliente_nombre = serializers.SerializerMethodField()
+    sesion_actividad = serializers.CharField(source='sesion_clase.horario.tipo_actividad.nombre', read_only=True)
+    sesion_fecha = serializers.DateField(source='sesion_clase.fecha', read_only=True)
+    sesion_hora_inicio = serializers.TimeField(source='sesion_clase.hora_inicio_efectiva', read_only=True)
+    sesion_hora_fin = serializers.TimeField(source='sesion_clase.hora_fin_efectiva', read_only=True)
+    sesion_entrenador = serializers.SerializerMethodField()
+    sesion_espacio = serializers.CharField(source='sesion_clase.espacio_efectivo.nombre', read_only=True)
+    sesion_sede = serializers.CharField(source='sesion_clase.espacio_efectivo.sede.nombre', read_only=True)
+
     class Meta:
         model = ReservaClase
         fields = [
             'id', 'cliente', 'sesion_clase', 'fecha_reserva', 'estado',
             'observaciones', 'fecha_cancelacion', 'motivo_cancelacion',
-            'cliente_detalle', 'sesion_detalle', 'actividad_nombre',
-            'fecha_sesion', 'hora_inicio', 'hora_fin'
+            'cliente_detalle', 'sesion_detalle',
+            # Campos simples para cards
+            'codigo_reserva', 'cliente_nombre', 'sesion_actividad', 'sesion_fecha',
+            'sesion_hora_inicio', 'sesion_hora_fin', 'sesion_entrenador',
+            'sesion_espacio', 'sesion_sede'
         ]
         read_only_fields = ['fecha_reserva', 'fecha_cancelacion']
+
+    def get_cliente_nombre(self, obj):
+        if obj.cliente and obj.cliente.persona:
+            persona = obj.cliente.persona
+            return f"{persona.nombre} {persona.apellido_paterno} {persona.apellido_materno}"
+        return ""
+
+    def get_sesion_entrenador(self, obj):
+        if obj.sesion_clase:
+            entrenador = obj.sesion_clase.entrenador_efectivo
+            if entrenador and entrenador.empleado and entrenador.empleado.persona:
+                persona = entrenador.empleado.persona
+                return f"{persona.nombre} {persona.apellido_paterno} {persona.apellido_materno}"
+        return ""
 
     def validate(self, data):
         """Validaciones personalizadas"""
         cliente = data.get('cliente')
         sesion_clase = data.get('sesion_clase')
-        
+
         if cliente and sesion_clase:
-            # Verificar membresía activa
-            if not cliente.membresias.filter(
+            # Verificar membresía activa - buscar en el modelo correcto (SuscripcionMembresia)
+            tiene_membresia_activa = SuscripcionMembresia.objects.filter(
+                cliente=cliente,
                 estado='activa',
                 fecha_inicio__lte=timezone.now().date(),
                 fecha_fin__gte=timezone.now().date()
-            ).exists():
+            ).exists()
+
+            if not tiene_membresia_activa:
                 raise serializers.ValidationError("El cliente no tiene una membresía activa")
-            
+
             # Verificar cupo disponible
             if sesion_clase.esta_llena:
                 raise serializers.ValidationError("La sesión ya está llena")
-        
+
         return data
 
 

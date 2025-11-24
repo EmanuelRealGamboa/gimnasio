@@ -33,6 +33,7 @@ urlpatterns = [
     path('api/gestion-equipos/', include('gestion_equipos.urls')),
     path('api/accesos/', include('control_acceso.urls')),
     path('api/horarios/', include('horarios.urls')),  # App de reservas y horarios
+    path('api/limpieza/', include('empleados.urls_limpieza')),  # Módulo de gestión de limpieza
 
 ]
 

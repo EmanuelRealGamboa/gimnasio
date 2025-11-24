@@ -23,7 +23,16 @@ class MembresiaViewSet(viewsets.ModelViewSet):
     Permite crear, leer, actualizar y eliminar membresías.
     """
     queryset = Membresia.objects.all()
-    permission_classes = [EsAdministradorOCajero]
+
+    def get_permissions(self):
+        """
+        Permisos personalizados:
+        - Clientes autenticados pueden ver membresías (list, retrieve, activas)
+        - Solo admin/cajero pueden crear, actualizar, eliminar
+        """
+        if self.action in ['list', 'retrieve', 'activas']:
+            return [IsAuthenticated()]
+        return [EsAdministradorOCajero()]
 
     def get_serializer_class(self):
         """Retorna el serializer apropiado según la acción"""
@@ -37,8 +46,19 @@ class MembresiaViewSet(viewsets.ModelViewSet):
         """
         Permite filtrar membresías por tipo, activo, precio, sede, etc.
         Parámetros de query: tipo, activo, search, sede, permite_todas_sedes
+
+        Si el usuario es un cliente, solo muestra membresías de su sede
+        o membresías que permiten todas las sedes.
         """
         queryset = Membresia.objects.select_related('sede').prefetch_related('espacios_incluidos').all()
+
+        # Si el usuario es un cliente, filtrar por su sede
+        if hasattr(self.request.user, 'persona') and hasattr(self.request.user.persona, 'cliente'):
+            cliente = self.request.user.persona.cliente
+            # Mostrar membresías de la sede del cliente o que permiten todas las sedes
+            queryset = queryset.filter(
+                Q(sede_id=cliente.sede_id) | Q(permite_todas_sedes=True)
+            )
 
         # Filtrar por tipo
         tipo = self.request.query_params.get('tipo', None)
@@ -161,8 +181,13 @@ class MembresiaViewSet(viewsets.ModelViewSet):
         """
         Endpoint para obtener solo membresías activas
         GET /api/membresias/activas/
+
+        Si el usuario es un cliente, solo muestra membresías activas
+        de su sede o que permiten todas las sedes.
         """
-        membresias = Membresia.objects.filter(activo=True)
+        # Usar get_queryset() para que aplique el filtro de sede del cliente
+        queryset = self.get_queryset()
+        membresias = queryset.filter(activo=True)
         serializer = MembresiaListSerializer(membresias, many=True)
         return Response(serializer.data)
 
@@ -173,7 +198,7 @@ class SuscripcionMembresiaViewSet(viewsets.ModelViewSet):
     Permite crear, leer, actualizar y cancelar suscripciones.
     """
     queryset = SuscripcionMembresia.objects.all()
-    permission_classes = [EsAdministradorOCajero]
+    permission_classes = [IsAuthenticated]  # Cambiado: ahora los clientes también pueden crear
 
     def get_serializer_class(self):
         """Retorna el serializer apropiado según la acción"""
@@ -190,7 +215,12 @@ class SuscripcionMembresiaViewSet(viewsets.ModelViewSet):
             'cliente', 'cliente__persona', 'membresia', 'sede_suscripcion'
         ).all()
 
-        # Filtrar por cliente
+        # Si el usuario es un cliente, solo mostrar sus propias suscripciones
+        if hasattr(self.request.user, 'persona') and hasattr(self.request.user.persona, 'cliente'):
+            cliente = self.request.user.persona.cliente
+            queryset = queryset.filter(cliente=cliente)
+
+        # Filtrar por cliente (solo para admins)
         cliente_id = self.request.query_params.get('cliente', None)
         if cliente_id:
             queryset = queryset.filter(cliente_id=cliente_id)
@@ -223,6 +253,130 @@ class SuscripcionMembresiaViewSet(viewsets.ModelViewSet):
             )
 
         return queryset
+
+    def create(self, request, *args, **kwargs):
+        """
+        Crear nueva suscripción.
+        Si el usuario autenticado es un cliente, se infiere automáticamente:
+        - cliente: del usuario autenticado
+        - sede_suscripcion: de la sede del cliente
+
+        Body requerido para clientes:
+        {
+            "membresia": <id>,
+            "metodo_pago": "efectivo|tarjeta|transferencia",
+            "notas": "opcional"
+        }
+        """
+        # Verificar si el usuario es un cliente
+        if hasattr(request.user, 'persona') and hasattr(request.user.persona, 'cliente'):
+            cliente = request.user.persona.cliente
+
+            # Validar que la membresía existe
+            membresia_id = request.data.get('membresia')
+            if not membresia_id:
+                return Response(
+                    {'error': 'El campo membresia es requerido'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            try:
+                membresia = Membresia.objects.get(id=membresia_id)
+            except Membresia.DoesNotExist:
+                return Response(
+                    {'error': 'La membresía especificada no existe'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Validar que la membresía esté disponible en la sede del cliente
+            if not membresia.permite_todas_sedes and membresia.sede_id != cliente.sede_id:
+                return Response(
+                    {'error': 'Esta membresía no está disponible en tu sede'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Crear suscripción directamente con el modelo
+            # (el método save() del modelo calculará fecha_fin automáticamente)
+            suscripcion = SuscripcionMembresia.objects.create(
+                cliente=cliente,
+                membresia=membresia,
+                fecha_inicio=timezone.now().date(),
+                precio_pagado=request.data.get('precio_pagado', membresia.precio),
+                metodo_pago=request.data.get('metodo_pago', 'efectivo'),
+                notas=request.data.get('notas', 'Suscripción desde app móvil'),
+                sede_suscripcion_id=cliente.sede_id
+            )
+
+            return Response(
+                {
+                    'message': 'Suscripción creada exitosamente',
+                    'data': SuscripcionMembresiaSerializer(suscripcion).data
+                },
+                status=status.HTTP_201_CREATED
+            )
+        else:
+            # Si no es cliente (ej: admin/cajero), usar el método por defecto
+            return super().create(request, *args, **kwargs)
+
+    @action(detail=False, methods=['post'])
+    def procesar_pago(self, request):
+        """
+        Endpoint para simular procesamiento de pago
+        POST /api/suscripciones/procesar_pago/
+
+        Body:
+        {
+            "membresia": <id>,
+            "metodo_pago": "tarjeta|efectivo|transferencia",
+            "numero_tarjeta": "opcional, para tarjeta",
+            "cvv": "opcional, para tarjeta"
+        }
+
+        Simula un proceso de pago y retorna:
+        - success: true/false
+        - transaction_id: ID de transacción simulado
+        - message: Mensaje del resultado
+        """
+        import time
+        import random
+        from datetime import datetime
+
+        # Simular delay de procesamiento (1-2 segundos)
+        time.sleep(random.uniform(1, 2))
+
+        membresia_id = request.data.get('membresia')
+        metodo_pago = request.data.get('metodo_pago', 'efectivo')
+
+        # Validar membresía
+        try:
+            membresia = Membresia.objects.get(id=membresia_id)
+        except Membresia.DoesNotExist:
+            return Response({
+                'success': False,
+                'message': 'La membresía seleccionada no existe'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Simular aprobación (95% de éxito)
+        es_exitoso = random.random() < 0.95
+
+        if es_exitoso:
+            # Generar ID de transacción simulado
+            transaction_id = f"TXN{datetime.now().strftime('%Y%m%d%H%M%S')}{random.randint(1000, 9999)}"
+
+            return Response({
+                'success': True,
+                'transaction_id': transaction_id,
+                'message': 'Pago procesado exitosamente',
+                'monto': float(membresia.precio),
+                'membresia_nombre': membresia.nombre_plan,
+                'metodo_pago': metodo_pago
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                'success': False,
+                'message': 'El pago fue rechazado. Por favor intenta con otro método de pago.',
+                'codigo_error': 'INSUFFICIENT_FUNDS'
+            }, status=status.HTTP_402_PAYMENT_REQUIRED)
 
     @action(detail=False, methods=['get'])
     def clientes_con_membresia(self, request):

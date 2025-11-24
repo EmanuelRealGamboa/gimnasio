@@ -16,21 +16,40 @@ function ClienteList() {
   const [sedes, setSedes] = useState([]);
   const [estadisticas, setEstadisticas] = useState(null);
   const navigate = useNavigate();
+  // Obtener datos de usuario y rol
+  const userData = JSON.parse(localStorage.getItem('user_data'));
+  const isCajero = userData?.dashboard === 'Recepción' || (userData?.permisos?.includes('gestionar_ventas') || userData?.permisos?.includes('gestionar_acceso'));
+  const cajeroSedeId = isCajero ? userData?.sede_id : null;
 
   useEffect(() => {
+    // Si es cajero, filtrar por sede automáticamente
+    if (isCajero && cajeroSedeId) {
+      setSedeFilter(cajeroSedeId.toString());
+    }
     fetchClientes();
     fetchEstadisticas();
     fetchSedes();
   }, []);
 
   useEffect(() => {
-    filterClientes();
+    // Si es cajero, forzar el filtro por sede
+    if (isCajero && cajeroSedeId) {
+      setSedeFilter(cajeroSedeId.toString());
+      filterClientes();
+    } else {
+      filterClientes();
+    }
   }, [clientes, searchTerm, estadoFilter, nivelFilter, sedeFilter]);
 
   const fetchClientes = async () => {
     try {
       setLoading(true);
-      const response = await clienteService.getClientes();
+      let params = {};
+      // Si es cajero, filtrar por sede desde el backend
+      if (isCajero && cajeroSedeId) {
+        params.sede = cajeroSedeId;
+      }
+      const response = await clienteService.getClientes(params);
       setClientes(response.data);
     } catch (err) {
       console.error('Error al cargar clientes:', err);

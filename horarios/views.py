@@ -14,8 +14,9 @@ from .models import (
 from .serializers import (
     TipoActividadSerializer, HorarioSerializer, HorarioCreateSerializer,
     SesionClaseSerializer, SesionClaseCreateSerializer, BloqueoHorarioSerializer,
-    HorarioCalendarioSerializer, SesionCalendarioSerializer,
-    HorarioDisponibilidadSerializer
+    HorarioCalendarioSerializer, SesionCalendarioSerializer, SesionDisponibleSerializer,
+    HorarioDisponibilidadSerializer, ReservaClaseSerializer, ReservaClaseCreateSerializer,
+    ReservaEquipoSerializer, ReservaEntrenadorSerializer
 )
 from .permissions import EsAdministradorOSupervisor, PuedeGestionarHorarios, PuedeHacerReservas
 from clientes.models import Cliente
@@ -27,14 +28,31 @@ class TipoActividadViewSet(viewsets.ModelViewSet):
     """
     ViewSet para gestionar tipos de actividades
     """
-    queryset = TipoActividad.objects.all()
+    queryset = TipoActividad.objects.select_related('sede').all()
     serializer_class = TipoActividadSerializer
-    permission_classes = [PuedeGestionarHorarios]
+    permission_classes = [IsAuthenticated]  # Cambiado para permitir a clientes ver actividades
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['activo']
+    filterset_fields = ['activo', 'sede']
     search_fields = ['nombre', 'descripcion']
     ordering_fields = ['nombre', 'duracion_default']
     ordering = ['nombre']
+
+    def get_queryset(self):
+        """Filtrar tipos de actividad según el usuario y sede"""
+        queryset = super().get_queryset()
+
+        # Si el usuario es un cliente, filtrar automáticamente por su sede
+        if hasattr(self.request.user, 'persona') and hasattr(self.request.user.persona, 'cliente'):
+            cliente = self.request.user.persona.cliente
+            queryset = queryset.filter(sede=cliente.sede)
+
+        return queryset
+
+    def get_permissions(self):
+        """Solo admins pueden crear/editar/eliminar, todos pueden leer"""
+        if self.action in ['list', 'retrieve', 'equipos_necesarios']:
+            return [IsAuthenticated()]
+        return [PuedeGestionarHorarios()]
 
     @action(detail=True, methods=['get'])
     def equipos_necesarios(self, request, pk=None):
@@ -177,6 +195,58 @@ class HorarioViewSet(viewsets.ModelViewSet):
             'sesiones_creadas': sesiones_creadas
         })
 
+    @action(detail=False, methods=['get'])
+    def entrenadores(self, request):
+        """Obtener lista de entrenadores disponibles, opcionalmente filtrados por sede"""
+        sede_id = request.query_params.get('sede')
+
+        queryset = Entrenador.objects.select_related(
+            'empleado__persona', 'sede'
+        ).filter(empleado__estado='Activo')
+
+        if sede_id:
+            queryset = queryset.filter(sede_id=sede_id)
+
+        data = []
+        for entrenador in queryset:
+            persona = entrenador.empleado.persona
+            data.append({
+                'id': entrenador.empleado_id,
+                'nombre_completo': f"{persona.nombre} {persona.apellido_paterno} {persona.apellido_materno}",
+                'nombre': persona.nombre,
+                'especialidad': entrenador.especialidad,
+                'sede_id': entrenador.sede_id,
+                'sede_nombre': entrenador.sede.nombre
+            })
+
+        return Response(data)
+
+    @action(detail=False, methods=['get'])
+    def espacios(self, request):
+        """Obtener lista de espacios disponibles, opcionalmente filtrados por sede"""
+        from instalaciones.models import Espacio
+
+        sede_id = request.query_params.get('sede')
+
+        queryset = Espacio.objects.select_related('sede').all()
+
+        if sede_id:
+            queryset = queryset.filter(sede_id=sede_id)
+
+        data = []
+        for espacio in queryset:
+            data.append({
+                'id': espacio.id,
+                'espacio_id': espacio.id,
+                'nombre': espacio.nombre,
+                'descripcion': espacio.descripcion or '',
+                'capacidad': espacio.capacidad,
+                'sede_id': espacio.sede_id,
+                'sede_nombre': espacio.sede.nombre
+            })
+
+        return Response(data)
+
 
 class SesionClaseViewSet(viewsets.ModelViewSet):
     """
@@ -205,6 +275,41 @@ class SesionClaseViewSet(viewsets.ModelViewSet):
         if self.action in ['create', 'update', 'partial_update']:
             return SesionClaseCreateSerializer
         return SesionClaseSerializer
+
+    @action(detail=False, methods=['get'])
+    def disponibles(self, request):
+        """
+        Obtener sesiones disponibles para reservar.
+        Para clientes autenticados, filtra automáticamente por su sede.
+        """
+        queryset = self.get_queryset()
+
+        # Si el usuario es un cliente, filtrar por su sede
+        if hasattr(request.user, 'persona') and hasattr(request.user.persona, 'cliente'):
+            cliente = request.user.persona.cliente
+            queryset = queryset.filter(horario__espacio__sede=cliente.sede)
+
+        # Filtrar solo sesiones programadas (disponibles para reservar)
+        queryset = queryset.filter(
+            estado='programada',
+            fecha__gte=timezone.now().date()
+        )
+
+        # Filtros opcionales
+        tipo_actividad = request.query_params.get('tipo_actividad')
+        if tipo_actividad:
+            queryset = queryset.filter(horario__tipo_actividad_id=tipo_actividad)
+
+        fecha_desde = request.query_params.get('fecha_desde')
+        if fecha_desde:
+            queryset = queryset.filter(fecha__gte=fecha_desde)
+
+        fecha_hasta = request.query_params.get('fecha_hasta')
+        if fecha_hasta:
+            queryset = queryset.filter(fecha__lte=fecha_hasta)
+
+        serializer = SesionDisponibleSerializer(queryset, many=True)
+        return Response(serializer.data)
 
     @action(detail=False, methods=['get'])
     def calendario_mensual(self, request):
@@ -329,6 +434,11 @@ class ReservaClaseViewSet(viewsets.ModelViewSet):
         'sesion_clase__horario__entrenador__empleado__persona'
     ).all()
     permission_classes = [IsAuthenticated]
+    
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            return ReservaClaseCreateSerializer
+        return ReservaClaseSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = [
         'estado', 'cliente', 'sesion_clase__fecha',
@@ -345,14 +455,91 @@ class ReservaClaseViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Filtrar reservas según el usuario"""
         queryset = super().get_queryset()
-        
+
         # Si el usuario tiene una persona asociada y es cliente
         if hasattr(self.request.user, 'persona') and hasattr(self.request.user.persona, 'cliente'):
             # Los clientes solo ven sus propias reservas
             cliente = self.request.user.persona.cliente
             queryset = queryset.filter(cliente=cliente)
-        
+
         return queryset
+
+    def create(self, request, *args, **kwargs):
+        """
+        Crear nueva reserva de clase.
+        Si el usuario autenticado es un cliente, se infiere automáticamente:
+        - cliente: del usuario autenticado
+
+        Body requerido para clientes:
+        {
+            "sesion_clase": <id>,
+            "observaciones": "opcional"
+        }
+        """
+        # Verificar si el usuario es un cliente
+        if hasattr(request.user, 'persona') and hasattr(request.user.persona, 'cliente'):
+            cliente = request.user.persona.cliente
+
+            # Validar que la sesión existe
+            sesion_id = request.data.get('sesion_clase')
+            if not sesion_id:
+                return Response(
+                    {'error': 'El campo sesion_clase es requerido'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            try:
+                sesion = SesionClase.objects.get(id=sesion_id)
+            except SesionClase.DoesNotExist:
+                return Response(
+                    {'error': 'La sesión especificada no existe'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Validar que la sesión esté disponible
+            if sesion.estado != 'programada':
+                return Response(
+                    {'error': 'La sesión no está disponible para reservas'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Validar que haya cupo disponible
+            if sesion.asistentes_registrados >= sesion.cupo_efectivo:
+                return Response(
+                    {'error': 'La sesión ya alcanzó su cupo máximo'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Validar que el cliente no tenga ya una reserva para esta sesión
+            reserva_existente = ReservaClase.objects.filter(
+                cliente=cliente,
+                sesion_clase=sesion,
+                estado__in=['activa', 'confirmada']
+            ).exists()
+
+            if reserva_existente:
+                return Response(
+                    {'error': 'Ya tienes una reserva para esta sesión'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Crear reserva automáticamente
+            reserva = ReservaClase.objects.create(
+                cliente=cliente,
+                sesion_clase=sesion,
+                observaciones=request.data.get('observaciones', '')
+            )
+
+            return Response(
+                {
+                    'message': 'Reserva creada exitosamente',
+                    'data': ReservaClaseSerializer(reserva).data
+                },
+                status=status.HTTP_201_CREATED
+            )
+        else:
+            # Si no es cliente (ej: admin/cajero), usar el método por defecto
+            return super().create(request, *args, **kwargs)
 
     @action(detail=False, methods=['get'])
     def mis_reservas(self, request):

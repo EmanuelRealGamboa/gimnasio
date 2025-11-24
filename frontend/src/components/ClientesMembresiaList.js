@@ -88,7 +88,8 @@ function ClientesMembresiaList() {
           // Suscripciones activas con 5 días o menos para vencer
           return estado === 'activa' && diasRestantes <= 5 && diasRestantes > 0;
         case 'vencidas_canceladas':
-          return estado === 'vencida' || estado === 'cancelada';
+          // Incluir membresías vencidas, canceladas Y activas con 0 días restantes
+          return estado === 'vencida' || estado === 'cancelada' || (estado === 'activa' && diasRestantes === 0);
         default:
           return true;
       }

@@ -39,7 +39,15 @@ import VentaProductos from './components/VentaProductos';
 import VentasHistorial from './components/VentasHistorial';
 import SuscripcionesHistorial from './components/SuscripcionesHistorial';
 import ControlAccesos from './components/ControlAccesos';
+import AccesosMonitor from './components/AccesosMonitor';
 import HorariosList from './components/HorariosList';
+import HorarioForm from './components/HorarioForm';
+import HorarioDetail from './components/HorarioDetail';
+import TipoActividadList from './components/TipoActividadList';
+import TipoActividadForm from './components/TipoActividadForm';
+import GenerarSesiones from './components/GenerarSesiones';
+import ReservasClases from './components/ReservasClases';
+import GestionLimpieza from './components/GestionLimpieza';
 import ProtectedRoute from './components/ProtectedRoute';
 import authService from './services/authService';
 import './App.css';
@@ -311,11 +319,88 @@ function App() {
 
           {/* Rutas de gestión de horarios y reservas */}
           <Route
+            path="/horarios/tipos-actividad"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <TipoActividadList />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/horarios/tipos-actividad/new"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <TipoActividadForm />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/horarios/tipos-actividad/edit/:id"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <TipoActividadForm />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/horarios/sesiones"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <GenerarSesiones />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/horarios"
             element={
               <ProtectedRoute>
                 <Layout>
                   <HorariosList />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/horarios/new"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <HorarioForm />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/horarios/edit/:id"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <HorarioForm />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/horarios/:id"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <HorarioDetail />
                 </Layout>
               </ProtectedRoute>
             }
@@ -601,6 +686,42 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <ControlAccesos />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Accesos - Monitor en Tiempo Real */}
+          <Route
+            path="/accesos/monitor"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <AccesosMonitor />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Horarios - Reservas de Clases */}
+          <Route
+            path="/reservas-clases"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <ReservasClases />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Limpieza - Gestión de Limpieza */}
+          <Route
+            path="/limpieza"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <GestionLimpieza />
                 </Layout>
               </ProtectedRoute>
             }

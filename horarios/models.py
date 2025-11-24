@@ -5,7 +5,7 @@ from empleados.models import Entrenador
 from instalaciones.models import Espacio, Sede
 from clientes.models import Cliente
 from gestion_equipos.models import Activo
-from membresias.models import Membresia
+from membresias.models import Membresia, SuscripcionMembresia
 from datetime import datetime, time
 
 
@@ -13,19 +13,43 @@ class TipoActividad(models.Model):
     """
     Tipos de actividades que se pueden realizar (Yoga, CrossFit, Spinning, etc.)
     """
-    nombre = models.CharField(max_length=100, unique=True)
+    nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True, null=True)
     duracion_default = models.DurationField(help_text="Duración por defecto en formato HH:MM:SS")
     color_hex = models.CharField(max_length=7, default="#3b82f6", help_text="Color para mostrar en calendario (#RRGGBB)")
     activo = models.BooleanField(default=True)
-    
+    sede = models.ForeignKey(
+        Sede,
+        on_delete=models.CASCADE,
+        related_name='tipos_actividad',
+        help_text="Sede donde está disponible esta actividad",
+        null=True,
+        blank=True
+    )
+
     class Meta:
         verbose_name = "Tipo de Actividad"
         verbose_name_plural = "Tipos de Actividades"
         ordering = ['nombre']
-    
+        unique_together = ['nombre', 'sede']  # Permite mismo nombre en diferentes sedes
+
     def __str__(self):
+        if self.sede:
+            return f"{self.nombre} - {self.sede.nombre}"
         return self.nombre
+
+    @property
+    def duracion_horas(self):
+        """Retorna la duración en horas como número entero"""
+        if self.duracion_default:
+            return int(self.duracion_default.total_seconds() // 3600)
+        return 1
+
+    @property
+    def duracion_texto(self):
+        """Retorna la duración en formato legible (ej: '2 horas')"""
+        horas = self.duracion_horas
+        return f"{horas} hora{'s' if horas != 1 else ''}"
 
 
 class Horario(models.Model):
@@ -501,18 +525,21 @@ class ReservaClase(models.Model):
     
     def clean(self):
         """Validaciones personalizadas"""
-        # Verificar que el cliente tenga membresía activa
-        if not self.cliente.membresias.filter(
+        # Verificar que el cliente tenga membresía activa - buscar en el modelo correcto (SuscripcionMembresia)
+        tiene_membresia_activa = SuscripcionMembresia.objects.filter(
+            cliente=self.cliente,
             estado='activa',
             fecha_inicio__lte=timezone.now().date(),
             fecha_fin__gte=timezone.now().date()
-        ).exists():
+        ).exists()
+
+        if not tiene_membresia_activa:
             raise ValidationError("El cliente no tiene una membresía activa")
-        
+
         # Verificar que la sesión no esté llena
         if self.sesion_clase.esta_llena and self.estado == 'confirmada':
             raise ValidationError("La sesión ya está llena")
-        
+
         # Verificar que la sesión esté en el futuro
         fecha_sesion = self.sesion_clase.fecha
         if fecha_sesion < timezone.now().date():

@@ -120,13 +120,25 @@ class VentaProductoViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """
         Permite filtrar ventas por fecha, sede, estado, cliente, etc.
+        Si el usuario es cajero, solo puede ver ventas de su sede.
         """
         queryset = super().get_queryset()
+        user = self.request.user
+        from roles.models import PersonaRol
+        roles = PersonaRol.objects.filter(persona=user.persona).values_list('rol__nombre', flat=True)
+        if 'Cajero' in roles:
+            try:
+                cajero_sede = getattr(user.persona.empleado.cajero, 'sede', None)
+                if cajero_sede:
+                    queryset = queryset.filter(sede=cajero_sede)
+            except Exception:
+                queryset = queryset.none()
 
-        # Filtrar por sede
-        sede_id = self.request.query_params.get('sede', None)
-        if sede_id:
-            queryset = queryset.filter(sede_id=sede_id)
+        # Filtrar por sede (solo admins pueden ver otras sedes)
+        elif 'Administrador' in roles:
+            sede_id = self.request.query_params.get('sede', None)
+            if sede_id:
+                queryset = queryset.filter(sede_id=sede_id)
 
         # Filtrar por estado
         estado = self.request.query_params.get('estado', None)

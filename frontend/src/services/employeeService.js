@@ -50,6 +50,16 @@ class EmployeeService {
     const params = sedeId ? { sede: sedeId } : {};
     return api.get('/admin/empleados/estadisticas/', { params });
   }
+
+  // Obtener lista de entrenadores
+  async getEntrenadores(filters = {}) {
+    const params = new URLSearchParams();
+    if (filters.sede) params.append('sede', filters.sede);
+    if (filters.activo !== undefined) params.append('activo', filters.activo);
+
+    const response = await api.get(`/empleados/entrenadores/?${params.toString()}`);
+    return response.data;
+  }
 }
 
 export default new EmployeeService();
