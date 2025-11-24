@@ -1,0 +1,33 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: gimnasio
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=False
+      - DJANGO_ALLOWED_HOSTS=*
+      - PGDATABASE=gimnasio
+      - PGUSER=user
+      - PGPASSWORD=password
+      - PGHOST=db
+      - PGPORT=5432
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
