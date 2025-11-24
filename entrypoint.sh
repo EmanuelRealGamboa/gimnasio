@@ -4,12 +4,10 @@ set -e
 echo "==> Aplicando migraciones..."
 python manage.py migrate --noinput
 
-if [ "$DJANGO_SUPERUSER_USERNAME" ] && [ "$DJANGO_SUPERUSER_PASSWORD" ] && [ "$DJANGO_SUPERUSER_EMAIL" ]; then
-  echo "==> Creando superusuario (si no existe)..."
-  python manage.py createsuperuser \
-    --noinput \
-    --username "$DJANGO_SUPERUSER_USERNAME" \
-    --email "$DJANGO_SUPERUSER_EMAIL" || true
+echo "==> Creando superusuario (si no existe)..."
+if [ "$DJANGO_SUPERUSER_EMAIL" ] && [ "$DJANGO_SUPERUSER_PASSWORD" ]; then
+  # Django leerá DJANGO_SUPERUSER_* automáticamente
+  python manage.py createsuperuser --noinput || true
 fi
 
 echo "==> Levantando gunicorn..."
