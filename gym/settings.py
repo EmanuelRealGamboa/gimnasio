@@ -22,12 +22,12 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-o-%)_h!czhhq7@@c^4a_u92z39m4)mbsb+xitq*iqz_bepu0ax'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-o-%)_h!czhhq7@@c^4a_u92z39m4)mbsb+xitq*iqz_bepu0ax')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']  # Permite conexiones desde cualquier host (desarrollo)
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '*').split(',')  # Permite conexiones desde cualquier host (desarrollo)
 
 
 # Application definition
@@ -98,11 +98,11 @@ WSGI_APPLICATION = 'gym.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DATABASE_NAME'),
-        'USER': os.getenv('DATABASE_USER'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
-        'HOST': os.getenv('DATABASE_HOST'),
-        'PORT': os.getenv('DATABASE_PORT'),
+        'NAME': os.getenv('PGDATABASE', os.getenv('DATABASE_NAME')),
+        'USER': os.getenv('PGUSER', os.getenv('DATABASE_USER')),
+        'PASSWORD': os.getenv('PGPASSWORD', os.getenv('DATABASE_PASSWORD')),
+        'HOST': os.getenv('PGHOST', os.getenv('DATABASE_HOST')),
+        'PORT': os.getenv('PGPORT', os.getenv('DATABASE_PORT', '5432')),
     }
 }
 
