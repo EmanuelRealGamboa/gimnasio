@@ -1,4 +1,4 @@
-import api from './api';
+import api from './api'; // api.js ya usa REACT_APP_API_URL
 
 class InstalacionesService {
   // ========== SEDES ==========

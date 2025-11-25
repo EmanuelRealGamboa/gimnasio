@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000/api/horarios';
+const API_URL = (process.env.REACT_APP_API_URL || 'http://localhost:8000/api') + '/horarios';
 
 // Configurar interceptor para agregar token
 axios.interceptors.request.use(

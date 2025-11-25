@@ -215,7 +215,7 @@ const ActivoList = () => {
                 <div className="activo-card-image">
                   {activo.imagen ? (
                     <img
-                      src={activo.imagen.startsWith('http') ? activo.imagen : `http://localhost:8000${activo.imagen}`}
+                      src={activo.imagen.startsWith('http') ? activo.imagen : `https://carefree-fulfillment-production.up.railway.app${activo.imagen}`}
                       alt={activo.nombre}
                       onError={(e) => {
                         e.target.onerror = null;
