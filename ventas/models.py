@@ -4,7 +4,13 @@ from inventario.models import Producto
 
 
 # =====================================================
-# MODELO: VENTA
+# DEPRECATED: MODELO: VENTA
+# -----------------------------------------------------
+# Este modelo accede a producto.stock, campo que ya no existe en inventario.Producto
+# (el stock se gestiona por sede en inventario.Inventario).
+# Lanza AttributeError en runtime. Rutas desregistradas 2026-06-26.
+# NO borrar sin migración controlada + red de tests. Ver PLAN DE REFACTOR.
+# El flujo vigente de ventas usa VentaProducto / DetalleVentaProducto.
 # =====================================================
 class Venta(models.Model):
     venta_id = models.AutoField(primary_key=True)
@@ -55,7 +61,11 @@ class Venta(models.Model):
 
 
 # =====================================================
-# MODELO: PASARELA DE PAGO
+# DEPRECATED: MODELO: PASARELA DE PAGO
+# -----------------------------------------------------
+# Mismo problema que Venta: DetallePasarela.save() llama a producto.stock
+# que ya no existe. Rutas desregistradas 2026-06-26.
+# NO borrar sin migración controlada + red de tests. Ver PLAN DE REFACTOR.
 # =====================================================
 METODOS_PAGO = [
     ('Efectivo', 'Efectivo'),
