@@ -28,35 +28,30 @@ class ProductoSerializer(serializers.ModelSerializer):
         return None
 
     def create(self, validated_data):
+        import logging
+        logger = logging.getLogger(__name__)
+
         # Extraer 'sede' antes de crear el producto
         sede_id = validated_data.pop('sede', None)
-        print(f"🔍 DEBUG - Sede ID recibido: {sede_id}")
-        print(f"🔍 DEBUG - Validated data: {validated_data}")
 
         producto = super().create(validated_data)
-        print(f"✅ DEBUG - Producto creado: {producto.nombre} (ID: {producto.producto_id})")
 
         # Crear inventario inicial si se proporcionó sede
         if sede_id:
             from instalaciones.models import Sede
             try:
                 sede = Sede.objects.get(pk=sede_id)
-                print(f"✅ DEBUG - Sede encontrada: {sede.nombre} (ID: {sede.pk})")
-
-                inventario = Inventario.objects.create(
+                Inventario.objects.create(
                     producto=producto,
                     sede=sede,
                     cantidad_actual=0,
                     cantidad_minima=5,
                     cantidad_maxima=1000
                 )
-                print(f"✅ DEBUG - Inventario creado: Producto={producto.nombre}, Sede={sede.nombre}, ID={inventario.inventario_id}")
             except Sede.DoesNotExist:
-                print(f"❌ DEBUG - Sede con ID {sede_id} no existe")
+                logger.warning("Sede con ID %s no existe al crear inventario para producto %s", sede_id, producto.producto_id)
             except Exception as e:
-                print(f"❌ DEBUG - Error al crear inventario: {str(e)}")
-        else:
-            print("⚠️ DEBUG - No se proporcionó sede_id, inventario no creado")
+                logger.error("Error al crear inventario para producto %s: %s", producto.producto_id, e)
 
         return producto
 

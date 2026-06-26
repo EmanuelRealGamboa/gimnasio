@@ -78,10 +78,7 @@ class AuthService {
   getDashboardRoute() {
     const userData = this.getUserData();
 
-    console.log('User Data:', userData); // Debug
-
     if (!userData || !userData.dashboard) {
-      console.log('No dashboard data, redirecting to login');
       return '/login';
     }
 
@@ -96,8 +93,6 @@ class AuthService {
     };
 
     const route = dashboardMap[userData.dashboard] || '/login';
-    console.log('Redirecting to:', route); // Debug
-
     return route;
   }
 

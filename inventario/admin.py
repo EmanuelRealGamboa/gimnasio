@@ -137,7 +137,6 @@ class ProductoAdmin(admin.ModelAdmin):
                     'cantidad_maxima': 1000
                 }
             )
-            print(f"🆕 Inventario creado automáticamente para sede '{sede.nombre}': {obj.nombre}")
 
     def acciones(self, obj):
         return format_html(

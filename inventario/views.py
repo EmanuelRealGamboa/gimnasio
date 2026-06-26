@@ -1,3 +1,5 @@
+import logging
+
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -5,6 +7,8 @@ from django.db.models import Q
 from .models import CategoriaProducto, Producto, Inventario
 from .serializers import CategoriaProductoSerializer, ProductoSerializer, InventarioSerializer
 from .permissions import EsAdministradorOCajero
+
+logger = logging.getLogger(__name__)
 
 
 # -------------------------------
@@ -37,15 +41,13 @@ class ProductoViewSet(viewsets.ModelViewSet):
         Actualiza un producto sin modificar inventarios.
         El stock se gestiona desde el modelo Inventario por sede.
         """
-        producto = serializer.save()
-        print(f"✅ Producto actualizado: {producto.nombre}")
+        serializer.save()
 
     def perform_create(self, serializer):
         """
         Crea un producto. El serializer se encarga de crear el inventario inicial.
         """
-        producto = serializer.save()
-        print(f"🆕 Producto creado: {producto.nombre}")
+        serializer.save()
 
     def perform_destroy(self, instance):
         """
@@ -56,7 +58,6 @@ class ProductoViewSet(viewsets.ModelViewSet):
 
         try:
             instance.delete()
-            print(f"🗑️ Producto eliminado: {instance.nombre}")
         except ProtectedError:
             raise ValidationError({
                 'detail': 'No se puede eliminar este producto porque tiene ventas asociadas. '
