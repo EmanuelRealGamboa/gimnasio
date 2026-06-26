@@ -91,7 +91,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'authentication.middleware.RoleDashboardMiddleware',  # Middleware personalizado para redirección por roles
 ]
 
 ROOT_URLCONF = 'gym.urls'
