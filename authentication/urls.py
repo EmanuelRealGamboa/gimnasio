@@ -18,6 +18,14 @@ from authentication.dashboard_views import (
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
+from authentication.throttles import LoginRateThrottle
+
+
+class ThrottledTokenObtainPairView(TokenObtainPairView):
+    """Login con límite de intentos por IP (anti fuerza bruta)."""
+    throttle_classes = [LoginRateThrottle]
+
+
 urlpatterns = [
     # Gestión de empleados
     path('admin/empleados/', EmpleadoUserCreateView.as_view(), name='admin_crear_empleado'),
@@ -27,7 +35,7 @@ urlpatterns = [
     path('admin/empleados/<int:pk>/detalle', EmpleadoUserCreateView.as_view(), name='admin_usuario_detalle'),
 
     # Autenticación
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/', ThrottledTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     # Registro público para clientes (app móvil)

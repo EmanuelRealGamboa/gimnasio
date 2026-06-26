@@ -189,6 +189,12 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'
     ],
+
+    # Límite de intentos SOLO para el login (anti fuerza bruta).
+    # No se define DEFAULT_THROTTLE_CLASSES global para no limitar el resto de la API.
+    'DEFAULT_THROTTLE_RATES': {
+        'login': '10/min',
+    },
 }
 
 # CORS: abierto solo en local; en producción usa la lista blanca de abajo
