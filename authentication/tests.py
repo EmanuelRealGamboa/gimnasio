@@ -177,19 +177,40 @@ class EmpleadoEndpointTests(APITestCase):
     def test_listar_empleados(self):
         """
         Test: Listar todos los empleados existentes.
+        El endpoint filtra users que tengan Empleado asociado a través de persona.
+        Sembramos 3 empleados completos (Persona + User + Empleado).
         """
-        # Crear algunos empleados de prueba
+        from instalaciones.models import Sede
+        from datetime import date as _date
+
+        sede_test, _ = Sede.objects.get_or_create(
+            nombre='Sede Test Listar',
+            defaults={'direccion': 'Calle Test 1', 'telefono': '5550000001'}
+        )
+
         for i in range(3):
             persona = Persona.objects.create(
                 nombre=f'Empleado{i}',
                 apellido_paterno=f'Apellido{i}',
                 apellido_materno=f'Materno{i}',
-                telefono=f'555000000{i}'
+                telefono=f'555100000{i}'
             )
-            user = User.objects.create_user(
-                email=f'empleado{i}@test.com',
+            User.objects.create_user(
+                email=f'empleado_lista{i}@test.com',
                 password='password123',
                 persona=persona
+            )
+            # Crear el Empleado para que el endpoint lo incluya en el listado
+            Empleado.objects.create(
+                persona=persona,
+                puesto='Entrenador',
+                departamento='Fitness',
+                fecha_contratacion=_date(2024, 1, 1),
+                tipo_contrato='Indefinido',
+                salario='12000.00',
+                estado='Activo',
+                rfc=f'RFC{i:010d}',
+                sede=sede_test,
             )
 
         url = reverse('admin_crear_empleado')
@@ -197,8 +218,8 @@ class EmpleadoEndpointTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIsInstance(response.data, list)
-        # Al menos debería haber 4 usuarios (admin + 3 creados)
-        self.assertGreaterEqual(len(response.data), 4)
+        # Los 3 empleados creados aquí deben aparecer en la lista
+        self.assertGreaterEqual(len(response.data), 3)
 
     def test_obtener_detalle_empleado(self):
         """
