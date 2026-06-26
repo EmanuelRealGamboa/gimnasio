@@ -38,8 +38,8 @@ class FacturaViewSet(viewsets.ModelViewSet):
     filterset_class = FacturaFilter
     search_fields = ['cliente__persona__nombre', 'cliente__persona__apellido_paterno']
 
-    # ✅ Generar factura en PDF (visible sin token)
-    @action(detail=True, methods=['get'], permission_classes=[permissions.AllowAny])
+    # 🔒 Generar factura en PDF (requiere login: Administrador o Cajero)
+    @action(detail=True, methods=['get'])
     def generar_pdf(self, request, pk=None):
         factura = self.get_object()
 

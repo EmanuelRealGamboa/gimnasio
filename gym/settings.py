@@ -22,28 +22,30 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-o-%)_h!czhhq7@@c^4a_u92z39m4)mbsb+xitq*iqz_bepu0ax')
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured('Falta DJANGO_SECRET_KEY (defínela en el .env local y en Railway)')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = os.getenv('DEBUG', 'True') == 'True'
-#ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '*').split(',')  # Permite conexiones desde cualquier host (desarrollo)
-#CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
-#DEBUG = os.getenv('DEBUG', 'False') == 'True'
-DEBUG = False
+# DEBUG y hosts se controlan por variables de entorno (.env local / Railway)
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
+ALLOWED_HOSTS = os.getenv(
+    'DJANGO_ALLOWED_HOSTS',
+    'localhost,127.0.0.1',
+).split(',')
 
-ALLOWED_HOSTS = [
-    "carefree-fulfillment-production.up.railway.app",
-]
-
-CSRF_TRUSTED_ORIGINS = [
-    "https://carefree-fulfillment-production.up.railway.app",
-]
+CSRF_TRUSTED_ORIGINS = os.getenv(
+    'CSRF_TRUSTED_ORIGINS',
+    'http://localhost:3000,http://127.0.0.1:3000',
+).split(',')
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-CSRF_COOKIE_SECURE = True     # temporal para descartar problemas de cookie
-SESSION_COOKIE_SECURE = True   # temporal también
+# Cookies seguras solo en producción (https); en local (http) van en False
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SAMESITE = "Lax"
 
 
@@ -190,12 +192,11 @@ REST_FRAMEWORK = {
     ],
 }
 
-# CORS Configuration
-# Para desarrollo móvil, permitir todos los orígenes
-CORS_ALLOW_ALL_ORIGINS = True  # Desarrollo: permite cualquier origen
+# CORS: abierto solo en local; en producción usa la lista blanca de abajo
+CORS_ALLOW_ALL_ORIGINS = DEBUG
 
-# También mantener las configuraciones específicas por si se necesitan
 CORS_ALLOWED_ORIGINS = [
+    "https://carefree-fulfillment-production.up.railway.app",
     "http://localhost:3000",
     "http://localhost:3001",
 ]
@@ -223,11 +224,7 @@ CORS_ALLOW_METHODS = [
     'PUT',
 ]
 
-# Permitir que el endpoint de token no requiera CSRF
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:3001",
-]
+# (CSRF_TRUSTED_ORIGINS ya se define arriba, por variable de entorno)
 
 # Eximir ciertos endpoints de CSRF (para APIs)
 CSRF_COOKIE_HTTPONLY = False
