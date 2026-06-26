@@ -65,10 +65,15 @@ def venta_producto_crear(
         )
 
         for item in productos:
-            producto = (
-                Producto.objects.select_for_update()
-                .get(pk=item["producto_id"])
-            )
+            try:
+                producto = (
+                    Producto.objects.select_for_update()
+                    .get(pk=item["producto_id"])
+                )
+            except Producto.DoesNotExist:
+                raise ValidationError(
+                    f"El producto con id {item['producto_id']} no existe"
+                )
 
             try:
                 inventario = Inventario.objects.select_for_update().get(

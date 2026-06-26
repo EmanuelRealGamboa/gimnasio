@@ -365,21 +365,8 @@ def test_venta_crear_segundo_producto_con_stock_insuficiente_no_afecta_primero(d
     assert inv_a.cantidad_actual == stock_a_inicial
 
 
-@pytest.mark.xfail(
-    reason=(
-        "BUG: venta_producto_crear hace Producto.objects.get(pk=...) sin capturar "
-        "Producto.DoesNotExist, por lo que un producto_id inexistente lanza "
-        "Producto.DoesNotExist en lugar de ValidationError. "
-        "La interfaz pública debería lanzar ValidationError con mensaje descriptivo."
-    ),
-    strict=True,
-)
 def test_venta_crear_producto_inexistente_deberia_lanzar_validation_error(db, empleado, sede):
-    """
-    Documenta el comportamiento actual: producto_id que no existe en BD
-    lanza Producto.DoesNotExist en lugar de ValidationError.
-    Cuando se corrija el servicio, este test debe pasar y el xfail se elimina.
-    """
+    """Un producto_id inexistente lanza ValidationError (no Producto.DoesNotExist crudo)."""
     from inventario.models import Producto
 
     producto_id_fantasma = 999999
