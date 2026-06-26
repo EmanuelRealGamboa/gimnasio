@@ -301,7 +301,7 @@ class SuscripcionMembresiaViewSet(viewsets.ModelViewSet):
                 cliente=cliente,
                 membresia=membresia,
                 fecha_inicio=timezone.now().date(),
-                precio_pagado=request.data.get('precio_pagado', membresia.precio),
+                precio_pagado=membresia.precio,  # seguridad: SIEMPRE del modelo, nunca del request (evita manipulación)
                 metodo_pago=request.data.get('metodo_pago', 'efectivo'),
                 notas=request.data.get('notas', 'Suscripción desde app móvil'),
                 sede_suscripcion_id=cliente.sede_id

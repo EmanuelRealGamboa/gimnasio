@@ -397,23 +397,13 @@ class TestSuscripcionGetEspaciosYSedes:
 
 
 # =========================================================
-# 8. BUG CONOCIDO: precio_pagado manipulable
+# 8. precio_pagado NO manipulable por el cliente (bug arreglado 2026-06-26)
 # =========================================================
 
-@pytest.mark.xfail(
-    reason=(
-        "Bug conocido: precio_pagado se toma del request en la vista create() de "
-        "SuscripcionMembresiaViewSet (línea ~304). Un cliente puede enviar "
-        "precio_pagado=1 y suscribirse por $1. El precio debería tomarse SIEMPRE "
-        "de membresia.precio, nunca del request."
-    ),
-    strict=True,
-)
 def test_precio_pagado_no_puede_ser_manipulado_por_cliente(db):
     """
-    Un usuario-cliente autentica y envía precio_pagado=1.
-    El sistema DEBERÍA ignorar ese valor y usar membresia.precio.
-    Actualmente el sistema usa el valor del request → el test falla.
+    Un usuario-cliente se autentica y envía precio_pagado=1.
+    El sistema IGNORA ese valor y usa membresia.precio.
     """
     from tests.factories import UserFactory, PersonaFactory, ClienteFactory, SedeFactory, MembresiaFactory
     from roles.models import Rol
@@ -438,12 +428,11 @@ def test_precio_pagado_no_puede_ser_manipulado_por_cliente(db):
         format="json",
     )
 
-    if response.status_code == 201:
-        # Si se creó, verificar que el precio sea el de la membresía
-        sus = SuscripcionMembresia.objects.get(pk=response.data["data"]["id"])
-        assert sus.precio_pagado == decimal.Decimal("500.00"), (
-            f"precio_pagado debería ser 500.00 pero fue {sus.precio_pagado}"
-        )
+    assert response.status_code == 201, response.data
+    sus = SuscripcionMembresia.objects.get(pk=response.data["data"]["id"])
+    assert sus.precio_pagado == decimal.Decimal("500.00"), (
+        f"precio_pagado debería ser 500.00 pero fue {sus.precio_pagado}"
+    )
 
 
 # =========================================================
