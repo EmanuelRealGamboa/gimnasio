@@ -1,30 +1,6 @@
 from rest_framework import serializers
-from .models import Venta, PasarelaPago, DetallePasarela, VentaProducto, DetalleVentaProducto
+from .models import VentaProducto, DetalleVentaProducto
 from inventario.models import Producto
-
-class VentaSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Venta
-        fields = '__all__'
-
-
-class DetallePasarelaSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DetallePasarela
-        fields = '__all__'
-
-
-class PasarelaPagoSerializer(serializers.ModelSerializer):
-    detalles = DetallePasarelaSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = PasarelaPago
-        fields = '__all__'
-
-
-# =====================================================
-# NUEVOS SERIALIZERS: SISTEMA DE VENTAS CON CARRITO
-# =====================================================
 
 class DetalleVentaProductoSerializer(serializers.ModelSerializer):
     """Serializer para los detalles de venta (productos en el carrito)"""
