@@ -12,3 +12,8 @@ staticfiles/
 
 # Node
 node_modules/
+
+# Artefactos de tests/cobertura
+.coverage
+.pytest_cache/
+htmlcov/
