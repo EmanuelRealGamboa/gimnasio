@@ -1,5 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import {
+  Plus,
+  Search,
+  Tag,
+  RefreshCw,
+  Zap,
+  X,
+  Wrench,
+  ShieldCheck,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  ClipboardList,
+  AlertTriangle,
+  Siren,
+  Calendar,
+  Package,
+  Building2,
+  User,
+  Banknote,
+  Eye,
+  Play,
+  Pencil,
+  Trash2,
+  BarChart3,
+  ArrowLeft,
+} from 'lucide-react';
 import { mantenimientoService } from '../services/gestionEquiposService';
 import './GestionEquipos.css';
 
@@ -54,7 +81,7 @@ const MantenimientoList = () => {
     successModal.className = 'success-modal-overlay';
     successModal.innerHTML = `
       <div class="success-modal">
-        <div class="success-icon">✓</div>
+        <div class="success-icon"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
         <h2>¡Éxito!</h2>
         <p>${message}</p>
       </div>
@@ -144,17 +171,17 @@ const MantenimientoList = () => {
   };
 
   const getTipoIcon = (tipo) => {
-    return tipo === 'preventivo' ? '🛡️' : '🔧';
+    return tipo === 'preventivo' ? <ShieldCheck size={18} /> : <Wrench size={18} />;
   };
 
   const getEstadoIcon = (estado) => {
     const icons = {
-      'pendiente': '⏳',
-      'en_proceso': '🔄',
-      'completado': '✅',
-      'cancelado': '❌'
+      'pendiente': <Clock size={16} />,
+      'en_proceso': <RefreshCw size={16} />,
+      'completado': <CheckCircle2 size={16} />,
+      'cancelado': <XCircle size={16} />
     };
-    return icons[estado] || '📋';
+    return icons[estado] || <ClipboardList size={16} />;
   };
 
   const getDiasLabel = (dias) => {
@@ -164,25 +191,25 @@ const MantenimientoList = () => {
       return {
         text: `Vencido hace ${Math.abs(dias)} días`,
         color: '#ef4444',
-        icon: '🚨'
+        icon: <Siren size={16} />
       };
     } else if (dias === 0) {
       return {
         text: 'Hoy',
         color: '#f59e0b',
-        icon: '⚠️'
+        icon: <AlertTriangle size={16} />
       };
     } else if (dias <= 7) {
       return {
         text: `En ${dias} día${dias > 1 ? 's' : ''}`,
         color: '#f59e0b',
-        icon: '⚠️'
+        icon: <AlertTriangle size={16} />
       };
     } else {
       return {
         text: `En ${dias} días`,
         color: '#3b82f6',
-        icon: '📅'
+        icon: <Calendar size={16} />
       };
     }
   };
@@ -193,20 +220,20 @@ const MantenimientoList = () => {
         <div>
           <h1>Gestión de Mantenimientos</h1>
           <p className="subtitle">
-            {filtros.filter === 'vencidos' && '🚨 Mantenimientos vencidos - Requieren atención inmediata'}
-            {filtros.filter === 'alertas' && '⚠️ Mantenimientos próximos (15 días)'}
+            {filtros.filter === 'vencidos' && <><Siren size={16} /> Mantenimientos vencidos - Requieren atención inmediata</>}
+            {filtros.filter === 'alertas' && <><AlertTriangle size={16} style={{ color: 'var(--warning)' }} /> Mantenimientos próximos (15 días)</>}
             {!filtros.filter && 'Programación y seguimiento de mantenimientos de equipos'}
           </p>
         </div>
         <Link to="/gestion-equipos/mantenimientos/new" className="btn btn-primary">
-          + Nuevo Mantenimiento
+          <Plus size={18} /> Nuevo Mantenimiento
         </Link>
       </div>
 
       {/* Filtros Mejorados */}
       <div className="filters-section">
         <div className="filter-search">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon"><Search size={18} /></span>
           <input
             type="text"
             placeholder="Buscar por activo o descripción..."
@@ -219,7 +246,7 @@ const MantenimientoList = () => {
         <div className="filters-row">
           <div className="filter-group">
             <label className="filter-label">
-              <span className="filter-icon">🏷️</span>
+              <span className="filter-icon"><Tag size={16} /></span>
               Tipo
             </label>
             <select
@@ -228,14 +255,14 @@ const MantenimientoList = () => {
               className="filter-select"
             >
               <option value="">Todos los tipos</option>
-              <option value="preventivo">🛡️ Preventivo</option>
-              <option value="correctivo">🔧 Correctivo</option>
+              <option value="preventivo">Preventivo</option>
+              <option value="correctivo">Correctivo</option>
             </select>
           </div>
 
           <div className="filter-group">
             <label className="filter-label">
-              <span className="filter-icon">🔄</span>
+              <span className="filter-icon"><RefreshCw size={16} /></span>
               Estado
             </label>
             <select
@@ -244,16 +271,16 @@ const MantenimientoList = () => {
               className="filter-select"
             >
               <option value="">Todos los estados</option>
-              <option value="pendiente">⏳ Pendiente</option>
-              <option value="en_proceso">🔄 En Proceso</option>
-              <option value="completado">✅ Completado</option>
-              <option value="cancelado">❌ Cancelado</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="en_proceso">En Proceso</option>
+              <option value="completado">Completado</option>
+              <option value="cancelado">Cancelado</option>
             </select>
           </div>
 
           <div className="filter-group">
             <label className="filter-label">
-              <span className="filter-icon">⚡</span>
+              <span className="filter-icon"><Zap size={16} /></span>
               Filtros Especiales
             </label>
             <select
@@ -262,8 +289,8 @@ const MantenimientoList = () => {
               className="filter-select"
             >
               <option value="">Ninguno</option>
-              <option value="alertas">⚠️ Próximos (15 días)</option>
-              <option value="vencidos">🚨 Vencidos</option>
+              <option value="alertas">Próximos (15 días)</option>
+              <option value="vencidos">Vencidos</option>
             </select>
           </div>
 
@@ -271,7 +298,7 @@ const MantenimientoList = () => {
             onClick={() => setFiltros({ search: '', tipo_mantenimiento: '', estado: '', filter: '' })}
             className="btn-clear-filters"
           >
-            <span className="clear-icon">✕</span>
+            <span className="clear-icon"><X size={16} /></span>
             Limpiar filtros
           </button>
         </div>
@@ -282,11 +309,11 @@ const MantenimientoList = () => {
         <div className="loading">Cargando mantenimientos...</div>
       ) : mantenimientos.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-icon">🔧</div>
+          <div className="empty-icon"><Wrench size={48} /></div>
           <h3>No se encontraron mantenimientos</h3>
           <p>Comienza creando el primer mantenimiento para tus equipos</p>
           <Link to="/gestion-equipos/mantenimientos/new" className="btn btn-primary">
-            + Crear primer mantenimiento
+            <Plus size={18} /> Crear primer mantenimiento
           </Link>
         </div>
       ) : (
@@ -314,7 +341,7 @@ const MantenimientoList = () => {
 
                   {/* Información del activo */}
                   <div className="mantenimiento-activo">
-                    <div className="activo-icon">📦</div>
+                    <div className="activo-icon"><Package size={20} /></div>
                     <div className="activo-info">
                       <div className="activo-codigo">{mant.activo_codigo}</div>
                       <div className="activo-nombre">{mant.activo_nombre}</div>
@@ -324,7 +351,7 @@ const MantenimientoList = () => {
                   {/* Detalles */}
                   <div className="mantenimiento-detalles">
                     <div className="detalle-item">
-                      <span className="detalle-icon">📅</span>
+                      <span className="detalle-icon"><Calendar size={16} /></span>
                       <div className="detalle-content">
                         <span className="detalle-label">Fecha Programada</span>
                         <span className="detalle-value">
@@ -339,7 +366,7 @@ const MantenimientoList = () => {
 
                     {mant.fecha_ejecucion && (
                       <div className="detalle-item">
-                        <span className="detalle-icon">✓</span>
+                        <span className="detalle-icon"><CheckCircle2 size={16} style={{ color: 'var(--success)' }} /></span>
                         <div className="detalle-content">
                           <span className="detalle-label">Fecha Ejecución</span>
                           <span className="detalle-value">
@@ -356,7 +383,7 @@ const MantenimientoList = () => {
                     {mant.responsable && (
                       <div className="detalle-item">
                         <span className="detalle-icon">
-                          {mant.responsable.tipo === 'externo' ? '🏢' : '👤'}
+                          {mant.responsable.tipo === 'externo' ? <Building2 size={16} /> : <User size={16} />}
                         </span>
                         <div className="detalle-content">
                           <span className="detalle-label">Responsable</span>
@@ -366,7 +393,7 @@ const MantenimientoList = () => {
                     )}
 
                     <div className="detalle-item">
-                      <span className="detalle-icon">💵</span>
+                      <span className="detalle-icon"><Banknote size={16} /></span>
                       <div className="detalle-content">
                         <span className="detalle-label">Costo</span>
                         <span className="detalle-value detalle-costo">{formatCurrency(mant.costo)}</span>
@@ -396,7 +423,7 @@ const MantenimientoList = () => {
                       className="btn-action btn-action-view"
                       title="Ver detalles"
                     >
-                      <span className="action-icon">👁️</span>
+                      <span className="action-icon"><Eye size={16} /></span>
                       <span className="action-text">Ver Detalles</span>
                     </Link>
 
@@ -407,7 +434,7 @@ const MantenimientoList = () => {
                           className="btn-action btn-action-start"
                           title="Iniciar mantenimiento"
                         >
-                          <span className="action-icon">▶️</span>
+                          <span className="action-icon"><Play size={16} /></span>
                           <span className="action-text">Iniciar</span>
                         </button>
                         <Link
@@ -415,7 +442,7 @@ const MantenimientoList = () => {
                           className="btn-action btn-action-edit"
                           title="Editar"
                         >
-                          <span className="action-icon">✏️</span>
+                          <span className="action-icon"><Pencil size={16} /></span>
                           <span className="action-text">Editar</span>
                         </Link>
                       </>
@@ -427,7 +454,7 @@ const MantenimientoList = () => {
                         className="btn-action btn-action-complete"
                         title="Completar"
                       >
-                        <span className="action-icon">✅</span>
+                        <span className="action-icon"><CheckCircle2 size={16} /></span>
                         <span className="action-text">Completar</span>
                       </button>
                     )}
@@ -438,7 +465,7 @@ const MantenimientoList = () => {
                         className="btn-action btn-action-cancel"
                         title="Cancelar"
                       >
-                        <span className="action-icon">❌</span>
+                        <span className="action-icon"><XCircle size={16} /></span>
                         <span className="action-text">Cancelar</span>
                       </button>
                     )}
@@ -448,7 +475,7 @@ const MantenimientoList = () => {
                       className="btn-action btn-action-delete"
                       title="Eliminar"
                     >
-                      <span className="action-icon">🗑️</span>
+                      <span className="action-icon"><Trash2 size={16} /></span>
                       <span className="action-text">Eliminar</span>
                     </button>
                   </div>
@@ -459,7 +486,7 @@ const MantenimientoList = () => {
 
           <div className="footer-info">
             <p>
-              <span className="footer-icon">📊</span>
+              <span className="footer-icon"><BarChart3 size={16} /></span>
               Total de mantenimientos: <strong>{mantenimientos.length}</strong>
             </p>
           </div>
@@ -468,7 +495,7 @@ const MantenimientoList = () => {
 
       <div style={{ marginTop: '24px', textAlign: 'center' }}>
         <Link to="/gestion-equipos" className="btn-back-to-dashboard">
-          ← Volver al Dashboard
+          <ArrowLeft size={18} /> Volver al Dashboard
         </Link>
       </div>
     </div>

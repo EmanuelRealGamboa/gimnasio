@@ -1,5 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import {
+  ArrowLeft,
+  Pencil,
+  Sparkles,
+  ClipboardList,
+  Tag,
+  Package,
+  Folder,
+  RefreshCw,
+  DollarSign,
+  Calendar,
+  Banknote,
+  MapPin,
+  Building2,
+  DoorOpen,
+  Pin,
+  Wrench,
+  Hash,
+  FileText,
+  Image as ImageIcon,
+  AlertTriangle,
+  CheckCircle2,
+} from 'lucide-react';
 import { activoService, categoriaActivoService } from '../services/gestionEquiposService';
 import sedeService from '../services/sedeService';
 import espacioService from '../services/espacioService';
@@ -56,7 +79,7 @@ const ActivoForm = () => {
     successModal.className = 'success-modal-overlay';
     successModal.innerHTML = `
       <div class="success-modal">
-        <div class="success-icon">✓</div>
+        <div class="success-icon"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
         <h2>¡Éxito!</h2>
         <p>${message}</p>
       </div>
@@ -271,11 +294,11 @@ const ActivoForm = () => {
       {/* Header mejorado */}
       <div className="form-header">
         <Link to="/gestion-equipos/activos" className="btn-back-form">
-          ← Volver al Listado
+          <ArrowLeft size={18} /> Volver al Listado
         </Link>
         <div className="form-header-info">
           <h1 className="form-title">
-            {isEdit ? '✏️ Editar Activo' : '✨ Nuevo Activo'}
+            {isEdit ? <><Pencil size={20} /> Editar Activo</> : <><Sparkles size={20} /> Nuevo Activo</>}
           </h1>
           <p className="form-subtitle">
             {isEdit ? 'Actualiza la información del activo' : 'Registra un nuevo equipo en el inventario'}
@@ -286,14 +309,14 @@ const ActivoForm = () => {
       <form onSubmit={handleSubmit} className="activo-form">
         {/* Sección: Información General */}
         <div className="form-section-header">
-          <span className="section-icon">📋</span>
+          <span className="section-icon"><ClipboardList size={20} /></span>
           <h2 className="section-title">Información General</h2>
         </div>
 
         <div className="form-row">
           <div className="form-field">
             <label className="field-label">
-              <span className="label-icon">🏷️</span>
+              <span className="label-icon"><Tag size={16} /></span>
               Código del Activo *
             </label>
             <input
@@ -307,20 +330,20 @@ const ActivoForm = () => {
               required
             />
             {codigoExistente && !errors.codigo && (
-              <span className="field-error">⚠️ Este código ya existe</span>
+              <span className="field-error"><AlertTriangle size={16} style={{ color: 'var(--warning)' }} /> Este código ya existe</span>
             )}
             {errors.codigo && (
-              <span className="field-error">⚠️ {errors.codigo}</span>
+              <span className="field-error"><AlertTriangle size={16} style={{ color: 'var(--warning)' }} /> {errors.codigo}</span>
             )}
             {!errors.codigo && !codigoExistente && formData.codigo && (
-              <span className="field-success">✓ Código disponible</span>
+              <span className="field-success"><CheckCircle2 size={16} style={{ color: 'var(--success)' }} /> Código disponible</span>
             )}
             <span className="field-hint">Identificador único del equipo</span>
           </div>
 
           <div className="form-field">
             <label className="field-label">
-              <span className="label-icon">📦</span>
+              <span className="label-icon"><Package size={16} /></span>
               Nombre del Activo *
             </label>
             <input
@@ -334,7 +357,7 @@ const ActivoForm = () => {
               required
             />
             {errors.nombre && (
-              <span className="field-error">⚠️ {errors.nombre}</span>
+              <span className="field-error"><AlertTriangle size={16} style={{ color: 'var(--warning)' }} /> {errors.nombre}</span>
             )}
           </div>
         </div>
@@ -342,7 +365,7 @@ const ActivoForm = () => {
         <div className="form-row">
           <div className="form-field">
             <label className="field-label">
-              <span className="label-icon">📁</span>
+              <span className="label-icon"><Folder size={16} /></span>
               Categoría *
             </label>
             <select
@@ -360,13 +383,13 @@ const ActivoForm = () => {
               ))}
             </select>
             {errors.categoria && (
-              <span className="field-error">⚠️ {errors.categoria}</span>
+              <span className="field-error"><AlertTriangle size={16} style={{ color: 'var(--warning)' }} /> {errors.categoria}</span>
             )}
           </div>
 
           <div className="form-field">
             <label className="field-label">
-              <span className="label-icon">🔄</span>
+              <span className="label-icon"><RefreshCw size={16} /></span>
               Estado *
             </label>
             <select
@@ -376,24 +399,24 @@ const ActivoForm = () => {
               className="field-select"
               required
             >
-              <option value="activo">✓ Activo</option>
-              <option value="mantenimiento">🔧 En Mantenimiento</option>
-              <option value="inactivo">⏸️ Inactivo</option>
-              <option value="baja">🚫 Dado de Baja</option>
+              <option value="activo">Activo</option>
+              <option value="mantenimiento">En Mantenimiento</option>
+              <option value="inactivo">Inactivo</option>
+              <option value="baja">Dado de Baja</option>
             </select>
           </div>
         </div>
 
         {/* Sección: Información de Compra */}
         <div className="form-section-header">
-          <span className="section-icon">💰</span>
+          <span className="section-icon"><DollarSign size={20} /></span>
           <h2 className="section-title">Información de Compra</h2>
         </div>
 
         <div className="form-row">
           <div className="form-field">
             <label className="field-label">
-              <span className="label-icon">📅</span>
+              <span className="label-icon"><Calendar size={16} /></span>
               Fecha de Compra *
             </label>
             <input
@@ -406,14 +429,14 @@ const ActivoForm = () => {
               required
             />
             {errors.fecha_compra && (
-              <span className="field-error">⚠️ {errors.fecha_compra}</span>
+              <span className="field-error"><AlertTriangle size={16} style={{ color: 'var(--warning)' }} /> {errors.fecha_compra}</span>
             )}
             <span className="field-hint">Fecha en que se adquirió el equipo</span>
           </div>
 
           <div className="form-field">
             <label className="field-label">
-              <span className="label-icon">💵</span>
+              <span className="label-icon"><Banknote size={16} /></span>
               Valor (MXN) *
             </label>
             <input
@@ -428,7 +451,7 @@ const ActivoForm = () => {
               required
             />
             {errors.valor && (
-              <span className="field-error">⚠️ {errors.valor}</span>
+              <span className="field-error"><AlertTriangle size={16} style={{ color: 'var(--warning)' }} /> {errors.valor}</span>
             )}
             <span className="field-hint">Precio de compra del activo</span>
           </div>
@@ -436,14 +459,14 @@ const ActivoForm = () => {
 
         {/* Sección: Ubicación */}
         <div className="form-section-header">
-          <span className="section-icon">📍</span>
+          <span className="section-icon"><MapPin size={20} /></span>
           <h2 className="section-title">Ubicación</h2>
         </div>
 
         <div className="form-row">
           <div className="form-field">
             <label className="field-label">
-              <span className="label-icon">🏢</span>
+              <span className="label-icon"><Building2 size={16} /></span>
               Sede *
             </label>
             <select
@@ -461,13 +484,13 @@ const ActivoForm = () => {
               ))}
             </select>
             {errors.sede && (
-              <span className="field-error">⚠️ {errors.sede}</span>
+              <span className="field-error"><AlertTriangle size={16} style={{ color: 'var(--warning)' }} /> {errors.sede}</span>
             )}
           </div>
 
           <div className="form-field">
             <label className="field-label">
-              <span className="label-icon">🚪</span>
+              <span className="label-icon"><DoorOpen size={16} /></span>
               Espacio
             </label>
             <select
@@ -493,7 +516,7 @@ const ActivoForm = () => {
         <div className="form-row single">
           <div className="form-field">
             <label className="field-label">
-              <span className="label-icon">📌</span>
+              <span className="label-icon"><Pin size={16} /></span>
               Ubicación Específica
             </label>
             <input
@@ -511,14 +534,14 @@ const ActivoForm = () => {
 
         {/* Sección: Detalles Técnicos */}
         <div className="form-section-header">
-          <span className="section-icon">🔧</span>
+          <span className="section-icon"><Wrench size={20} /></span>
           <h2 className="section-title">Detalles Técnicos</h2>
         </div>
 
         <div className="form-row">
           <div className="form-field">
             <label className="field-label">
-              <span className="label-icon">🏷️</span>
+              <span className="label-icon"><Tag size={16} /></span>
               Marca
             </label>
             <input
@@ -535,7 +558,7 @@ const ActivoForm = () => {
 
           <div className="form-field">
             <label className="field-label">
-              <span className="label-icon">📋</span>
+              <span className="label-icon"><ClipboardList size={16} /></span>
               Modelo
             </label>
             <input
@@ -554,7 +577,7 @@ const ActivoForm = () => {
         <div className="form-row single">
           <div className="form-field">
             <label className="field-label">
-              <span className="label-icon">🔢</span>
+              <span className="label-icon"><Hash size={16} /></span>
               Número de Serie
             </label>
             <input
@@ -573,7 +596,7 @@ const ActivoForm = () => {
         <div className="form-row single">
           <div className="form-field">
             <label className="field-label">
-              <span className="label-icon">📝</span>
+              <span className="label-icon"><FileText size={16} /></span>
               Descripción
             </label>
             <textarea
@@ -591,7 +614,7 @@ const ActivoForm = () => {
         <div className="form-row single">
           <div className="form-field field-file">
             <label className="field-label">
-              <span className="label-icon">🖼️</span>
+              <span className="label-icon"><ImageIcon size={16} /></span>
               Imagen del Activo
             </label>
             <div className="file-input-wrapper">
@@ -606,7 +629,7 @@ const ActivoForm = () => {
                   {formData.imagen ? formData.imagen.name : 'Haz clic para seleccionar una imagen'}
                 </span>
                 <span className="file-icon">
-                  {formData.imagen ? '✓' : '📁'}
+                  {formData.imagen ? <CheckCircle2 size={18} style={{ color: 'var(--success)' }} /> : <Folder size={18} />}
                 </span>
               </div>
             </div>
@@ -645,7 +668,7 @@ const ActivoForm = () => {
               </span>
             ) : (
               <>
-                {isEdit ? '✓ Actualizar Activo' : '✨ Crear Activo'}
+                {isEdit ? <><CheckCircle2 size={18} /> Actualizar Activo</> : <><Sparkles size={18} /> Crear Activo</>}
               </>
             )}
           </button>

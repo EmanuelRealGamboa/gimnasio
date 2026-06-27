@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import proveedorService from '../services/proveedorService';
 import './ClienteForm.css';
 
@@ -118,7 +119,7 @@ function ProveedorForm() {
   const showSuccessMessage = (message) => {
     const successModal = document.createElement('div');
     successModal.className = 'success-modal-overlay';
-    successModal.innerHTML = '<div class="success-modal"><div class="success-icon">✓</div><h2>¡Éxito!</h2><p>' + message + '</p></div>';
+    successModal.innerHTML = '<div class="success-modal"><div class="success-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div><h2>¡Éxito!</h2><p>' + message + '</p></div>';
     document.body.appendChild(successModal);
     setTimeout(() => successModal.remove(), 2000);
   };
@@ -132,7 +133,7 @@ function ProveedorForm() {
       <div className="form-header">
         <h2>{isEditMode ? 'Editar Proveedor' : 'Nuevo Proveedor'}</h2>
         <button className="btn-back" onClick={() => navigate('/gestion-equipos/proveedores')}>
-          ← Volver
+          <ArrowLeft size={18} /> Volver
         </button>
       </div>
 

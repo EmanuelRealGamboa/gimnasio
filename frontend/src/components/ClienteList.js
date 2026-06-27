@@ -1,5 +1,25 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import {
+  Users,
+  CheckCircle2,
+  Flag,
+  Target,
+  BarChart3,
+  Search,
+  RefreshCw,
+  Building2,
+  X,
+  Plus,
+  Pause,
+  Ban,
+  Phone,
+  Mail,
+  Calendar,
+  Eye,
+  Pencil,
+  Trash2
+} from 'lucide-react';
 import clienteService from '../services/clienteService';
 import sedeService from '../services/sedeService';
 import './GestionEquipos.css';
@@ -110,7 +130,7 @@ function ClienteList() {
     if (window.confirm('¿Estás seguro de eliminar este cliente?')) {
       try {
         await clienteService.deleteCliente(id);
-        alert('✓ Cliente eliminado exitosamente');
+        alert('Cliente eliminado exitosamente');
         fetchClientes();
         fetchEstadisticas();
       } catch (err) {
@@ -140,11 +160,11 @@ function ClienteList() {
 
   const getNivelIcon = (nivel) => {
     const icons = {
-      'principiante': '🏁',
-      'intermedio': '📊',
-      'avanzado': '🎯'
+      'principiante': <Flag size={16} />,
+      'intermedio': <BarChart3 size={16} />,
+      'avanzado': <Target size={16} />
     };
-    return icons[nivel] || '🏁';
+    return icons[nivel] || <Flag size={16} />;
   };
 
   return (
@@ -156,7 +176,8 @@ function ClienteList() {
           <p className="subtitle">Administración de clientes del gimnasio</p>
         </div>
         <Link to="/clientes/new" className="btn btn-primary">
-          + Nuevo Cliente
+          <Plus size={18} />
+          Nuevo Cliente
         </Link>
       </div>
 
@@ -165,7 +186,7 @@ function ClienteList() {
         <div className="stats-grid">
           <div className="stat-card">
             <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)' }}>
-              👥
+              <Users size={24} />
             </div>
             <div className="stat-content">
               <div className="stat-label">Total Clientes</div>
@@ -175,7 +196,7 @@ function ClienteList() {
 
           <div className="stat-card">
             <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }}>
-              ✓
+              <CheckCircle2 size={24} />
             </div>
             <div className="stat-content">
               <div className="stat-label">Activos</div>
@@ -185,7 +206,7 @@ function ClienteList() {
 
           <div className="stat-card">
             <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }}>
-              🏁
+              <Flag size={24} />
             </div>
             <div className="stat-content">
               <div className="stat-label">Principiantes</div>
@@ -195,7 +216,7 @@ function ClienteList() {
 
           <div className="stat-card">
             <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)' }}>
-              🎯
+              <Target size={24} />
             </div>
             <div className="stat-content">
               <div className="stat-label">Avanzados</div>
@@ -208,7 +229,7 @@ function ClienteList() {
       {/* Filtros */}
       <div className="filters-section">
         <div className="filter-search">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon"><Search size={18} /></span>
           <input
             type="text"
             placeholder="Buscar por nombre, teléfono o email..."
@@ -221,7 +242,7 @@ function ClienteList() {
         <div className="filters-row">
           <div className="filter-group">
             <label className="filter-label">
-              <span className="filter-icon">🔄</span>
+              <span className="filter-icon"><RefreshCw size={16} /></span>
               Estado
             </label>
             <select
@@ -230,15 +251,15 @@ function ClienteList() {
               className="filter-select"
             >
               <option value="">Todos los estados</option>
-              <option value="activo">✓ Activo</option>
-              <option value="inactivo">⏸️ Inactivo</option>
-              <option value="suspendido">🚫 Suspendido</option>
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+              <option value="suspendido">Suspendido</option>
             </select>
           </div>
 
           <div className="filter-group">
             <label className="filter-label">
-              <span className="filter-icon">📊</span>
+              <span className="filter-icon"><BarChart3 size={16} /></span>
               Nivel
             </label>
             <select
@@ -247,15 +268,15 @@ function ClienteList() {
               className="filter-select"
             >
               <option value="">Todos los niveles</option>
-              <option value="principiante">🏁 Principiante</option>
-              <option value="intermedio">📊 Intermedio</option>
-              <option value="avanzado">🎯 Avanzado</option>
+              <option value="principiante">Principiante</option>
+              <option value="intermedio">Intermedio</option>
+              <option value="avanzado">Avanzado</option>
             </select>
           </div>
 
           <div className="filter-group">
             <label className="filter-label">
-              <span className="filter-icon">🏢</span>
+              <span className="filter-icon"><Building2 size={16} /></span>
               Sede
             </label>
             <select
@@ -281,7 +302,7 @@ function ClienteList() {
             }}
             className="btn-clear-filters"
           >
-            <span className="clear-icon">✕</span>
+            <span className="clear-icon"><X size={16} /></span>
             Limpiar filtros
           </button>
         </div>
@@ -292,11 +313,12 @@ function ClienteList() {
         <div className="loading">Cargando clientes...</div>
       ) : filteredClientes.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-icon">👥</div>
+          <div className="empty-icon"><Users size={48} /></div>
           <h3>No se encontraron clientes</h3>
           <p>Comienza agregando el primer cliente del gimnasio</p>
           <Link to="/clientes/nuevo" className="btn btn-primary">
-            + Crear primer cliente
+            <Plus size={18} />
+            Crear primer cliente
           </Link>
         </div>
       ) : (
@@ -313,9 +335,9 @@ function ClienteList() {
                     className="cliente-estado-badge"
                     style={{ backgroundColor: getEstadoColor(cliente.estado) }}
                   >
-                    {cliente.estado === 'activo' && '✓'}
-                    {cliente.estado === 'inactivo' && '⏸️'}
-                    {cliente.estado === 'suspendido' && '🚫'}
+                    {cliente.estado === 'activo' && <CheckCircle2 size={16} />}
+                    {cliente.estado === 'inactivo' && <Pause size={16} />}
+                    {cliente.estado === 'suspendido' && <Ban size={16} />}
                     <span>{cliente.estado?.charAt(0).toUpperCase() + cliente.estado?.slice(1)}</span>
                   </div>
                 </div>
@@ -329,25 +351,25 @@ function ClienteList() {
                   <div className="cliente-detalles">
                     {cliente.sede_nombre && (
                       <div className="detalle-item">
-                        <span className="detalle-icon">🏢</span>
+                        <span className="detalle-icon"><Building2 size={16} /></span>
                         <span className="detalle-text">{cliente.sede_nombre}</span>
                       </div>
                     )}
 
                     <div className="detalle-item">
-                      <span className="detalle-icon">📞</span>
+                      <span className="detalle-icon"><Phone size={16} /></span>
                       <span className="detalle-text">{cliente.telefono || 'Sin teléfono'}</span>
                     </div>
 
                     {cliente.email && (
                       <div className="detalle-item">
-                        <span className="detalle-icon">📧</span>
+                        <span className="detalle-icon"><Mail size={16} /></span>
                         <span className="detalle-text">{cliente.email}</span>
                       </div>
                     )}
 
                     <div className="detalle-item">
-                      <span className="detalle-icon">📅</span>
+                      <span className="detalle-icon"><Calendar size={16} /></span>
                       <span className="detalle-text">
                         Registro: {new Date(cliente.fecha_registro).toLocaleDateString('es-MX')}
                       </span>
@@ -355,7 +377,7 @@ function ClienteList() {
 
                     {cliente.objetivo_fitness && (
                       <div className="detalle-item">
-                        <span className="detalle-icon">🎯</span>
+                        <span className="detalle-icon"><Target size={16} /></span>
                         <span className="detalle-text">{cliente.objetivo_fitness}</span>
                       </div>
                     )}
@@ -381,7 +403,7 @@ function ClienteList() {
                     to={`/clientes/${cliente.id}`}
                     className="btn-action btn-action-view"
                   >
-                    <span className="action-icon">👁️</span>
+                    <span className="action-icon"><Eye size={16} /></span>
                     <span className="action-text">Ver Detalle</span>
                   </Link>
 
@@ -389,7 +411,7 @@ function ClienteList() {
                     to={`/clientes/edit/${cliente.id}`}
                     className="btn-action btn-action-edit"
                   >
-                    <span className="action-icon">✏️</span>
+                    <span className="action-icon"><Pencil size={16} /></span>
                     <span className="action-text">Editar</span>
                   </Link>
 
@@ -397,7 +419,7 @@ function ClienteList() {
                     onClick={() => handleDelete(cliente.id)}
                     className="btn-action btn-action-delete"
                   >
-                    <span className="action-icon">🗑️</span>
+                    <span className="action-icon"><Trash2 size={16} /></span>
                     <span className="action-text">Eliminar</span>
                   </button>
                 </div>
@@ -407,7 +429,7 @@ function ClienteList() {
 
           <div className="footer-info">
             <p>
-              <span className="footer-icon">📊</span>
+              <span className="footer-icon"><BarChart3 size={16} /></span>
               Mostrando <strong>{filteredClientes.length}</strong> de <strong>{clientes.length}</strong> clientes
             </p>
           </div>

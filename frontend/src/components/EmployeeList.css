@@ -44,8 +44,9 @@
 }
 
 .btn-icon {
-  font-size: 1.2rem;
-  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .filters-container {
@@ -74,7 +75,8 @@
 }
 
 .search-icon {
-  font-size: 1.2rem;
+  display: inline-flex;
+  align-items: center;
   color: var(--text-secondary);
   margin-right: 0.5rem;
 }

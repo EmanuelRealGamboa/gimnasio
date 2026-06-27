@@ -1,5 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  SprayCan,
+  ClipboardList,
+  FileText,
+  Users,
+  Clock,
+  BarChart3,
+  RefreshCw,
+  Plus,
+  CheckCircle2,
+  XCircle,
+  Pencil,
+  Trash2,
+  Play,
+  Timer,
+  TrendingUp,
+  Star,
+  Building2,
+  X,
+  Info,
+  AlertTriangle,
+  Circle,
+  Check
+} from 'lucide-react';
 import limpiezaService from '../services/limpiezaService';
 import instalacionesService from '../services/instalacionesService';
 import './GestionLimpieza.css';
@@ -209,21 +233,21 @@ function GestionLimpieza() {
 
   const getEstadoIcon = (estado) => {
     const icons = {
-      'pendiente': '⏳',
-      'en_progreso': '🔄',
-      'completada': '✅',
-      'cancelada': '❌'
+      'pendiente': <Clock size={16} style={{ color: 'var(--warning)' }} />,
+      'en_progreso': <RefreshCw size={16} style={{ color: 'var(--info)' }} />,
+      'completada': <CheckCircle2 size={16} style={{ color: 'var(--success)' }} />,
+      'cancelada': <XCircle size={16} style={{ color: 'var(--danger)' }} />
     };
-    return icons[estado] || '📋';
+    return icons[estado] || <ClipboardList size={16} />;
   };
 
   const getPrioridadIcon = (prioridad) => {
     const icons = {
-      'alta': '🔴',
-      'media': '🟡',
-      'baja': '🟢'
+      'alta': <Circle size={12} fill="var(--danger)" style={{ color: 'var(--danger)' }} />,
+      'media': <Circle size={12} fill="var(--warning)" style={{ color: 'var(--warning)' }} />,
+      'baja': <Circle size={12} fill="var(--success)" style={{ color: 'var(--success)' }} />
     };
-    return icons[prioridad] || '⚪';
+    return icons[prioridad] || <Circle size={12} style={{ color: 'var(--text-secondary)' }} />;
   };
 
   const handleCrearAsignacion = async (e) => {
@@ -493,7 +517,7 @@ function GestionLimpieza() {
       {/* Header */}
       <div className="limpieza-header">
         <div>
-          <h1>🧹 Gestión de Limpieza</h1>
+          <h1><SprayCan size={24} /> Gestión de Limpieza</h1>
           <p className="limpieza-subtitle">
             Administra el personal, horarios, tareas y asignaciones de limpieza
           </p>
@@ -506,31 +530,31 @@ function GestionLimpieza() {
           className={`tab-button ${activeTab === 'asignaciones' ? 'active' : ''}`}
           onClick={() => setActiveTab('asignaciones')}
         >
-          📋 Asignaciones
+          <ClipboardList size={18} /> Asignaciones
         </button>
         <button
           className={`tab-button ${activeTab === 'tareas' ? 'active' : ''}`}
           onClick={() => setActiveTab('tareas')}
         >
-          📝 Catálogo de Tareas
+          <FileText size={18} /> Catálogo de Tareas
         </button>
         <button
           className={`tab-button ${activeTab === 'personal' ? 'active' : ''}`}
           onClick={() => setActiveTab('personal')}
         >
-          👥 Personal
+          <Users size={18} /> Personal
         </button>
         <button
           className={`tab-button ${activeTab === 'horarios' ? 'active' : ''}`}
           onClick={() => setActiveTab('horarios')}
         >
-          🕐 Horarios
+          <Clock size={18} /> Horarios
         </button>
         <button
           className={`tab-button ${activeTab === 'reportes' ? 'active' : ''}`}
           onClick={() => setActiveTab('reportes')}
         >
-          📊 Reportes
+          <BarChart3 size={18} /> Reportes
         </button>
       </div>
 
@@ -569,13 +593,13 @@ function GestionLimpieza() {
                 <div className="filter-group">
                   <label>&nbsp;</label>
                   <button className="btn-secondary" onClick={fetchAsignaciones}>
-                    🔄 Actualizar
+                    <RefreshCw size={18} /> Actualizar
                   </button>
                 </div>
                 <div className="filter-group">
                   <label>&nbsp;</label>
                   <button className="btn-primary" onClick={() => setShowCreateModal(true)}>
-                    ➕ Nueva Asignación
+                    <Plus size={18} /> Nueva Asignación
                   </button>
                 </div>
               </div>
@@ -586,7 +610,7 @@ function GestionLimpieza() {
               <div className="stats-grid">
                 <div className="stat-card">
                   <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}>
-                    📋
+                    <ClipboardList size={22} />
                   </div>
                   <div className="stat-content">
                     <div className="stat-label">Total Tareas</div>
@@ -595,7 +619,7 @@ function GestionLimpieza() {
                 </div>
                 <div className="stat-card">
                   <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }}>
-                    ✅
+                    <CheckCircle2 size={22} />
                   </div>
                   <div className="stat-content">
                     <div className="stat-label">Completadas</div>
@@ -606,7 +630,7 @@ function GestionLimpieza() {
                 </div>
                 <div className="stat-card">
                   <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}>
-                    ⏳
+                    <Clock size={22} />
                   </div>
                   <div className="stat-content">
                     <div className="stat-label">Pendientes</div>
@@ -617,7 +641,7 @@ function GestionLimpieza() {
                 </div>
                 <div className="stat-card">
                   <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}>
-                    🔄
+                    <RefreshCw size={22} />
                   </div>
                   <div className="stat-content">
                     <div className="stat-label">En Progreso</div>
@@ -632,7 +656,7 @@ function GestionLimpieza() {
             {/* Lista de Asignaciones */}
             <div className="section-card">
               <h2 className="section-title">
-                📋 Asignaciones del {new Date(fechaFilter).toLocaleDateString('es-MX')}
+                <ClipboardList size={20} /> Asignaciones del {new Date(fechaFilter).toLocaleDateString('es-MX')}
               </h2>
 
               {loading ? (
@@ -642,7 +666,7 @@ function GestionLimpieza() {
                 </div>
               ) : asignaciones.length === 0 ? (
                 <div className="empty-state">
-                  <div className="empty-icon">📋</div>
+                  <div className="empty-icon"><ClipboardList size={48} /></div>
                   <p>No hay asignaciones para esta fecha</p>
                   <p className="empty-subtitle">Cambia la fecha o crea una nueva asignación</p>
                 </div>
@@ -700,21 +724,21 @@ function GestionLimpieza() {
                                     onClick={() => handleMarcarEnProgreso(asignacion.id)}
                                     title="Iniciar tarea"
                                   >
-                                    ▶️ Iniciar
+                                    <Play size={16} /> Iniciar
                                   </button>
                                   <button
                                     className="btn-warning btn-small"
                                     onClick={() => handleEditAsignacion(asignacion)}
                                     title="Editar asignación"
                                   >
-                                    ✏️
+                                    <Pencil size={16} />
                                   </button>
                                   <button
                                     className="btn-danger btn-small"
                                     onClick={() => handleDeleteAsignacion(asignacion)}
                                     title="Eliminar asignación"
                                   >
-                                    🗑️
+                                    <Trash2 size={16} />
                                   </button>
                                 </>
                               )}
@@ -723,12 +747,12 @@ function GestionLimpieza() {
                                   className="btn-primary btn-small"
                                   onClick={() => handleMarcarCompletada(asignacion.id)}
                                 >
-                                  ✅ Completar
+                                  <CheckCircle2 size={16} /> Completar
                                 </button>
                               )}
                               {asignacion.estado === 'completada' && (
-                                <span style={{ color: '#16a34a', fontWeight: 600 }}>
-                                  ✅ Completada
+                                <span style={{ color: '#16a34a', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                                  <CheckCircle2 size={16} /> Completada
                                 </span>
                               )}
                             </div>
@@ -749,12 +773,12 @@ function GestionLimpieza() {
         {activeTab === 'tareas' && (
           <div className="tareas-tab">
             <div className="section-card">
-              <h2 className="section-title">📝 Catálogo de Tareas de Limpieza</h2>
+              <h2 className="section-title"><FileText size={20} /> Catálogo de Tareas de Limpieza</h2>
 
               {/* Botón para crear nueva tarea */}
               <div style={{ marginBottom: '2rem' }}>
                 <button className="btn-primary" onClick={() => setShowCreateTareaModal(true)}>
-                  ➕ Nueva Tarea
+                  <Plus size={18} /> Nueva Tarea
                 </button>
               </div>
 
@@ -765,7 +789,7 @@ function GestionLimpieza() {
                 </div>
               ) : tareas.length === 0 ? (
                 <div className="empty-state">
-                  <div className="empty-icon">📝</div>
+                  <div className="empty-icon"><FileText size={48} /></div>
                   <p>No hay tareas de limpieza en el catálogo</p>
                   <p className="empty-subtitle">Crea tareas para asignarlas al personal de limpieza</p>
                 </div>
@@ -798,8 +822,8 @@ function GestionLimpieza() {
                             </span>
                           </td>
                           <td>
-                            <span style={{ color: '#6b7280' }}>
-                              ⏱️ {tarea.duracion_estimada} min
+                            <span style={{ color: '#6b7280', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <Timer size={16} /> {tarea.duracion_estimada} min
                             </span>
                           </td>
                           <td>
@@ -809,7 +833,11 @@ function GestionLimpieza() {
                           </td>
                           <td>
                             <span className={`badge badge-${tarea.activo ? 'activo' : 'inactivo'}`}>
-                              {tarea.activo ? '✅ Activo' : '❌ Inactivo'}
+                              {tarea.activo ? (
+                                <><CheckCircle2 size={16} style={{ color: 'var(--success)' }} /> Activo</>
+                              ) : (
+                                <><XCircle size={16} style={{ color: 'var(--danger)' }} /> Inactivo</>
+                              )}
                             </span>
                           </td>
                           <td>
@@ -824,14 +852,14 @@ function GestionLimpieza() {
                                 onClick={() => handleEditTarea(tarea)}
                                 title="Editar tarea"
                               >
-                                ✏️ Editar
+                                <Pencil size={16} /> Editar
                               </button>
                               <button
                                 className="btn-danger btn-small"
                                 onClick={() => handleDeleteTarea(tarea)}
                                 title="Eliminar tarea"
                               >
-                                🗑️
+                                <Trash2 size={16} />
                               </button>
                             </div>
                           </td>
@@ -851,7 +879,7 @@ function GestionLimpieza() {
         {activeTab === 'personal' && (
           <div className="personal-tab">
             <div className="section-card">
-              <h2 className="section-title">👥 Personal de Limpieza</h2>
+              <h2 className="section-title"><Users size={20} /> Personal de Limpieza</h2>
 
               {/* Filtros */}
               <div className="filters-row">
@@ -871,7 +899,7 @@ function GestionLimpieza() {
                 <div className="filter-group">
                   <label>&nbsp;</label>
                   <button className="btn-secondary" onClick={fetchPersonal}>
-                    🔄 Actualizar
+                    <RefreshCw size={18} /> Actualizar
                   </button>
                 </div>
               </div>
@@ -883,7 +911,7 @@ function GestionLimpieza() {
                 </div>
               ) : personal.length === 0 ? (
                 <div className="empty-state">
-                  <div className="empty-icon">👥</div>
+                  <div className="empty-icon"><Users size={48} /></div>
                   <p>No hay personal de limpieza registrado</p>
                   <p className="empty-subtitle">Agrega empleados de limpieza desde el módulo de Personal</p>
                 </div>
@@ -965,12 +993,12 @@ function GestionLimpieza() {
         {activeTab === 'horarios' && (
           <div className="horarios-tab">
             <div className="section-card">
-              <h2 className="section-title">🕐 Horarios de Limpieza</h2>
+              <h2 className="section-title"><Clock size={20} /> Horarios de Limpieza</h2>
               <p style={{ color: '#6b7280', marginBottom: '2rem' }}>
                 Este tab mostrará los horarios recurrentes (próximamente)
               </p>
               <div className="empty-state">
-                <div className="empty-icon">🕐</div>
+                <div className="empty-icon"><Clock size={48} /></div>
                 <p>Horarios de limpieza</p>
                 <p className="empty-subtitle">En desarrollo...</p>
               </div>
@@ -984,7 +1012,7 @@ function GestionLimpieza() {
         {activeTab === 'reportes' && (
           <div className="reportes-tab">
             <div className="section-card">
-              <h2 className="section-title">📊 Reportes y Estadísticas</h2>
+              <h2 className="section-title"><BarChart3 size={20} /> Reportes y Estadísticas</h2>
               {loading ? (
                 <div className="loading-spinner">
                   <div className="spinner"></div>
@@ -994,7 +1022,7 @@ function GestionLimpieza() {
                 <div className="stats-grid">
                   <div className="stat-card">
                     <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }}>
-                      ✅
+                      <CheckCircle2 size={22} />
                     </div>
                     <div className="stat-content">
                       <div className="stat-label">Tareas Completadas</div>
@@ -1003,7 +1031,7 @@ function GestionLimpieza() {
                   </div>
                   <div className="stat-card">
                     <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}>
-                      ⏳
+                      <Clock size={22} />
                     </div>
                     <div className="stat-content">
                       <div className="stat-label">Tareas Pendientes</div>
@@ -1012,7 +1040,7 @@ function GestionLimpieza() {
                   </div>
                   <div className="stat-card">
                     <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}>
-                      📈
+                      <TrendingUp size={22} />
                     </div>
                     <div className="stat-content">
                       <div className="stat-label">Tasa de Cumplimiento</div>
@@ -1021,7 +1049,7 @@ function GestionLimpieza() {
                   </div>
                   <div className="stat-card">
                     <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}>
-                      ⭐
+                      <Star size={22} />
                     </div>
                     <div className="stat-content">
                       <div className="stat-label">Calificación Promedio</div>
@@ -1030,7 +1058,7 @@ function GestionLimpieza() {
                   </div>
                   <div className="stat-card">
                     <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' }}>
-                      👥
+                      <Users size={22} />
                     </div>
                     <div className="stat-content">
                       <div className="stat-label">Total Personal</div>
@@ -1039,7 +1067,7 @@ function GestionLimpieza() {
                   </div>
                   <div className="stat-card">
                     <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
-                      🏢
+                      <Building2 size={22} />
                     </div>
                     <div className="stat-content">
                       <div className="stat-label">Espacios Limpios Hoy</div>
@@ -1049,7 +1077,7 @@ function GestionLimpieza() {
                 </div>
               ) : (
                 <div className="empty-state">
-                  <div className="empty-icon">📊</div>
+                  <div className="empty-icon"><BarChart3 size={48} /></div>
                   <p>No hay estadísticas disponibles</p>
                 </div>
               )}
@@ -1065,9 +1093,9 @@ function GestionLimpieza() {
         <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>➕ Nueva Asignación de Tarea</h2>
+              <h2><Plus size={20} /> Nueva Asignación de Tarea</h2>
               <button className="modal-close" onClick={() => setShowCreateModal(false)}>
-                ✕
+                <X size={20} />
               </button>
             </div>
 
@@ -1076,7 +1104,7 @@ function GestionLimpieza() {
                 {/* PASO 1: Seleccionar Sede */}
                 <div className="form-row">
                   <div className="form-group">
-                    <label>1️⃣ Sede *</label>
+                    <label>1. Sede *</label>
                     <select
                       name="sede"
                       value={nuevaAsignacion.sede}
@@ -1095,7 +1123,7 @@ function GestionLimpieza() {
 
                   {/* PASO 2: Seleccionar Empleado de Limpieza (filtrado por sede) */}
                   <div className="form-group">
-                    <label>2️⃣ Personal de Limpieza *</label>
+                    <label>2. Personal de Limpieza *</label>
                     <select
                       name="personal_limpieza"
                       value={nuevaAsignacion.personal_limpieza}
@@ -1121,7 +1149,7 @@ function GestionLimpieza() {
                 {/* PASO 3: Seleccionar Espacio (filtrado por sede) */}
                 <div className="form-row">
                   <div className="form-group">
-                    <label>3️⃣ Espacio a Limpiar *</label>
+                    <label>3. Espacio a Limpiar *</label>
                     <select
                       name="espacio"
                       value={nuevaAsignacion.espacio}
@@ -1145,7 +1173,7 @@ function GestionLimpieza() {
 
                   {/* PASO 4: Seleccionar Tarea */}
                   <div className="form-group">
-                    <label>4️⃣ Tarea a Realizar *</label>
+                    <label>4. Tarea a Realizar *</label>
                     <select
                       name="tarea"
                       value={nuevaAsignacion.tarea}
@@ -1166,7 +1194,7 @@ function GestionLimpieza() {
                 {/* PASO 5: Fecha de Asignación */}
                 <div className="form-row">
                   <div className="form-group">
-                    <label>5️⃣ Fecha de Asignación *</label>
+                    <label>5. Fecha de Asignación *</label>
                     <input
                       type="date"
                       name="fecha"
@@ -1175,8 +1203,8 @@ function GestionLimpieza() {
                       required
                       className="filter-input"
                     />
-                    <small style={{ color: '#6b7280', fontSize: '0.85rem', marginTop: '0.25rem' }}>
-                      ⏰ La hora de inicio se guardará automáticamente al crear la asignación
+                    <small style={{ color: '#6b7280', fontSize: '0.85rem', marginTop: '0.25rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <Clock size={16} /> La hora de inicio se guardará automáticamente al crear la asignación
                     </small>
                   </div>
 
@@ -1188,7 +1216,7 @@ function GestionLimpieza() {
                       borderRadius: '8px',
                       fontSize: '0.85rem'
                     }}>
-                      <strong style={{ color: '#16a34a' }}>ℹ️ Confirmación desde App Móvil</strong>
+                      <strong style={{ color: '#16a34a', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}><Info size={16} style={{ color: 'var(--info)' }} /> Confirmación desde App Móvil</strong>
                       <p style={{ margin: '0.25rem 0 0 0', color: '#15803d' }}>
                         El empleado confirmará la finalización desde la app móvil
                       </p>
@@ -1198,7 +1226,7 @@ function GestionLimpieza() {
 
                 {/* PASO 6: Notas Opcionales */}
                 <div className="form-group">
-                  <label>6️⃣ Notas/Instrucciones (Opcional)</label>
+                  <label>6. Notas/Instrucciones (Opcional)</label>
                   <textarea
                     name="notas"
                     value={nuevaAsignacion.notas}
@@ -1220,7 +1248,7 @@ function GestionLimpieza() {
                   Cancelar
                 </button>
                 <button type="submit" className="btn-primary">
-                  ✅ Crear Asignación
+                  <Check size={18} /> Crear Asignación
                 </button>
               </div>
             </form>
@@ -1235,9 +1263,9 @@ function GestionLimpieza() {
         <div className="modal-overlay" onClick={() => setShowCreateTareaModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>➕ Nueva Tarea de Limpieza</h2>
+              <h2><Plus size={20} /> Nueva Tarea de Limpieza</h2>
               <button className="modal-close" onClick={() => setShowCreateTareaModal(false)}>
-                ✕
+                <X size={20} />
               </button>
             </div>
 
@@ -1304,9 +1332,9 @@ function GestionLimpieza() {
                       required
                       className="filter-select"
                     >
-                      <option value="baja">🟢 Baja</option>
-                      <option value="media">🟡 Media</option>
-                      <option value="alta">🔴 Alta</option>
+                      <option value="baja">Baja</option>
+                      <option value="media">Media</option>
+                      <option value="alta">Alta</option>
                     </select>
                   </div>
                 </div>
@@ -1347,7 +1375,7 @@ function GestionLimpieza() {
                   Cancelar
                 </button>
                 <button type="submit" className="btn-primary">
-                  ✅ Crear Tarea
+                  <Check size={18} /> Crear Tarea
                 </button>
               </div>
             </form>
@@ -1362,9 +1390,9 @@ function GestionLimpieza() {
         <div className="modal-overlay" onClick={() => setShowEditTareaModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>✏️ Editar Tarea de Limpieza</h2>
+              <h2><Pencil size={20} /> Editar Tarea de Limpieza</h2>
               <button className="modal-close" onClick={() => setShowEditTareaModal(false)}>
-                ✕
+                <X size={20} />
               </button>
             </div>
 
@@ -1431,9 +1459,9 @@ function GestionLimpieza() {
                       required
                       className="filter-select"
                     >
-                      <option value="baja">🟢 Baja</option>
-                      <option value="media">🟡 Media</option>
-                      <option value="alta">🔴 Alta</option>
+                      <option value="baja">Baja</option>
+                      <option value="media">Media</option>
+                      <option value="alta">Alta</option>
                     </select>
                   </div>
                 </div>
@@ -1474,7 +1502,7 @@ function GestionLimpieza() {
                   Cancelar
                 </button>
                 <button type="submit" className="btn-primary">
-                  ✅ Actualizar Tarea
+                  <Check size={18} /> Actualizar Tarea
                 </button>
               </div>
             </form>
@@ -1489,9 +1517,9 @@ function GestionLimpieza() {
         <div className="modal-overlay" onClick={() => setShowEditAsignacionModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>✏️ Editar Asignación de Tarea</h2>
+              <h2><Pencil size={20} /> Editar Asignación de Tarea</h2>
               <button className="modal-close" onClick={() => setShowEditAsignacionModal(false)}>
-                ✕
+                <X size={20} />
               </button>
             </div>
 
@@ -1500,7 +1528,7 @@ function GestionLimpieza() {
                 {/* PASO 1: Seleccionar Sede */}
                 <div className="form-row">
                   <div className="form-group">
-                    <label>1️⃣ Sede *</label>
+                    <label>1. Sede *</label>
                     <select
                       name="sede"
                       value={nuevaAsignacion.sede}
@@ -1519,7 +1547,7 @@ function GestionLimpieza() {
 
                   {/* PASO 2: Seleccionar Empleado de Limpieza (filtrado por sede) */}
                   <div className="form-group">
-                    <label>2️⃣ Personal de Limpieza *</label>
+                    <label>2. Personal de Limpieza *</label>
                     <select
                       name="personal_limpieza"
                       value={nuevaAsignacion.personal_limpieza}
@@ -1545,7 +1573,7 @@ function GestionLimpieza() {
                 {/* PASO 3: Seleccionar Espacio (filtrado por sede) */}
                 <div className="form-row">
                   <div className="form-group">
-                    <label>3️⃣ Espacio a Limpiar *</label>
+                    <label>3. Espacio a Limpiar *</label>
                     <select
                       name="espacio"
                       value={nuevaAsignacion.espacio}
@@ -1569,7 +1597,7 @@ function GestionLimpieza() {
 
                   {/* PASO 4: Seleccionar Tarea */}
                   <div className="form-group">
-                    <label>4️⃣ Tarea a Realizar *</label>
+                    <label>4. Tarea a Realizar *</label>
                     <select
                       name="tarea"
                       value={nuevaAsignacion.tarea}
@@ -1590,7 +1618,7 @@ function GestionLimpieza() {
                 {/* PASO 5: Fecha de Asignación */}
                 <div className="form-row">
                   <div className="form-group">
-                    <label>5️⃣ Fecha de Asignación *</label>
+                    <label>5. Fecha de Asignación *</label>
                     <input
                       type="date"
                       name="fecha"
@@ -1604,7 +1632,7 @@ function GestionLimpieza() {
 
                 {/* PASO 6: Notas Opcionales */}
                 <div className="form-group">
-                  <label>6️⃣ Notas/Instrucciones (Opcional)</label>
+                  <label>6. Notas/Instrucciones (Opcional)</label>
                   <textarea
                     name="notas"
                     value={nuevaAsignacion.notas}
@@ -1626,7 +1654,7 @@ function GestionLimpieza() {
                   Cancelar
                 </button>
                 <button type="submit" className="btn-primary">
-                  ✅ Actualizar Asignación
+                  <Check size={18} /> Actualizar Asignación
                 </button>
               </div>
             </form>
@@ -1641,9 +1669,9 @@ function GestionLimpieza() {
         <div className="modal-overlay" onClick={() => setShowConfirmModal(false)}>
           <div className="modal-content confirm-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>⚠️ Confirmar Acción</h2>
+              <h2><AlertTriangle size={20} style={{ color: 'var(--warning)' }} /> Confirmar Acción</h2>
               <button className="modal-close" onClick={() => setShowConfirmModal(false)}>
-                ✕
+                <X size={20} />
               </button>
             </div>
 
@@ -1666,7 +1694,7 @@ function GestionLimpieza() {
                 className="btn-danger"
                 onClick={handleConfirm}
               >
-                ✅ Confirmar
+                <Check size={18} /> Confirmar
               </button>
             </div>
           </div>
@@ -1678,14 +1706,14 @@ function GestionLimpieza() {
         <div className="modal-overlay" onClick={() => setShowSuccessModal(false)}>
           <div className="modal-content success-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header success-header">
-              <h2>✅ Éxito</h2>
+              <h2><CheckCircle2 size={20} style={{ color: 'var(--success)' }} /> Éxito</h2>
               <button className="modal-close" onClick={() => setShowSuccessModal(false)}>
-                ✕
+                <X size={20} />
               </button>
             </div>
 
             <div className="modal-body">
-              <div className="success-icon">✓</div>
+              <div className="success-icon"><CheckCircle2 size={48} style={{ color: 'var(--success)' }} /></div>
               <p className="success-message">
                 {successMessage}
               </p>

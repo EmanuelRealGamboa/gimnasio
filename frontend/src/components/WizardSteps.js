@@ -1,3 +1,4 @@
+import { Check } from 'lucide-react';
 import './WizardSteps.css';
 
 function WizardSteps({ currentStep, steps }) {
@@ -16,7 +17,7 @@ function WizardSteps({ currentStep, steps }) {
           >
             <div className="step-number">
               {index + 1 < currentStep ? (
-                <span className="step-check">✓</span>
+                <span className="step-check"><Check size={20} /></span>
               ) : (
                 <span>{index + 1}</span>
               )}

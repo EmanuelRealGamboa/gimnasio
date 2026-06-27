@@ -52,8 +52,9 @@
 }
 
 .icon-gym {
-  font-size: 5rem;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   animation: float 3s ease-in-out infinite;
 }
 
@@ -160,7 +161,8 @@
 }
 
 .error-icon {
-  font-size: 1.25rem;
+  display: inline-flex;
+  align-items: center;
   flex-shrink: 0;
 }
 
@@ -190,7 +192,8 @@
 }
 
 .label-icon {
-  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
 }
 
 .form-input {
@@ -270,8 +273,8 @@
 }
 
 .btn-arrow {
-  font-size: 1.25rem;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
   transition: transform var(--transition-fast);
 }
 

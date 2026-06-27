@@ -1,5 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  DoorOpen,
+  CheckCircle2,
+  XCircle,
+  Users,
+  RefreshCw,
+  Pause,
+  ClipboardList,
+  Ticket,
+  Building2,
+  Clock,
+  BarChart3,
+  AlertTriangle,
+  StickyNote
+} from 'lucide-react';
 import accesosService from '../services/accesosService';
 import instalacionesService from '../services/instalacionesService';
 import './AccesosMonitor.css';
@@ -100,7 +115,9 @@ function AccesosMonitor() {
   };
 
   const getEstadoIcon = (autorizado) => {
-    return autorizado ? '✅' : '❌';
+    return autorizado
+      ? <CheckCircle2 size={24} style={{ color: 'var(--success)' }} />
+      : <XCircle size={24} style={{ color: 'var(--danger)' }} />;
   };
 
   if (loading) {
@@ -119,7 +136,7 @@ function AccesosMonitor() {
       {/* Header */}
       <div className="monitor-header">
         <div>
-          <h1>🚪 Monitor de Accesos en Tiempo Real</h1>
+          <h1><DoorOpen size={24} /> Monitor de Accesos en Tiempo Real</h1>
           <p className="monitor-subtitle">Visualiza quién está entrando al gimnasio</p>
         </div>
         <div className="header-actions">
@@ -128,7 +145,11 @@ function AccesosMonitor() {
             onClick={() => setAutoRefresh(!autoRefresh)}
             title={autoRefresh ? 'Auto-refresh activado' : 'Auto-refresh desactivado'}
           >
-            {autoRefresh ? '🔄 Auto-refresh ON' : '⏸ Auto-refresh OFF'}
+            {autoRefresh ? (
+              <><RefreshCw size={18} /> Auto-refresh ON</>
+            ) : (
+              <><Pause size={18} /> Auto-refresh OFF</>
+            )}
           </button>
           <button
             className="btn-manual-refresh"
@@ -137,7 +158,7 @@ function AccesosMonitor() {
               fetchEstadisticas();
             }}
           >
-            🔄 Refrescar
+            <RefreshCw size={18} /> Refrescar
           </button>
         </div>
       </div>
@@ -146,7 +167,7 @@ function AccesosMonitor() {
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}>
-            🚪
+            <DoorOpen size={22} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Accesos Hoy</div>
@@ -156,7 +177,7 @@ function AccesosMonitor() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }}>
-            ✅
+            <CheckCircle2 size={22} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Autorizados</div>
@@ -166,7 +187,7 @@ function AccesosMonitor() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' }}>
-            ❌
+            <XCircle size={22} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Denegados</div>
@@ -176,7 +197,7 @@ function AccesosMonitor() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}>
-            👥
+            <Users size={22} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Clientes Únicos (Mes)</div>
@@ -205,12 +226,12 @@ function AccesosMonitor() {
       {/* Lista de Accesos */}
       <div className="accesos-section">
         <h2 className="section-title">
-          📋 Últimos Accesos ({accesos.length})
+          <ClipboardList size={20} /> Últimos Accesos ({accesos.length})
         </h2>
 
         {accesos.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-icon">🚪</div>
+            <div className="empty-icon"><DoorOpen size={48} /></div>
             <p>No hay accesos registrados hoy</p>
             <p className="empty-subtitle">Los accesos aparecerán aquí en tiempo real</p>
           </div>
@@ -234,7 +255,7 @@ function AccesosMonitor() {
                       <h3>{acceso.cliente_nombre || 'Cliente Desconocido'}</h3>
                       {acceso.membresia_nombre && (
                         <p className="membresia-badge">
-                          🎫 {acceso.membresia_nombre}
+                          <Ticket size={16} /> {acceso.membresia_nombre}
                         </p>
                       )}
                     </div>
@@ -242,16 +263,16 @@ function AccesosMonitor() {
 
                   <div className="acceso-detalles">
                     <div className="detalle-item">
-                      <span className="detalle-label">🏢 Sede:</span>
+                      <span className="detalle-label"><Building2 size={16} /> Sede:</span>
                       <span className="detalle-value">{acceso.sede_nombre || 'N/A'}</span>
                     </div>
                     <div className="detalle-item">
-                      <span className="detalle-label">🕐 Hora:</span>
+                      <span className="detalle-label"><Clock size={16} /> Hora:</span>
                       <span className="detalle-value">{formatHora(acceso.fecha_hora_entrada)}</span>
                     </div>
                     {acceso.membresia_estado && (
                       <div className="detalle-item">
-                        <span className="detalle-label">📊 Estado Membresía:</span>
+                        <span className="detalle-label"><BarChart3 size={16} /> Estado Membresía:</span>
                         <span className={`badge badge-${acceso.membresia_estado}`}>
                           {acceso.membresia_estado}
                         </span>
@@ -261,14 +282,14 @@ function AccesosMonitor() {
 
                   {!acceso.autorizado && acceso.motivo_denegado && (
                     <div className="acceso-motivo-denegado">
-                      <span className="motivo-icon">⚠️</span>
+                      <span className="motivo-icon"><AlertTriangle size={16} style={{ color: 'var(--warning)' }} /></span>
                       <span className="motivo-text">{acceso.motivo_denegado}</span>
                     </div>
                   )}
 
                   {acceso.notas && (
                     <div className="acceso-notas">
-                      <span className="notas-icon">📝</span>
+                      <span className="notas-icon"><StickyNote size={16} /></span>
                       <span className="notas-text">{acceso.notas}</span>
                     </div>
                   )}

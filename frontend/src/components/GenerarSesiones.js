@@ -1,4 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import {
+  RefreshCw,
+  Info,
+  Search,
+  X,
+  Loader,
+  Calendar,
+  AlarmClock,
+  User,
+  MapPin,
+  Users,
+} from 'lucide-react';
 import horariosService from '../services/horariosService';
 import instalacionesService from '../services/instalacionesService';
 import './GenerarSesiones.css';
@@ -121,7 +133,7 @@ const GenerarSesiones = () => {
 
       // Mostrar mensaje de éxito con animación
       setSuccessMessage(
-        `✓ ${resultado.mensaje || 'Sesiones generadas exitosamente'} - ` +
+        `${resultado.mensaje || 'Sesiones generadas exitosamente'} - ` +
         `${resultado.sesiones_creadas} sesiones creadas`
       );
       setTimeout(() => setSuccessMessage(''), 4000);
@@ -164,7 +176,7 @@ const GenerarSesiones = () => {
       <div className="page-header">
         <div>
           <h2>
-            <span className="header-icon">🔄</span>
+            <span className="header-icon"><RefreshCw size={20} /></span>
             Generar Sesiones de Clases
           </h2>
           <p className="subtitle">
@@ -175,7 +187,7 @@ const GenerarSesiones = () => {
 
       {/* Info Card */}
       <div className="info-card">
-        <div className="info-icon-large">ℹ️</div>
+        <div className="info-icon-large"><Info size={26} style={{ color: 'var(--info)' }} /></div>
         <div className="info-content">
           <h3>¿Cómo funciona?</h3>
           <p>
@@ -195,11 +207,11 @@ const GenerarSesiones = () => {
       <div className="filters-card">
         <div className="filters-header">
           <h3>
-            <span className="filter-icon">🔍</span>
+            <span className="filter-icon"><Search size={18} /></span>
             Filtrar Horarios
           </h3>
           <button className="btn-limpiar" onClick={limpiarFiltros}>
-            ✕ Limpiar Filtros
+            <X size={16} /> Limpiar Filtros
           </button>
         </div>
 
@@ -258,7 +270,7 @@ const GenerarSesiones = () => {
       {error && (
         <div className="alert alert-error">
           <span className="alert-icon" onClick={() => setError(null)}>
-            ✕
+            <X size={16} />
           </span>
           {error}
         </div>
@@ -269,7 +281,7 @@ const GenerarSesiones = () => {
         <div className="alert alert-success">
           <span>{successMessage}</span>
           <span className="alert-icon" onClick={() => setSuccessMessage('')}>
-            ✕
+            <X size={16} />
           </span>
         </div>
       )}
@@ -277,12 +289,12 @@ const GenerarSesiones = () => {
       {/* Lista de Horarios */}
       {loading ? (
         <div className="loading-spinner">
-          <span className="spinner">⏳</span>
+          <span className="spinner"><Loader size={24} /></span>
           <p>Cargando horarios...</p>
         </div>
       ) : horarios.length === 0 ? (
         <div className="no-data-container">
-          <div className="no-data-icon">📅</div>
+          <div className="no-data-icon"><Calendar size={26} /></div>
           <p>No se encontraron horarios activos con los filtros seleccionados</p>
         </div>
       ) : (
@@ -304,24 +316,24 @@ const GenerarSesiones = () => {
 
               <div className="horario-card-body">
                 <div className="horario-info-row">
-                  <span className="info-label">⏰ Horario</span>
+                  <span className="info-label"><AlarmClock size={16} /> Horario</span>
                   <span className="info-value">
                     {formatHora(horario.hora_inicio)} - {formatHora(horario.hora_fin)}
                   </span>
                 </div>
 
                 <div className="horario-info-row">
-                  <span className="info-label">👤 Entrenador</span>
+                  <span className="info-label"><User size={16} /> Entrenador</span>
                   <span className="info-value">{horario.entrenador_nombre}</span>
                 </div>
 
                 <div className="horario-info-row">
-                  <span className="info-label">📍 Espacio</span>
+                  <span className="info-label"><MapPin size={16} /> Espacio</span>
                   <span className="info-value">{horario.espacio_nombre}</span>
                 </div>
 
                 <div className="horario-info-row">
-                  <span className="info-label">👥 Cupo</span>
+                  <span className="info-label"><Users size={16} /> Cupo</span>
                   <span className="info-value">{horario.cupo_maximo} personas</span>
                 </div>
               </div>
@@ -331,7 +343,7 @@ const GenerarSesiones = () => {
                   className="btn-generar-principal"
                   onClick={() => abrirModal(horario)}
                 >
-                  🔄 Generar Sesiones
+                  <RefreshCw size={18} /> Generar Sesiones
                 </button>
               </div>
             </div>
@@ -344,9 +356,9 @@ const GenerarSesiones = () => {
         <div className="modal-overlay" onClick={cerrarModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>🔄 Generar Sesiones</h3>
+              <h3><RefreshCw size={20} /> Generar Sesiones</h3>
               <button className="modal-close" onClick={cerrarModal}>
-                ✕
+                <X size={18} />
               </button>
             </div>
 
@@ -396,7 +408,7 @@ const GenerarSesiones = () => {
                 </div>
 
                 <div className="info-message">
-                  <span className="info-icon">ℹ️</span>
+                  <span className="info-icon"><Info size={16} style={{ color: 'var(--info)' }} /></span>
                   <p>
                     Se crearán sesiones automáticamente para todos los{' '}
                     <strong>
@@ -412,7 +424,7 @@ const GenerarSesiones = () => {
                     Cancelar
                   </button>
                   <button type="submit" className="btn-primary">
-                    🔄 Generar Sesiones
+                    <RefreshCw size={18} /> Generar Sesiones
                   </button>
                 </div>
               </form>

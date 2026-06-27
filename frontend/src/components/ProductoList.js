@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Package, Tag, Plus, Search, X, BarChart3, CheckCircle2, XCircle, Pencil, Trash2 } from 'lucide-react';
 import inventarioService from '../services/inventarioService';
 import ConfirmModal from './ConfirmModal';
 import './Inventario.css';
@@ -87,7 +88,7 @@ function ProductoList() {
 
     try {
       await inventarioService.deleteProducto(productoToDelete.producto_id);
-      showNotif('✓ Producto eliminado exitosamente', 'success');
+      showNotif('Producto eliminado exitosamente', 'success');
       setShowConfirmModal(false);
       setProductoToDelete(null);
       fetchProductos();
@@ -97,7 +98,7 @@ function ProductoList() {
       // Detectar si es un error de protección por ventas asociadas
       const errorMsg = err.response?.data?.detail || err.message || '';
       if (errorMsg.includes('protected') || errorMsg.includes('referenced') || err.response?.status === 500) {
-        showNotif('⚠️ No se puede eliminar: el producto tiene ventas asociadas. Puedes desactivarlo en su lugar.', 'error');
+        showNotif('No se puede eliminar: el producto tiene ventas asociadas. Puedes desactivarlo en su lugar.', 'error');
       } else {
         showNotif('Error al eliminar el producto', 'error');
       }
@@ -157,7 +158,7 @@ function ProductoList() {
       {/* Header */}
       <div className="inventario-header">
         <div>
-          <h1>📦 Productos</h1>
+          <h1><Package size={26} /> Productos</h1>
           <p className="inventario-subtitle">Gestiona los productos de tu inventario</p>
         </div>
         <div className="header-actions">
@@ -165,13 +166,13 @@ function ProductoList() {
             className="btn-secondary"
             onClick={() => navigate('/inventario/categorias')}
           >
-            📂 Categorías
+            <Tag size={18} /> Categorías
           </button>
           <button
             className="btn-primary"
             onClick={() => navigate('/inventario/productos/new')}
           >
-            <span>➕</span> Nuevo Producto
+            <Plus size={18} /> Nuevo Producto
           </button>
         </div>
       </div>
@@ -180,7 +181,7 @@ function ProductoList() {
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)' }}>
-            📦
+            <Package size={26} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Total Productos</div>
@@ -190,7 +191,7 @@ function ProductoList() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }}>
-            ✓
+            <CheckCircle2 size={26} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Con Stock</div>
@@ -200,7 +201,7 @@ function ProductoList() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' }}>
-            ✗
+            <XCircle size={26} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Sin Stock</div>
@@ -210,7 +211,7 @@ function ProductoList() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}>
-            📊
+            <BarChart3 size={26} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Stock Total</div>
@@ -222,7 +223,7 @@ function ProductoList() {
       {/* Filters */}
       <div className="filters-section">
         <div className="search-box">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon"><Search size={18} /></span>
           <input
             type="text"
             placeholder="Buscar por nombre o código..."
@@ -235,7 +236,7 @@ function ProductoList() {
               className="clear-search"
               onClick={() => setSearchTerm('')}
             >
-              ✕
+              <X size={16} />
             </button>
           )}
         </div>
@@ -290,7 +291,7 @@ function ProductoList() {
             {filteredProductos.length === 0 ? (
               <tr>
                 <td colSpan="7" className="text-center empty-state">
-                  <div className="empty-icon">📦</div>
+                  <div className="empty-icon"><Package size={64} /></div>
                   <p>No se encontraron productos</p>
                   <button
                     className="btn-primary"
@@ -338,14 +339,14 @@ function ProductoList() {
                           onClick={() => navigate(`/inventario/productos/edit/${producto.producto_id}`)}
                           title="Editar"
                         >
-                          ✏️
+                          <Pencil size={16} />
                         </button>
                         <button
                           className="btn-action btn-action-delete"
                           onClick={() => handleDeleteClick(producto)}
                           title="Eliminar"
                         >
-                          🗑️
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </td>

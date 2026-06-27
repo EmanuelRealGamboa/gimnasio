@@ -1,5 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  Bell,
+  AlertTriangle,
+  Dumbbell,
+  Wrench,
+  Building2,
+  Package,
+  CheckCircle2,
+  ClipboardList,
+  Clock,
+  Settings,
+  DollarSign,
+  BarChart3,
+} from 'lucide-react';
 import { activoService, mantenimientoService } from '../services/gestionEquiposService';
 import './GestionEquipos.css';
 
@@ -64,7 +78,7 @@ const GestionEquipos = () => {
               className="notification-button"
               onClick={() => setShowNotifications(!showNotifications)}
             >
-              <span className="bell-icon">🔔</span>
+              <span className="bell-icon"><Bell size={22} /></span>
               {totalNotifications > 0 && (
                 <span className="notification-badge">{totalNotifications}</span>
               )}
@@ -81,7 +95,7 @@ const GestionEquipos = () => {
                 <div className="notifications-list">
                   {vencidos.length > 0 && (
                     <div className="notification-section">
-                      <h4 className="notification-title danger">⚠️ Vencidos ({vencidos.length})</h4>
+                      <h4 className="notification-title danger"><AlertTriangle size={16} style={{ color: 'var(--warning)' }} /> Vencidos ({vencidos.length})</h4>
                       {vencidos.slice(0, 3).map(mant => (
                         <Link
                           key={mant.mantenimiento_id}
@@ -103,7 +117,7 @@ const GestionEquipos = () => {
                           className="notification-view-all"
                           onClick={() => setShowNotifications(false)}
                         >
-                          Ver todos los {vencidos.length} vencidos →
+                          Ver todos los {vencidos.length} vencidos
                         </Link>
                       )}
                     </div>
@@ -111,7 +125,7 @@ const GestionEquipos = () => {
 
                   {alertas.length > 0 && (
                     <div className="notification-section">
-                      <h4 className="notification-title warning">🔔 Próximos ({alertas.length})</h4>
+                      <h4 className="notification-title warning"><Bell size={16} /> Próximos ({alertas.length})</h4>
                       {alertas.slice(0, 3).map(mant => (
                         <Link
                           key={mant.mantenimiento_id}
@@ -133,7 +147,7 @@ const GestionEquipos = () => {
                           className="notification-view-all"
                           onClick={() => setShowNotifications(false)}
                         >
-                          Ver todas las {alertas.length} alertas →
+                          Ver todas las {alertas.length} alertas
                         </Link>
                       )}
                     </div>
@@ -156,7 +170,7 @@ const GestionEquipos = () => {
         <h2>Acceso Rápido</h2>
         <div className="quick-access-grid">
           <Link to="/gestion-equipos/activos" className="quick-access-card activos">
-            <div className="card-icon">🏋️</div>
+            <div className="card-icon"><Dumbbell size={26} /></div>
             <div className="card-content">
               <h3>Activos</h3>
               <p>Inventario de equipos</p>
@@ -167,7 +181,7 @@ const GestionEquipos = () => {
           </Link>
 
           <Link to="/gestion-equipos/mantenimientos" className="quick-access-card mantenimientos">
-            <div className="card-icon">🔧</div>
+            <div className="card-icon"><Wrench size={26} /></div>
             <div className="card-content">
               <h3>Mantenimientos</h3>
               <p>Programar y gestionar</p>
@@ -178,7 +192,7 @@ const GestionEquipos = () => {
           </Link>
 
           <Link to="/gestion-equipos/proveedores" className="quick-access-card proveedores">
-            <div className="card-icon">🏢</div>
+            <div className="card-icon"><Building2 size={26} /></div>
             <div className="card-content">
               <h3>Proveedores</h3>
               <p>Gestión de servicios</p>
@@ -194,7 +208,7 @@ const GestionEquipos = () => {
 
           <div className="stats-grid">
             <div className="stat-card primary">
-              <div className="stat-icon">📦</div>
+              <div className="stat-icon"><Package size={24} /></div>
               <div className="stat-info">
                 <div className="stat-value">{estadisticasActivos.total_activos}</div>
                 <div className="stat-label">Total de Activos</div>
@@ -203,7 +217,7 @@ const GestionEquipos = () => {
             </div>
 
             <div className="stat-card success">
-              <div className="stat-icon">✓</div>
+              <div className="stat-icon"><CheckCircle2 size={24} style={{ color: 'var(--success)' }} /></div>
               <div className="stat-info">
                 <div className="stat-value">{estadisticasActivos.por_estado?.activo || 0}</div>
                 <div className="stat-label">Activos Operando</div>
@@ -212,7 +226,7 @@ const GestionEquipos = () => {
             </div>
 
             <div className="stat-card warning">
-              <div className="stat-icon">🔧</div>
+              <div className="stat-icon"><Wrench size={24} /></div>
               <div className="stat-info">
                 <div className="stat-value">{estadisticasActivos.por_estado?.mantenimiento || 0}</div>
                 <div className="stat-label">En Mantenimiento</div>
@@ -221,7 +235,7 @@ const GestionEquipos = () => {
             </div>
 
             <div className="stat-card danger">
-              <div className="stat-icon">⚠️</div>
+              <div className="stat-icon"><AlertTriangle size={24} style={{ color: 'var(--warning)' }} /></div>
               <div className="stat-info">
                 <div className="stat-value">{estadisticasActivos.alertas_mantenimiento || 0}</div>
                 <div className="stat-label">Alertas</div>
@@ -295,7 +309,7 @@ const GestionEquipos = () => {
 
           <div className="stats-grid">
             <div className="stat-card primary">
-              <div className="stat-icon">📋</div>
+              <div className="stat-icon"><ClipboardList size={24} /></div>
               <div className="stat-info">
                 <div className="stat-value">{estadisticasMantenimientos.total_mantenimientos}</div>
                 <div className="stat-label">Total</div>
@@ -304,7 +318,7 @@ const GestionEquipos = () => {
             </div>
 
             <div className="stat-card warning">
-              <div className="stat-icon">⏳</div>
+              <div className="stat-icon"><Clock size={24} /></div>
               <div className="stat-info">
                 <div className="stat-value">{estadisticasMantenimientos.por_estado?.pendiente || 0}</div>
                 <div className="stat-label">Pendientes</div>
@@ -313,7 +327,7 @@ const GestionEquipos = () => {
             </div>
 
             <div className="stat-card info">
-              <div className="stat-icon">⚙️</div>
+              <div className="stat-icon"><Settings size={24} /></div>
               <div className="stat-info">
                 <div className="stat-value">{estadisticasMantenimientos.por_estado?.en_proceso || 0}</div>
                 <div className="stat-label">En Proceso</div>
@@ -322,7 +336,7 @@ const GestionEquipos = () => {
             </div>
 
             <div className="stat-card success">
-              <div className="stat-icon">✓</div>
+              <div className="stat-icon"><CheckCircle2 size={24} style={{ color: 'var(--success)' }} /></div>
               <div className="stat-info">
                 <div className="stat-value">{estadisticasMantenimientos.por_estado?.completado || 0}</div>
                 <div className="stat-label">Completados</div>
@@ -336,14 +350,14 @@ const GestionEquipos = () => {
             <h3>Análisis de Costos</h3>
             <div className="cost-analysis">
               <div className="cost-card total">
-                <div className="cost-icon">💰</div>
+                <div className="cost-icon"><DollarSign size={24} /></div>
                 <div className="cost-info">
                   <div className="cost-label">Total Invertido</div>
                   <div className="cost-value">{formatCurrency(estadisticasMantenimientos.costo_total || 0)}</div>
                 </div>
               </div>
               <div className="cost-card average">
-                <div className="cost-icon">📊</div>
+                <div className="cost-icon"><BarChart3 size={24} /></div>
                 <div className="cost-info">
                   <div className="cost-label">Costo Promedio</div>
                   <div className="cost-value">{formatCurrency(estadisticasMantenimientos.costo_promedio || 0)}</div>

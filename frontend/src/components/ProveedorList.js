@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Plus, ClipboardList, CheckCircle2, PauseCircle, Search, User, Phone, Mail, Pencil, Trash2, Lock, Unlock } from 'lucide-react';
 import proveedorService from '../services/proveedorService';
 import ConfirmModal from './ConfirmModal';
 import './ProveedorList.css';
@@ -110,7 +111,7 @@ function ProveedorList() {
   const showSuccessMessage = (message) => {
     const successModal = document.createElement('div');
     successModal.className = 'success-modal-overlay';
-    successModal.innerHTML = '<div class="success-modal"><div class="success-icon">✓</div><h2>¡Éxito!</h2><p>' + message + '</p></div>';
+    successModal.innerHTML = '<div class="success-modal"><div class="success-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div><h2>¡Éxito!</h2><p>' + message + '</p></div>';
     document.body.appendChild(successModal);
     setTimeout(() => successModal.remove(), 2000);
   };
@@ -135,7 +136,7 @@ function ProveedorList() {
           <p className="subtitle">Administración de proveedores de servicios</p>
         </div>
         <button className="btn btn-primary" onClick={() => navigate('/gestion-equipos/proveedores/new')}>
-          + Nuevo Proveedor
+          <Plus size={18} /> Nuevo Proveedor
         </button>
       </div>
 
@@ -144,21 +145,21 @@ function ProveedorList() {
       {estadisticas && (
         <div className="stats-grid">
           <div className="stat-card">
-            <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}>📋</div>
+            <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}><ClipboardList size={26} /></div>
             <div className="stat-content">
               <h3>{estadisticas.total_proveedores}</h3>
               <p>Total Proveedores</p>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>✓</div>
+            <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}><CheckCircle2 size={26} /></div>
             <div className="stat-content">
               <h3>{estadisticas.proveedores_activos}</h3>
               <p>Activos</p>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)' }}>⏸</div>
+            <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)' }}><PauseCircle size={26} /></div>
             <div className="stat-content">
               <h3>{estadisticas.proveedores_inactivos}</h3>
               <p>Inactivos</p>
@@ -169,7 +170,7 @@ function ProveedorList() {
 
       <div className="filters-container">
         <div className="search-box">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon"><Search size={18} /></span>
           <input type="text" placeholder="Buscar..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
         </div>
         <div className="filter-group">
@@ -197,30 +198,30 @@ function ProveedorList() {
               <div className="card-body-prov">
                 {proveedor.nombre_contacto && (
                   <div className="info-item-prov">
-                    <span className="info-icon">👤</span>
+                    <span className="info-icon"><User size={16} /></span>
                     <span className="info-text">{proveedor.nombre_contacto}</span>
                   </div>
                 )}
                 <div className="info-item-prov">
-                  <span className="info-icon">📱</span>
+                  <span className="info-icon"><Phone size={16} /></span>
                   <span className="info-text">{proveedor.telefono}</span>
                 </div>
                 {proveedor.email && (
                   <div className="info-item-prov">
-                    <span className="info-icon">📧</span>
+                    <span className="info-icon"><Mail size={16} /></span>
                     <span className="info-text">{proveedor.email}</span>
                   </div>
                 )}
               </div>
               <div className="card-actions-prov">
                 <button className="btn-action btn-edit" onClick={() => navigate(`/gestion-equipos/proveedores/edit/${proveedor.proveedor_id}`)} title="Editar">
-                  ✏️ Editar
+                  <Pencil size={16} /> Editar
                 </button>
                 <button className={`btn-action ${proveedor.activo ? 'btn-toggle-off' : 'btn-toggle-on'}`} onClick={() => handleToggleActivo(proveedor)} title={proveedor.activo ? 'Desactivar' : 'Activar'}>
-                  {proveedor.activo ? '🔒' : '🔓'}
+                  {proveedor.activo ? <Lock size={16} /> : <Unlock size={16} />}
                 </button>
                 <button className="btn-action btn-delete" onClick={() => handleDeleteClick(proveedor)} title="Eliminar">
-                  🗑️
+                  <Trash2 size={16} />
                 </button>
               </div>
             </div>

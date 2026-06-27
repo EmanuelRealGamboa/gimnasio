@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Plus, X, Building2, CheckCircle2, Calendar, Target, Star } from 'lucide-react';
 import membresiaService from '../services/membresiaService';
 import instalacionesService from '../services/instalacionesService';
 import './Ventas.css';
@@ -174,8 +175,8 @@ function SuscribirMembresiaModal({ isOpen, onClose, cliente, onSuccess }) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content modal-large" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>➕ Suscribir a Membresía</h2>
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <h2><Plus size={20} /> Suscribir a Membresía</h2>
+          <button className="modal-close" onClick={onClose}><X size={20} /></button>
         </div>
 
         <div className="modal-body">
@@ -208,9 +209,9 @@ function SuscribirMembresiaModal({ isOpen, onClose, cliente, onSuccess }) {
                         className={`sede-option-btn ${selectedSede === sede.id ? 'selected' : ''}`}
                         onClick={() => setSelectedSede(sede.id)}
                       >
-                        <span className="sede-icon">🏢</span>
+                        <span className="sede-icon"><Building2 size={20} /></span>
                         <span className="sede-name">{sede.nombre}</span>
-                        {selectedSede === sede.id && <span className="check-icon">✓</span>}
+                        {selectedSede === sede.id && <span className="check-icon"><CheckCircle2 size={16} /></span>}
                       </button>
                     ))}
                   </div>
@@ -246,7 +247,7 @@ function SuscribirMembresiaModal({ isOpen, onClose, cliente, onSuccess }) {
 
                       {membresia.duracion_dias && (
                         <div className="membresia-option-duration">
-                          📅 {membresia.duracion_dias} días
+                          <Calendar size={16} /> {membresia.duracion_dias} días
                         </div>
                       )}
 
@@ -256,18 +257,18 @@ function SuscribirMembresiaModal({ isOpen, onClose, cliente, onSuccess }) {
 
                       {membresia.espacios_count > 0 && (
                         <div className="membresia-espacios-badge">
-                          🎯 {membresia.espacios_count} espacio{membresia.espacios_count !== 1 ? 's' : ''} incluido{membresia.espacios_count !== 1 ? 's' : ''}
+                          <Target size={16} /> {membresia.espacios_count} espacio{membresia.espacios_count !== 1 ? 's' : ''} incluido{membresia.espacios_count !== 1 ? 's' : ''}
                         </div>
                       )}
 
                       {membresia.permite_todas_sedes && (
                         <div className="membresia-multi-sede-badge">
-                          ⭐ Acceso a todas las sedes
+                          <Star size={16} /> Acceso a todas las sedes
                         </div>
                       )}
 
                       {selectedMembresia?.id === membresia.id && (
-                        <div className="selected-indicator">✓</div>
+                        <div className="selected-indicator"><CheckCircle2 size={18} /></div>
                       )}
                     </div>
                   ))

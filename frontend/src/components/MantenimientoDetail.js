@@ -1,5 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import {
+  ArrowLeft,
+  Pencil,
+  Clock,
+  RefreshCw,
+  CheckCircle2,
+  XCircle,
+  ClipboardList,
+  ShieldCheck,
+  Wrench,
+  Package,
+  Calendar,
+  Siren,
+  AlertTriangle,
+  Banknote,
+  User,
+  Building2,
+  FileText,
+  FileSpreadsheet,
+  BarChart3,
+} from 'lucide-react';
 import { mantenimientoService } from '../services/gestionEquiposService';
 import './ActivoDetail.css';
 
@@ -46,16 +67,16 @@ const MantenimientoDetail = () => {
 
   const getEstadoIcon = (estado) => {
     const icons = {
-      'pendiente': '⏳',
-      'en_proceso': '🔄',
-      'completado': '✅',
-      'cancelado': '❌'
+      'pendiente': <Clock size={16} />,
+      'en_proceso': <RefreshCw size={16} />,
+      'completado': <CheckCircle2 size={16} />,
+      'cancelado': <XCircle size={16} />
     };
-    return icons[estado] || '📋';
+    return icons[estado] || <ClipboardList size={16} />;
   };
 
   const getTipoIcon = (tipo) => {
-    return tipo === 'preventivo' ? '🛡️' : '🔧';
+    return tipo === 'preventivo' ? <ShieldCheck size={48} /> : <Wrench size={48} />;
   };
 
   if (loading) {
@@ -84,7 +105,7 @@ const MantenimientoDetail = () => {
       {/* Header */}
       <div className="detail-header">
         <Link to="/gestion-equipos/mantenimientos" className="btn-back">
-          ← Volver al Listado
+          <ArrowLeft size={16} /> Volver al Listado
         </Link>
         <div className="header-actions">
           {mantenimiento.estado === 'pendiente' && (
@@ -92,7 +113,7 @@ const MantenimientoDetail = () => {
               to={`/gestion-equipos/mantenimientos/edit/${id}`}
               className="btn btn-edit"
             >
-              ✏️ Editar
+              <Pencil size={16} /> Editar
             </Link>
           )}
         </div>
@@ -122,7 +143,7 @@ const MantenimientoDetail = () => {
         {/* Información del Activo */}
         <div className="detail-section">
           <div className="section-header">
-            <span className="section-icon">📦</span>
+            <span className="section-icon"><Package size={20} /></span>
             <h2 className="section-title">Información del Activo</h2>
           </div>
           <div className="section-content">
@@ -146,7 +167,7 @@ const MantenimientoDetail = () => {
         {/* Fechas */}
         <div className="detail-section">
           <div className="section-header">
-            <span className="section-icon">📅</span>
+            <span className="section-icon"><Calendar size={20} /></span>
             <h2 className="section-title">Fechas</h2>
           </div>
           <div className="section-content">
@@ -178,13 +199,13 @@ const MantenimientoDetail = () => {
                 <span className="info-value">
                   {mantenimiento.dias_para_mantenimiento < 0 ? (
                     <span style={{ color: '#ef4444' }}>
-                      🚨 Vencido hace {Math.abs(mantenimiento.dias_para_mantenimiento)} días
+                      <Siren size={16} /> Vencido hace {Math.abs(mantenimiento.dias_para_mantenimiento)} días
                     </span>
                   ) : mantenimiento.dias_para_mantenimiento === 0 ? (
-                    <span style={{ color: '#f59e0b' }}>⚠️ Hoy</span>
+                    <span style={{ color: '#f59e0b' }}><AlertTriangle size={16} /> Hoy</span>
                   ) : (
                     <span style={{ color: '#3b82f6' }}>
-                      📅 En {mantenimiento.dias_para_mantenimiento} día{mantenimiento.dias_para_mantenimiento > 1 ? 's' : ''}
+                      <Calendar size={16} /> En {mantenimiento.dias_para_mantenimiento} día{mantenimiento.dias_para_mantenimiento > 1 ? 's' : ''}
                     </span>
                   )}
                 </span>
@@ -196,7 +217,7 @@ const MantenimientoDetail = () => {
         {/* Costo */}
         <div className="detail-section">
           <div className="section-header">
-            <span className="section-icon">💵</span>
+            <span className="section-icon"><Banknote size={20} /></span>
             <h2 className="section-title">Información Financiera</h2>
           </div>
           <div className="section-content">
@@ -212,7 +233,7 @@ const MantenimientoDetail = () => {
         {/* Responsable */}
         <div className="detail-section">
           <div className="section-header">
-            <span className="section-icon">👤</span>
+            <span className="section-icon"><User size={20} /></span>
             <h2 className="section-title">Responsable</h2>
           </div>
           <div className="section-content">
@@ -221,7 +242,7 @@ const MantenimientoDetail = () => {
                 <div className="info-row">
                   <span className="info-label">Tipo</span>
                   <span className="info-value">
-                    {mantenimiento.responsable.tipo === 'externo' ? '🏢 Proveedor Externo' : '👤 Empleado Interno'}
+                    {mantenimiento.responsable.tipo === 'externo' ? <><Building2 size={16} /> Proveedor Externo</> : <><User size={16} /> Empleado Interno</>}
                   </span>
                 </div>
                 <div className="info-row">
@@ -242,7 +263,7 @@ const MantenimientoDetail = () => {
         {/* Descripción */}
         <div className="detail-section full-width">
           <div className="section-header">
-            <span className="section-icon">📝</span>
+            <span className="section-icon"><FileText size={20} /></span>
             <h2 className="section-title">Descripción del Trabajo</h2>
           </div>
           <div className="section-content">
@@ -254,7 +275,7 @@ const MantenimientoDetail = () => {
         {mantenimiento.observaciones && (
           <div className="detail-section full-width">
             <div className="section-header">
-              <span className="section-icon">📄</span>
+              <span className="section-icon"><FileSpreadsheet size={20} /></span>
               <h2 className="section-title">Observaciones</h2>
             </div>
             <div className="section-content">
@@ -266,7 +287,7 @@ const MantenimientoDetail = () => {
         {/* Auditoría */}
         <div className="detail-section full-width">
           <div className="section-header">
-            <span className="section-icon">📊</span>
+            <span className="section-icon"><BarChart3 size={20} /></span>
             <h2 className="section-title">Información de Auditoría</h2>
           </div>
           <div className="section-content">
@@ -297,7 +318,7 @@ const MantenimientoDetail = () => {
       {/* Botón volver */}
       <div style={{ marginTop: '32px', textAlign: 'center' }}>
         <Link to="/gestion-equipos/mantenimientos" className="btn-back-to-dashboard">
-          ← Volver al Listado de Mantenimientos
+          <ArrowLeft size={18} /> Volver al Listado de Mantenimientos
         </Link>
       </div>
     </div>

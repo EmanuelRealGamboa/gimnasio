@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Pencil, Plus, ArrowLeft, Save } from 'lucide-react';
 import inventarioService from '../services/inventarioService';
 import './Inventario.css';
 
@@ -78,10 +79,10 @@ function CategoriaProductoForm() {
 
       if (isEditMode) {
         await inventarioService.updateCategoria(id, formData);
-        showNotif('✓ Categoría actualizada exitosamente', 'success');
+        showNotif('Categoría actualizada exitosamente', 'success');
       } else {
         await inventarioService.createCategoria(formData);
-        showNotif('✓ Categoría creada exitosamente', 'success');
+        showNotif('Categoría creada exitosamente', 'success');
       }
 
       setTimeout(() => {
@@ -114,7 +115,7 @@ function CategoriaProductoForm() {
       {/* Header */}
       <div className="inventario-header">
         <div>
-          <h1>{isEditMode ? '✏️ Editar Categoría' : '➕ Nueva Categoría'}</h1>
+          <h1>{isEditMode ? <><Pencil size={26} /> Editar Categoría</> : <><Plus size={26} /> Nueva Categoría</>}</h1>
           <p className="inventario-subtitle">
             {isEditMode ? 'Modifica los datos de la categoría' : 'Completa los datos para crear una nueva categoría'}
           </p>
@@ -123,7 +124,7 @@ function CategoriaProductoForm() {
           className="btn-secondary"
           onClick={() => navigate('/inventario/categorias')}
         >
-          ← Volver
+          <ArrowLeft size={18} /> Volver
         </button>
       </div>
 
@@ -177,7 +178,7 @@ function CategoriaProductoForm() {
                 </>
               ) : (
                 <>
-                  {isEditMode ? '💾 Actualizar' : '➕ Crear'} Categoría
+                  {isEditMode ? <><Save size={18} /> Actualizar</> : <><Plus size={18} /> Crear</>} Categoría
                 </>
               )}
             </button>

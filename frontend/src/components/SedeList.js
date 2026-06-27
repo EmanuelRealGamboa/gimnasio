@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Plus, Building2, Pencil, Trash2 } from 'lucide-react';
 import sedeService from '../services/sedeService';
 import ConfirmModal from './ConfirmModal';
 import './SedeList.css';
@@ -78,7 +79,7 @@ function SedeList() {
     successModal.className = 'success-modal-overlay';
     successModal.innerHTML = `
       <div class="success-modal">
-        <div class="success-icon">✓</div>
+        <div class="success-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
         <h2>¡Éxito!</h2>
         <p>${message}</p>
       </div>
@@ -99,7 +100,8 @@ function SedeList() {
           className="btn btn-primary"
           onClick={() => navigate('/sedes/new')}
         >
-          + Nueva Sede
+          <Plus size={18} />
+          Nueva Sede
         </button>
       </div>
 
@@ -109,7 +111,7 @@ function SedeList() {
         <div className="search-box">
           <input
             type="text"
-            placeholder="🔍 Buscar por nombre o dirección..."
+            placeholder="Buscar por nombre o dirección..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -145,21 +147,21 @@ function SedeList() {
                       onClick={() => navigate(`/espacios?sede=${sede.id}`)}
                       title="Ver espacios"
                     >
-                      🏢
+                      <Building2 size={18} />
                     </button>
                     <button
                       className="btn-action btn-edit"
                       onClick={() => navigate(`/sedes/edit/${sede.id}`)}
                       title="Editar"
                     >
-                      ✏️
+                      <Pencil size={18} />
                     </button>
                     <button
                       className="btn-action btn-delete"
                       onClick={() => handleDeleteClick(sede)}
                       title="Eliminar"
                     >
-                      🗑️
+                      <Trash2 size={18} />
                     </button>
                   </td>
                 </tr>

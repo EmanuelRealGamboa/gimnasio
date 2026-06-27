@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import {
+  Dumbbell,
+  ArrowLeft,
+  X,
+  ClipboardList,
+  Loader,
+  Save,
+  CheckCircle2,
+} from 'lucide-react';
 import horariosService from '../services/horariosService';
 import instalacionesService from '../services/instalacionesService';
 import './TipoActividadForm.css';
@@ -107,13 +116,13 @@ const TipoActividadForm = () => {
       <div className="form-header">
         <div>
           <h2>
-            <span className="header-icon">🏋️</span>
+            <span className="header-icon"><Dumbbell size={20} /></span>
             {isEdit ? 'Editar Tipo de Actividad' : 'Nuevo Tipo de Actividad'}
           </h2>
           <p className="subtitle">Complete la información del tipo de actividad</p>
         </div>
         <button type="button" className="btn-secondary" onClick={() => navigate('/horarios/tipos-actividad')}>
-          ← Volver
+          <ArrowLeft size={18} /> Volver
         </button>
       </div>
 
@@ -121,7 +130,7 @@ const TipoActividadForm = () => {
         <div className="alert alert-error">
           <span>{error}</span>
           <span className="alert-icon" onClick={() => setError(null)}>
-            ✕
+            <X size={16} />
           </span>
         </div>
       )}
@@ -129,7 +138,7 @@ const TipoActividadForm = () => {
       <form onSubmit={handleSubmit} className="tipo-form">
         <div className="form-card">
           <div className="card-header">
-            <h3>📋 Información General</h3>
+            <h3><ClipboardList size={18} /> Información General</h3>
           </div>
           <div className="card-body">
             <div className="form-row">
@@ -247,7 +256,13 @@ const TipoActividadForm = () => {
             Cancelar
           </button>
           <button type="submit" className="btn-primary" disabled={loading}>
-            {loading ? '⏳ Guardando...' : isEdit ? '💾 Actualizar' : '✅ Crear Actividad'}
+            {loading ? (
+              <><Loader size={18} /> Guardando...</>
+            ) : isEdit ? (
+              <><Save size={18} /> Actualizar</>
+            ) : (
+              <><CheckCircle2 size={18} /> Crear Actividad</>
+            )}
           </button>
         </div>
       </form>

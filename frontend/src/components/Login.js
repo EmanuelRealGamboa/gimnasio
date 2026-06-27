@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Dumbbell, Check, AlertTriangle, Mail, Lock, ArrowRight } from 'lucide-react';
 import authService from '../services/authService';
 import './Login.css';
 
@@ -55,25 +56,25 @@ function Login() {
         <div className="login-brand">
           <div className="brand-content">
             <div className="brand-icon">
-              <span className="icon-gym">🏋️</span>
+              <span className="icon-gym"><Dumbbell size={64} /></span>
             </div>
             <h1 className="brand-title">GIMNASIO</h1>
             <p className="brand-subtitle">Sistema de Gestión Integral</p>
             <div className="brand-features">
               <div className="feature-item">
-                <span className="feature-icon">✓</span>
+                <span className="feature-icon"><Check size={16} /></span>
                 <span>Gestión de Clientes</span>
               </div>
               <div className="feature-item">
-                <span className="feature-icon">✓</span>
+                <span className="feature-icon"><Check size={16} /></span>
                 <span>Control de Accesos</span>
               </div>
               <div className="feature-item">
-                <span className="feature-icon">✓</span>
+                <span className="feature-icon"><Check size={16} /></span>
                 <span>Inventario y Ventas</span>
               </div>
               <div className="feature-item">
-                <span className="feature-icon">✓</span>
+                <span className="feature-icon"><Check size={16} /></span>
                 <span>Gestión de Personal</span>
               </div>
             </div>
@@ -90,7 +91,7 @@ function Login() {
 
             {error && (
               <div className="error-message">
-                <span className="error-icon">⚠</span>
+                <span className="error-icon"><AlertTriangle size={20} style={{ color: 'var(--warning)' }} /></span>
                 <span>{error}</span>
               </div>
             )}
@@ -98,7 +99,7 @@ function Login() {
             <form onSubmit={handleSubmit} className="login-form">
               <div className="form-group">
                 <label htmlFor="email">
-                  <span className="label-icon">📧</span>
+                  <span className="label-icon"><Mail size={16} /></span>
                   Correo Electrónico
                 </label>
                 <input
@@ -114,7 +115,7 @@ function Login() {
 
               <div className="form-group">
                 <label htmlFor="password">
-                  <span className="label-icon">🔒</span>
+                  <span className="label-icon"><Lock size={16} /></span>
                   Contraseña
                 </label>
                 <input
@@ -137,7 +138,7 @@ function Login() {
                 ) : (
                   <>
                     <span>Ingresar</span>
-                    <span className="btn-arrow">→</span>
+                    <span className="btn-arrow"><ArrowRight size={18} /></span>
                   </>
                 )}
               </button>

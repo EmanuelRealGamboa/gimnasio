@@ -1,3 +1,11 @@
+/* ==================== BOTONES CON ICONO ==================== */
+
+.activo-list-container .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* ==================== ESTADÍSTICAS GRID ==================== */
 
 .stats-grid {

@@ -1,4 +1,18 @@
 import { useState, useEffect } from 'react';
+import {
+  ShoppingCart,
+  Building2,
+  Check,
+  AlertTriangle,
+  X,
+  Search,
+  Plus,
+  Minus,
+  Trash2,
+  Banknote,
+  CreditCard,
+  Smartphone,
+} from 'lucide-react';
 import ventasProductosService from '../services/ventasProductosService';
 import clienteService from '../services/clienteService';
 import instalacionesService from '../services/instalacionesService';
@@ -284,14 +298,14 @@ const VentaProductos = () => {
       <div className="pos-header">
         <div className="header-left">
           <h1>
-            <span className="header-icon">🛒</span>
+            <span className="header-icon"><ShoppingCart size={26} /></span>
             Punto de Venta
           </h1>
         </div>
 
         <div className="sede-selector-header">
           <label className="sede-label">
-            <span className="sede-icon">🏢</span>
+            <span className="sede-icon"><Building2 size={18} /></span>
             Seleccionar Sede:
           </label>
           <select
@@ -302,7 +316,7 @@ const VentaProductos = () => {
             }}
             className={`sede-select ${!sedeSeleccionada ? 'sede-required' : 'sede-selected'}`}
           >
-            <option value="">⚠️ Seleccione una sede...</option>
+            <option value="">Seleccione una sede...</option>
             {sedes && sedes.length > 0 && sedes.map((sede, index) => {
               if (!sede) return null;
               const sedeId = sede.sede_id || sede.id || sede.pk;
@@ -318,7 +332,7 @@ const VentaProductos = () => {
 
           {sedeSeleccionada && (
             <div className="sede-badge-active">
-              <span className="badge-icon">✓</span>
+              <span className="badge-icon"><Check size={18} /></span>
               {sedes.find(s => (s.sede_id || s.id) === parseInt(sedeSeleccionada))?.nombre || 'Sede Activa'}
             </div>
           )}
@@ -328,7 +342,7 @@ const VentaProductos = () => {
       {/* Alerta si no hay sede seleccionada */}
       {!sedeSeleccionada && (
         <div className="alert alert-warning">
-          <span className="alert-icon-warning">⚠️</span>
+          <span className="alert-icon-warning"><AlertTriangle size={26} style={{ color: 'var(--warning)' }} /></span>
           <div className="alert-content">
             <strong>Seleccione una sede para comenzar</strong>
             <p>Debe seleccionar la sede donde se realizará la venta para ver los productos disponibles.</p>
@@ -339,14 +353,14 @@ const VentaProductos = () => {
       {/* Mensajes */}
       {error && (
         <div className="alert alert-error">
-          <span className="alert-icon" onClick={() => setError(null)}>✕</span>
+          <span className="alert-icon" onClick={() => setError(null)}><X size={18} /></span>
           {error}
         </div>
       )}
 
       {success && (
         <div className="alert alert-success">
-          <span className="alert-icon" onClick={() => setSuccess(null)}>✕</span>
+          <span className="alert-icon" onClick={() => setSuccess(null)}><X size={18} /></span>
           {success}
         </div>
       )}
@@ -357,7 +371,7 @@ const VentaProductos = () => {
         <div className="productos-section">
           <div className="search-bar">
             <div className="search-input-wrapper">
-              <span className="search-icon">🔍</span>
+              <span className="search-icon"><Search size={18} /></span>
               <input
                 type="text"
                 placeholder="Buscar producto por nombre o código..."
@@ -391,7 +405,7 @@ const VentaProductos = () => {
                     className="btn-agregar"
                     disabled={!producto.stock || producto.stock === 0}
                   >
-                    <span>+</span>
+                    <Plus size={18} />
                     Agregar
                   </button>
                 </div>
@@ -412,7 +426,7 @@ const VentaProductos = () => {
             <h2>Carrito de Compra</h2>
             {carrito.length > 0 && (
               <button onClick={vaciarCarrito} className="btn-vaciar">
-                <span>🗑️</span>
+                <Trash2 size={18} />
                 Vaciar
               </button>
             )}
@@ -422,7 +436,7 @@ const VentaProductos = () => {
           <div className="carrito-items">
             {carrito.length === 0 ? (
               <div className="carrito-vacio">
-                <span style={{fontSize: '48px'}}>🛒</span>
+                <ShoppingCart size={48} />
                 <p>El carrito está vacío</p>
               </div>
             ) : (
@@ -441,14 +455,14 @@ const VentaProductos = () => {
                           onClick={() => eliminarDelCarrito(item.producto_id)}
                           className="btn-eliminar-item"
                         >
-                          <span>✕</span>
+                          <X size={16} />
                         </button>
                       </div>
 
                       <div className="item-controls">
                         <div className="cantidad-control">
                           <button onClick={() => actualizarCantidad(item.producto_id, item.cantidad - 1)}>
-                            <span>−</span>
+                            <Minus size={16} />
                           </button>
                           <input
                             type="number"
@@ -458,7 +472,7 @@ const VentaProductos = () => {
                             max={item.stock}
                           />
                           <button onClick={() => actualizarCantidad(item.producto_id, item.cantidad + 1)}>
-                            <span>+</span>
+                            <Plus size={16} />
                           </button>
                         </div>
 
@@ -518,7 +532,7 @@ const VentaProductos = () => {
                     className={`metodo-btn ${metodoPago === 'efectivo' ? 'active' : ''}`}
                     onClick={() => setMetodoPago('efectivo')}
                   >
-                    <span style={{fontSize: '20px'}}>💵</span>
+                    <Banknote size={20} />
                     Efectivo
                   </button>
                   <button
@@ -526,7 +540,7 @@ const VentaProductos = () => {
                     className={`metodo-btn ${metodoPago === 'tarjeta' ? 'active' : ''}`}
                     onClick={() => setMetodoPago('tarjeta')}
                   >
-                    <span style={{fontSize: '20px'}}>💳</span>
+                    <CreditCard size={20} />
                     Tarjeta
                   </button>
                   <button
@@ -534,7 +548,7 @@ const VentaProductos = () => {
                     className={`metodo-btn ${metodoPago === 'transferencia' ? 'active' : ''}`}
                     onClick={() => setMetodoPago('transferencia')}
                   >
-                    <span style={{fontSize: '20px'}}>📱</span>
+                    <Smartphone size={20} />
                     Transferencia
                   </button>
                 </div>
@@ -603,7 +617,8 @@ const VentaProductos = () => {
                   </div>
                   {calcularCambio() < 0 && (
                     <div className="alerta-pago">
-                      ⚠️ El monto recibido es insuficiente
+                      <AlertTriangle size={16} style={{ color: 'var(--warning)' }} />
+                      El monto recibido es insuficiente
                     </div>
                   )}
                 </div>

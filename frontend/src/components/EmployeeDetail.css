@@ -32,6 +32,12 @@
   gap: 1rem;
 }
 
+.header-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .detail-section {
   margin-bottom: 2rem;
 }
@@ -178,7 +184,8 @@
 }
 
 .document-icon {
-  font-size: 2rem;
+  display: inline-flex;
+  align-items: center;
 }
 
 .document-header label {

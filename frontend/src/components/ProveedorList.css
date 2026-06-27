@@ -107,3 +107,42 @@
     flex-wrap: wrap;
   }
 }
+
+/* ==================== ICON ALIGNMENT (lucide-react) ==================== */
+
+.proveedor-list-container .header h1 {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.proveedor-list-container .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.proveedor-list-container .stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.proveedor-list-container .search-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.info-item-prov .info-icon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-secondary);
+}
+
+.card-actions-prov .btn-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}

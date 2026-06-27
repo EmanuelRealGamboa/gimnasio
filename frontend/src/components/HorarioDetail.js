@@ -1,5 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import {
+  Loader,
+  ArrowLeft,
+  Calendar,
+  Pencil,
+  Trash2,
+  CheckCircle2,
+  PauseCircle,
+  XCircle,
+  ClipboardList,
+  MapPin,
+  CalendarDays,
+  BarChart3,
+  FileText,
+  ArrowRight,
+  Clock,
+} from 'lucide-react';
 import horariosService from '../services/horariosService';
 import ConfirmModal from './ConfirmModal';
 import './HorarioDetail.css';
@@ -97,7 +114,7 @@ const HorarioDetail = () => {
     return (
       <div className="horario-detail-container">
         <div className="loading-spinner">
-          <span className="spinner">⏳</span>
+          <span className="spinner"><Loader size={24} /></span>
           <p>Cargando horario...</p>
         </div>
       </div>
@@ -110,7 +127,7 @@ const HorarioDetail = () => {
         <div className="alert alert-error">
           <span>{error || 'Horario no encontrado'}</span>
           <button className="btn-secondary" onClick={() => navigate('/horarios')}>
-            ← Volver
+            <ArrowLeft size={18} /> Volver
           </button>
         </div>
       </div>
@@ -123,21 +140,21 @@ const HorarioDetail = () => {
       <div className="detail-header">
         <div>
           <h2>
-            <span className="header-icon">📅</span>
+            <span className="header-icon"><Calendar size={20} /></span>
             Detalle del Horario
           </h2>
           <p className="subtitle">{horario.tipo_actividad_nombre}</p>
         </div>
         <div className="header-actions">
           <button className="btn-secondary" onClick={() => navigate('/horarios')}>
-            ← Volver
+            <ArrowLeft size={18} /> Volver
           </button>
           <button className="btn-edit" onClick={() => navigate(`/horarios/edit/${id}`)}>
-            ✏️ Editar
+            <Pencil size={18} /> Editar
           </button>
           {horario.estado === 'activo' && (
             <button className="btn-danger" onClick={confirmarEliminar}>
-              🗑️ Eliminar
+              <Trash2 size={18} /> Eliminar
             </button>
           )}
         </div>
@@ -147,9 +164,9 @@ const HorarioDetail = () => {
       <div className={`estado-banner estado-${horario.estado}`}>
         <div className="estado-content">
           <span className="estado-icon">
-            {horario.estado === 'activo' && '✓'}
-            {horario.estado === 'suspendido' && '⏸'}
-            {horario.estado === 'cancelado' && '✕'}
+            {horario.estado === 'activo' && <CheckCircle2 size={22} style={{ color: 'var(--success)' }} />}
+            {horario.estado === 'suspendido' && <PauseCircle size={22} style={{ color: 'var(--warning)' }} />}
+            {horario.estado === 'cancelado' && <XCircle size={22} style={{ color: 'var(--danger)' }} />}
           </span>
           <span className="estado-text">
             {horario.estado === 'activo' && 'Horario Activo'}
@@ -164,7 +181,7 @@ const HorarioDetail = () => {
         {/* Card: Información General */}
         <div className="detail-card">
           <div className="card-header">
-            <h3>📋 Información General</h3>
+            <h3><ClipboardList size={18} /> Información General</h3>
           </div>
           <div className="card-body">
             <div className="info-row">
@@ -181,7 +198,7 @@ const HorarioDetail = () => {
               <span className="info-label">Horario:</span>
               <div className="horario-display">
                 <span className="hora-inicio">{formatHora(horario.hora_inicio)}</span>
-                <span className="separador">→</span>
+                <span className="separador"><ArrowRight size={16} /></span>
                 <span className="hora-fin">{formatHora(horario.hora_fin)}</span>
               </div>
             </div>
@@ -195,7 +212,7 @@ const HorarioDetail = () => {
         {/* Card: Ubicación y Personal */}
         <div className="detail-card">
           <div className="card-header">
-            <h3>📍 Ubicación y Personal</h3>
+            <h3><MapPin size={18} /> Ubicación y Personal</h3>
           </div>
           <div className="card-body">
             <div className="info-row">
@@ -216,7 +233,7 @@ const HorarioDetail = () => {
         {/* Card: Vigencia */}
         <div className="detail-card">
           <div className="card-header">
-            <h3>📆 Vigencia</h3>
+            <h3><CalendarDays size={18} /> Vigencia</h3>
           </div>
           <div className="card-body">
             <div className="info-row">
@@ -233,7 +250,7 @@ const HorarioDetail = () => {
         {/* Card: Estadísticas */}
         <div className="detail-card">
           <div className="card-header">
-            <h3>📊 Estadísticas</h3>
+            <h3><BarChart3 size={18} /> Estadísticas</h3>
           </div>
           <div className="card-body">
             <div className="info-row">
@@ -262,7 +279,7 @@ const HorarioDetail = () => {
       {horario.observaciones && (
         <div className="detail-card">
           <div className="card-header">
-            <h3>📝 Observaciones</h3>
+            <h3><FileText size={18} /> Observaciones</h3>
           </div>
           <div className="card-body">
             <p className="observaciones-text">{horario.observaciones}</p>
@@ -273,7 +290,7 @@ const HorarioDetail = () => {
       {/* Sesiones Recientes */}
       <div className="detail-card">
         <div className="card-header">
-          <h3>📅 Sesiones Recientes</h3>
+          <h3><Calendar size={18} /> Sesiones Recientes</h3>
         </div>
         <div className="card-body">
           {sesiones.length === 0 ? (
@@ -289,10 +306,10 @@ const HorarioDetail = () => {
                     {formatHora(sesion.hora_inicio)} - {formatHora(sesion.hora_fin)}
                   </div>
                   <span className={`sesion-estado estado-${sesion.estado}`}>
-                    {sesion.estado === 'programada' && '📅 Programada'}
-                    {sesion.estado === 'en_curso' && '⏳ En Curso'}
-                    {sesion.estado === 'completada' && '✓ Completada'}
-                    {sesion.estado === 'cancelada' && '✕ Cancelada'}
+                    {sesion.estado === 'programada' && <><Calendar size={16} /> Programada</>}
+                    {sesion.estado === 'en_curso' && <><Clock size={16} /> En Curso</>}
+                    {sesion.estado === 'completada' && <><CheckCircle2 size={16} style={{ color: 'var(--success)' }} /> Completada</>}
+                    {sesion.estado === 'cancelada' && <><XCircle size={16} style={{ color: 'var(--danger)' }} /> Cancelada</>}
                   </span>
                   <div className="sesion-reservas">
                     {sesion.reservas_count || 0} / {horario.cupo_maximo} reservas

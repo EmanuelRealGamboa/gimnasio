@@ -1,4 +1,23 @@
 import React, { useState, useEffect } from 'react';
+import {
+  CreditCard,
+  RefreshCw,
+  BarChart3,
+  CheckCircle2,
+  Clock,
+  DollarSign,
+  Calendar,
+  Search,
+  X,
+  Loader2,
+  ClipboardList,
+  Star,
+  XCircle,
+  Eye,
+  Ban,
+  ArrowLeft,
+  ArrowRight,
+} from 'lucide-react';
 import suscripcionesService from '../services/suscripcionesService';
 import instalacionesService from '../services/instalacionesService';
 import './SuscripcionesHistorial.css';
@@ -176,9 +195,9 @@ const SuscripcionesHistorial = () => {
 
   const getEstadoTexto = (estado) => {
     const textos = {
-      'activa': '✓ Activa',
-      'vencida': '⏰ Vencida',
-      'cancelada': '✕ Cancelada'
+      'activa': <><CheckCircle2 size={16} /> Activa</>,
+      'vencida': <><Clock size={16} /> Vencida</>,
+      'cancelada': <><XCircle size={16} /> Cancelada</>
     };
     return textos[estado] || estado;
   };
@@ -189,20 +208,20 @@ const SuscripcionesHistorial = () => {
       <div className="historial-header">
         <div className="header-left">
           <h1>
-            <span className="header-icon">💳</span>
+            <span className="header-icon"><CreditCard size={28} /></span>
             Historial de Suscripciones
           </h1>
           <p className="subtitle">Consulta y gestiona las suscripciones de membresías</p>
         </div>
         <button className="btn-primary" onClick={cargarSuscripciones}>
-          🔄 Actualizar
+          <RefreshCw size={18} /> Actualizar
         </button>
       </div>
 
       {/* Estadísticas */}
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-icon stat-icon-blue">📊</div>
+          <div className="stat-icon stat-icon-blue"><BarChart3 size={28} style={{ color: 'var(--info)' }} /></div>
           <div className="stat-content">
             <h3>{estadisticas.total_suscripciones}</h3>
             <p>Total de Suscripciones</p>
@@ -210,7 +229,7 @@ const SuscripcionesHistorial = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon stat-icon-green">✓</div>
+          <div className="stat-icon stat-icon-green"><CheckCircle2 size={28} style={{ color: 'var(--success)' }} /></div>
           <div className="stat-content">
             <h3>{estadisticas.activas}</h3>
             <p>Suscripciones Activas</p>
@@ -218,7 +237,7 @@ const SuscripcionesHistorial = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon stat-icon-yellow">⏰</div>
+          <div className="stat-icon stat-icon-yellow"><Clock size={28} style={{ color: 'var(--warning)' }} /></div>
           <div className="stat-content">
             <h3>{estadisticas.vencidas}</h3>
             <p>Suscripciones Vencidas</p>
@@ -226,7 +245,7 @@ const SuscripcionesHistorial = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon stat-icon-purple">💰</div>
+          <div className="stat-icon stat-icon-purple"><DollarSign size={28} style={{ color: 'var(--info)' }} /></div>
           <div className="stat-content">
             <h3>{formatPrecio(estadisticas.ingresos_totales)}</h3>
             <p>Ingresos Totales</p>
@@ -234,7 +253,7 @@ const SuscripcionesHistorial = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon stat-icon-orange">📅</div>
+          <div className="stat-icon stat-icon-orange"><Calendar size={28} style={{ color: 'var(--warning)' }} /></div>
           <div className="stat-content">
             <h3>{formatPrecio(estadisticas.ingresos_mes_actual)}</h3>
             <p>Ingresos del Mes</p>
@@ -246,11 +265,11 @@ const SuscripcionesHistorial = () => {
       <div className="filters-card">
         <div className="filters-header">
           <h3>
-            <span className="filter-icon">🔍</span>
+            <span className="filter-icon"><Search size={20} /></span>
             Filtros de Búsqueda
           </h3>
           <button className="btn-limpiar" onClick={limpiarFiltros}>
-            ✕ Limpiar Filtros
+            <X size={16} /> Limpiar Filtros
           </button>
         </div>
 
@@ -304,7 +323,7 @@ const SuscripcionesHistorial = () => {
       {/* Mensajes */}
       {error && (
         <div className="alert alert-error">
-          <span className="alert-icon" onClick={() => setError(null)}>✕</span>
+          <span className="alert-icon" onClick={() => setError(null)}><X size={16} /></span>
           {error}
         </div>
       )}
@@ -312,12 +331,12 @@ const SuscripcionesHistorial = () => {
       {/* Tabla de suscripciones */}
       {loading ? (
         <div className="loading-spinner">
-          <span className="spinner">⏳</span>
+          <span className="spinner"><Loader2 size={32} /></span>
           <p>Cargando suscripciones...</p>
         </div>
       ) : suscripcionesActuales.length === 0 ? (
         <div className="no-data-container">
-          <div className="no-data-icon">📋</div>
+          <div className="no-data-icon"><ClipboardList size={48} /></div>
           <p>No se encontraron suscripciones con los filtros seleccionados</p>
         </div>
       ) : (
@@ -350,7 +369,7 @@ const SuscripcionesHistorial = () => {
                       {suscripcion.sede_nombre ? (
                         <span className="badge-sede">{suscripcion.sede_nombre}</span>
                       ) : suscripcion.permite_todas_sedes ? (
-                        <span className="badge-multisede">⭐ Todas</span>
+                        <span className="badge-multisede"><Star size={14} /> Todas</span>
                       ) : 'N/A'}
                     </td>
                     <td>{formatFecha(suscripcion.fecha_inicio)}</td>
@@ -367,7 +386,7 @@ const SuscripcionesHistorial = () => {
                         onClick={() => verDetalle(suscripcion)}
                         title="Ver detalle"
                       >
-                        👁️
+                        <Eye size={18} />
                       </button>
                       {suscripcion.estado === 'activa' && (
                         <button
@@ -375,7 +394,7 @@ const SuscripcionesHistorial = () => {
                           onClick={() => cancelarSuscripcion(suscripcion.id)}
                           title="Cancelar suscripción"
                         >
-                          🚫
+                          <Ban size={18} />
                         </button>
                       )}
                     </td>
@@ -393,7 +412,7 @@ const SuscripcionesHistorial = () => {
                 onClick={() => setPaginaActual(paginaActual - 1)}
                 disabled={paginaActual === 1}
               >
-                ← Anterior
+                <ArrowLeft size={16} /> Anterior
               </button>
 
               <div className="pagination-info">
@@ -405,7 +424,7 @@ const SuscripcionesHistorial = () => {
                 onClick={() => setPaginaActual(paginaActual + 1)}
                 disabled={paginaActual === totalPaginas}
               >
-                Siguiente →
+                Siguiente <ArrowRight size={16} />
               </button>
             </div>
           )}
@@ -418,10 +437,10 @@ const SuscripcionesHistorial = () => {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>
-                <span className="modal-icon">📋</span>
+                <span className="modal-icon"><ClipboardList size={22} /></span>
                 Detalle de Suscripción #{suscripcionSeleccionada.id}
               </h2>
-              <button className="btn-cerrar-modal" onClick={cerrarModal}>✕</button>
+              <button className="btn-cerrar-modal" onClick={cerrarModal}><X size={20} /></button>
             </div>
 
             <div className="modal-body">
@@ -450,9 +469,11 @@ const SuscripcionesHistorial = () => {
                   </div>
                   <div className="info-item">
                     <span className="info-label">Sede:</span>
-                    <span className="info-value">
+                    <span className="info-value" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
                       {suscripcionSeleccionada.sede_nombre ||
-                       (suscripcionSeleccionada.permite_todas_sedes ? '⭐ Todas las sedes' : 'N/A')}
+                       (suscripcionSeleccionada.permite_todas_sedes
+                         ? <><Star size={16} /> Todas las sedes</>
+                         : 'N/A')}
                     </span>
                   </div>
                   <div className="info-item">
@@ -506,7 +527,7 @@ const SuscripcionesHistorial = () => {
                   className="btn-cancelar-suscripcion"
                   onClick={() => cancelarSuscripcion(suscripcionSeleccionada.id)}
                 >
-                  🚫 Cancelar Suscripción
+                  <Ban size={18} /> Cancelar Suscripción
                 </button>
               )}
               <button className="btn-cerrar" onClick={cerrarModal}>

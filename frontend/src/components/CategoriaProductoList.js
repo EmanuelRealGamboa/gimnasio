@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Tag, Plus, Search, X, Pencil, Trash2 } from 'lucide-react';
 import inventarioService from '../services/inventarioService';
 import ConfirmModal from './ConfirmModal';
 import './Inventario.css';
@@ -60,7 +61,7 @@ function CategoriaProductoList() {
 
     try {
       await inventarioService.deleteCategoria(categoriaToDelete.categoria_producto_id);
-      showNotif('✓ Categoría eliminada exitosamente', 'success');
+      showNotif('Categoría eliminada exitosamente', 'success');
       setShowConfirmModal(false);
       setCategoriaToDelete(null);
       fetchCategorias();
@@ -107,14 +108,14 @@ function CategoriaProductoList() {
       {/* Header */}
       <div className="inventario-header">
         <div>
-          <h1>📦 Categorías de Productos</h1>
+          <h1><Tag size={26} /> Categorías de Productos</h1>
           <p className="inventario-subtitle">Gestiona las categorías de tu inventario</p>
         </div>
         <button
           className="btn-primary"
           onClick={() => navigate('/inventario/categorias/new')}
         >
-          <span>➕</span> Nueva Categoría
+          <Plus size={18} /> Nueva Categoría
         </button>
       </div>
 
@@ -122,7 +123,7 @@ function CategoriaProductoList() {
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #666666 0%, #2a2a2a 100%)' }}>
-            📦
+            <Tag size={26} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Total Categorías</div>
@@ -132,7 +133,7 @@ function CategoriaProductoList() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }}>
-            🔍
+            <Search size={26} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Filtradas</div>
@@ -144,7 +145,7 @@ function CategoriaProductoList() {
       {/* Filters */}
       <div className="filters-section">
         <div className="search-box">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon"><Search size={18} /></span>
           <input
             type="text"
             placeholder="Buscar por nombre de categoría..."
@@ -157,7 +158,7 @@ function CategoriaProductoList() {
               className="clear-search"
               onClick={() => setSearchTerm('')}
             >
-              ✕
+              <X size={16} />
             </button>
           )}
         </div>
@@ -177,7 +178,7 @@ function CategoriaProductoList() {
             {filteredCategorias.length === 0 ? (
               <tr>
                 <td colSpan="3" className="text-center empty-state">
-                  <div className="empty-icon">📦</div>
+                  <div className="empty-icon"><Tag size={64} /></div>
                   <p>No se encontraron categorías</p>
                   <button
                     className="btn-primary"
@@ -201,14 +202,14 @@ function CategoriaProductoList() {
                         onClick={() => navigate(`/inventario/categorias/edit/${categoria.categoria_producto_id}`)}
                         title="Editar"
                       >
-                        ✏️
+                        <Pencil size={16} />
                       </button>
                       <button
                         className="btn-action btn-action-delete"
                         onClick={() => handleDeleteClick(categoria)}
                         title="Eliminar"
                       >
-                        🗑️
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   </td>

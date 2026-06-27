@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Users, CheckCircle2, XCircle, Building2, Search, UserPlus, Eye, Pencil, Trash2 } from 'lucide-react';
 import employeeService from '../services/employeeService';
 import sedeService from '../services/sedeService';
 import roleService from '../services/roleService';
@@ -8,21 +9,21 @@ import './EmployeeList.css';
 
 // Función para obtener el badge del rol
 const getRoleBadge = (rolNombre) => {
-  if (!rolNombre) return { color: '#666666', icon: '👤' };
+  if (!rolNombre) return { color: '#666666' };
 
   // Normalizar el nombre del rol para hacer la comparación
   const rolNormalizado = rolNombre.toLowerCase().trim();
 
   const roleMap = {
-    'administrador': { color: '#2a2a2a', icon: '👑' },
-    'entrenador': { color: '#22c55e', icon: '💪' },
-    'recepcionista': { color: '#f59e0b', icon: '🎫' },
-    'cajero': { color: '#2a2a2a', icon: '💰' },
-    'supervisor de espacio': { color: '#666666', icon: '🏗️' },
-    'personal de limpieza': { color: '#999999', icon: '🧹' }
+    'administrador': { color: '#2a2a2a' },
+    'entrenador': { color: '#22c55e' },
+    'recepcionista': { color: '#f59e0b' },
+    'cajero': { color: '#2a2a2a' },
+    'supervisor de espacio': { color: '#666666' },
+    'personal de limpieza': { color: '#999999' }
   };
 
-  return roleMap[rolNormalizado] || { color: '#666666', icon: '👤' };
+  return roleMap[rolNormalizado] || { color: '#666666' };
 };
 
 function EmployeeList() {
@@ -161,7 +162,7 @@ function EmployeeList() {
     successModal.className = 'success-modal-overlay';
     successModal.innerHTML = `
       <div class="success-modal">
-        <div class="success-icon">✓</div>
+        <div class="success-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
         <h2>¡Éxito!</h2>
         <p>${message}</p>
       </div>
@@ -190,7 +191,7 @@ function EmployeeList() {
           className="btn btn-primary"
           onClick={() => navigate('/employees/new')}
         >
-          <span className="btn-icon">+</span>
+          <span className="btn-icon"><UserPlus size={18} /></span>
           Nuevo Empleado
         </button>
       </div>
@@ -226,9 +227,10 @@ function EmployeeList() {
               justifyContent: 'center',
               fontSize: '1.5rem',
               boxShadow: '0 2px 6px rgba(42, 42, 42, 0.4)',
-              flexShrink: 0
+              flexShrink: 0,
+              color: '#ffffff'
             }}>
-              👥
+              <Users size={24} />
             </div>
             <div style={{ flex: 1 }}>
               <div style={{
@@ -272,9 +274,10 @@ function EmployeeList() {
               justifyContent: 'center',
               fontSize: '1.5rem',
               boxShadow: '0 2px 6px rgba(34, 197, 94, 0.4)',
-              flexShrink: 0
+              flexShrink: 0,
+              color: '#ffffff'
             }}>
-              ✓
+              <CheckCircle2 size={24} />
             </div>
             <div style={{ flex: 1 }}>
               <div style={{
@@ -318,9 +321,10 @@ function EmployeeList() {
               justifyContent: 'center',
               fontSize: '1.5rem',
               boxShadow: '0 2px 6px rgba(239, 68, 68, 0.4)',
-              flexShrink: 0
+              flexShrink: 0,
+              color: '#ffffff'
             }}>
-              ⏸️
+              <XCircle size={24} />
             </div>
             <div style={{ flex: 1 }}>
               <div style={{
@@ -362,7 +366,7 @@ function EmployeeList() {
                 alignItems: 'center',
                 gap: '0.5rem'
               }}>
-                <span style={{ fontSize: '1.5rem' }}>🏢</span>
+                <Building2 size={22} />
                 Empleados por Sede
               </div>
               <div style={{
@@ -411,7 +415,7 @@ function EmployeeList() {
 
       <div className="filters-container">
         <div className="search-box">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon"><Search size={18} /></span>
           <input
             type="text"
             placeholder="Buscar por nombre..."
@@ -556,21 +560,21 @@ function EmployeeList() {
                       onClick={() => handleViewDetail(employee.id)}
                       title="Ver detalles"
                     >
-                      👁️
+                      <Eye size={18} />
                     </button>
                     <button
                       className="btn-action btn-edit"
                       onClick={() => handleEdit(employee.id)}
                       title="Editar"
                     >
-                      ✏️
+                      <Pencil size={18} />
                     </button>
                     <button
                       className="btn-action btn-delete"
                       onClick={() => handleDeleteClick(employee)}
                       title="Eliminar"
                     >
-                      🗑️
+                      <Trash2 size={18} />
                     </button>
                     </td>
                   </tr>

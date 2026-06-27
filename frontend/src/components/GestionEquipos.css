@@ -998,6 +998,8 @@
   font-size: 18px;
   pointer-events: none;
   z-index: 1;
+  display: inline-flex;
+  align-items: center;
 }
 
 .search-input {

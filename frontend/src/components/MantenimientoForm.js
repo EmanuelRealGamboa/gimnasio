@@ -1,5 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import {
+  ArrowLeft,
+  Pencil,
+  Wrench,
+  ClipboardList,
+  Package,
+  Tag,
+  Calendar,
+  Banknote,
+  FileText,
+  User,
+  RefreshCw,
+  Building2,
+  AlertTriangle,
+  CheckCircle2,
+} from 'lucide-react';
 import { mantenimientoService, activoService, proveedorService } from '../services/gestionEquiposService';
 import './ActivoForm.css';
 
@@ -66,7 +82,7 @@ const MantenimientoForm = () => {
     successModal.className = 'success-modal-overlay';
     successModal.innerHTML = `
       <div class="success-modal">
-        <div class="success-icon">✓</div>
+        <div class="success-icon"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
         <h2>¡Éxito!</h2>
         <p>${message}</p>
       </div>
@@ -239,11 +255,11 @@ const MantenimientoForm = () => {
       {/* Header */}
       <div className="form-header">
         <Link to="/gestion-equipos/mantenimientos" className="btn-back-form">
-          ← Volver al Listado
+          <ArrowLeft size={18} /> Volver al Listado
         </Link>
         <div className="form-header-info">
           <h1 className="form-title">
-            {isEdit ? '✏️ Editar Mantenimiento' : '🔧 Nuevo Mantenimiento'}
+            {isEdit ? <><Pencil size={20} /> Editar Mantenimiento</> : <><Wrench size={20} /> Nuevo Mantenimiento</>}
           </h1>
           <p className="form-subtitle">
             {isEdit ? 'Actualiza la información del mantenimiento' : 'Programa un nuevo mantenimiento para un equipo'}
@@ -254,14 +270,14 @@ const MantenimientoForm = () => {
       <form onSubmit={handleSubmit} className="activo-form">
         {/* Sección: Información del Mantenimiento */}
         <div className="form-section-header">
-          <span className="section-icon">📋</span>
+          <span className="section-icon"><ClipboardList size={20} /></span>
           <h2 className="section-title">Información del Mantenimiento</h2>
         </div>
 
         <div className="form-row">
           <div className="form-field">
             <label className="field-label">
-              <span className="label-icon">📦</span>
+              <span className="label-icon"><Package size={16} /></span>
               Equipo/Activo *
             </label>
             <select
@@ -279,14 +295,14 @@ const MantenimientoForm = () => {
               ))}
             </select>
             {errors.activo && (
-              <span className="field-error">⚠️ {errors.activo}</span>
+              <span className="field-error"><AlertTriangle size={16} style={{ color: 'var(--warning)' }} /> {errors.activo}</span>
             )}
             <span className="field-hint">Equipo que recibirá mantenimiento</span>
           </div>
 
           <div className="form-field">
             <label className="field-label">
-              <span className="label-icon">🏷️</span>
+              <span className="label-icon"><Tag size={16} /></span>
               Tipo de Mantenimiento *
             </label>
             <select
@@ -296,11 +312,11 @@ const MantenimientoForm = () => {
               className={`field-select ${errors.tipo_mantenimiento ? 'input-error' : ''}`}
               required
             >
-              <option value="preventivo">🛡️ Preventivo</option>
-              <option value="correctivo">🔧 Correctivo</option>
+              <option value="preventivo">Preventivo</option>
+              <option value="correctivo">Correctivo</option>
             </select>
             {errors.tipo_mantenimiento && (
-              <span className="field-error">⚠️ {errors.tipo_mantenimiento}</span>
+              <span className="field-error"><AlertTriangle size={16} style={{ color: 'var(--warning)' }} /> {errors.tipo_mantenimiento}</span>
             )}
             <span className="field-hint">
               Preventivo: programado | Correctivo: reparación
@@ -311,7 +327,7 @@ const MantenimientoForm = () => {
         <div className="form-row">
           <div className="form-field">
             <label className="field-label">
-              <span className="label-icon">📅</span>
+              <span className="label-icon"><Calendar size={16} /></span>
               Fecha Programada *
             </label>
             <input
@@ -324,14 +340,14 @@ const MantenimientoForm = () => {
               required
             />
             {errors.fecha_programada && (
-              <span className="field-error">⚠️ {errors.fecha_programada}</span>
+              <span className="field-error"><AlertTriangle size={16} style={{ color: 'var(--warning)' }} /> {errors.fecha_programada}</span>
             )}
             <span className="field-hint">Fecha en que se realizará el mantenimiento</span>
           </div>
 
           <div className="form-field">
             <label className="field-label">
-              <span className="label-icon">💵</span>
+              <span className="label-icon"><Banknote size={16} /></span>
               Costo Estimado (MXN) *
             </label>
             <input
@@ -346,7 +362,7 @@ const MantenimientoForm = () => {
               required
             />
             {errors.costo && (
-              <span className="field-error">⚠️ {errors.costo}</span>
+              <span className="field-error"><AlertTriangle size={16} style={{ color: 'var(--warning)' }} /> {errors.costo}</span>
             )}
             <span className="field-hint">Costo estimado del mantenimiento</span>
           </div>
@@ -355,7 +371,7 @@ const MantenimientoForm = () => {
         <div className="form-row single">
           <div className="form-field">
             <label className="field-label">
-              <span className="label-icon">📝</span>
+              <span className="label-icon"><FileText size={16} /></span>
               Descripción del Trabajo *
             </label>
             <textarea
@@ -368,7 +384,7 @@ const MantenimientoForm = () => {
               required
             />
             {errors.descripcion && (
-              <span className="field-error">⚠️ {errors.descripcion}</span>
+              <span className="field-error"><AlertTriangle size={16} style={{ color: 'var(--warning)' }} /> {errors.descripcion}</span>
             )}
             <span className="field-hint">
               Ej: Lubricación de banda, ajuste de velocidad, limpieza de motor
@@ -378,14 +394,14 @@ const MantenimientoForm = () => {
 
         {/* Sección: Responsable */}
         <div className="form-section-header">
-          <span className="section-icon">👤</span>
+          <span className="section-icon"><User size={20} /></span>
           <h2 className="section-title">Responsable del Mantenimiento</h2>
         </div>
 
         <div className="form-row single">
           <div className="form-field">
             <label className="field-label">
-              <span className="label-icon">🔄</span>
+              <span className="label-icon"><RefreshCw size={16} /></span>
               Tipo de Responsable
             </label>
             <select
@@ -394,9 +410,9 @@ const MantenimientoForm = () => {
               onChange={handleChange}
               className="field-select"
             >
-              <option value="ninguno">⚪ Sin Asignar (Asignar después)</option>
-              <option value="proveedor">🏢 Proveedor Externo</option>
-              <option value="empleado">👤 Empleado Interno</option>
+              <option value="ninguno">Sin Asignar (Asignar después)</option>
+              <option value="proveedor">Proveedor Externo</option>
+              <option value="empleado">Empleado Interno</option>
             </select>
             <span className="field-hint">
               Selecciona quién realizará el mantenimiento
@@ -408,7 +424,7 @@ const MantenimientoForm = () => {
           <div className="form-row single">
             <div className="form-field">
               <label className="field-label">
-                <span className="label-icon">🏢</span>
+                <span className="label-icon"><Building2 size={16} /></span>
                 Proveedor de Servicio *
               </label>
               <select
@@ -426,7 +442,7 @@ const MantenimientoForm = () => {
                 ))}
               </select>
               {errors.proveedor_servicio && (
-                <span className="field-error">⚠️ {errors.proveedor_servicio}</span>
+                <span className="field-error"><AlertTriangle size={16} style={{ color: 'var(--warning)' }} /> {errors.proveedor_servicio}</span>
               )}
               <span className="field-hint">Empresa externa que realizará el servicio</span>
             </div>
@@ -437,7 +453,7 @@ const MantenimientoForm = () => {
           <div className="form-row single">
             <div className="form-field">
               <label className="field-label">
-                <span className="label-icon">👤</span>
+                <span className="label-icon"><User size={16} /></span>
                 Empleado Responsable *
               </label>
               <select
@@ -455,7 +471,7 @@ const MantenimientoForm = () => {
                 ))}
               </select>
               {errors.empleado_responsable && (
-                <span className="field-error">⚠️ {errors.empleado_responsable}</span>
+                <span className="field-error"><AlertTriangle size={16} style={{ color: 'var(--warning)' }} /> {errors.empleado_responsable}</span>
               )}
               <span className="field-hint">Empleado del gimnasio que realizará el mantenimiento</span>
             </div>
@@ -480,7 +496,7 @@ const MantenimientoForm = () => {
               </span>
             ) : (
               <>
-                {isEdit ? '✓ Actualizar Mantenimiento' : '🔧 Crear Mantenimiento'}
+                {isEdit ? <><CheckCircle2 size={18} /> Actualizar Mantenimiento</> : <><Wrench size={18} /> Crear Mantenimiento</>}
               </>
             )}
           </button>

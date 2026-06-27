@@ -1,4 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import {
+  Ticket,
+  BarChart3,
+  CheckCircle2,
+  Calendar,
+  Trophy,
+  XCircle,
+  Search,
+  X,
+  Loader,
+  User,
+  Dumbbell,
+  Clock,
+  MapPin,
+  AlertTriangle,
+  Users,
+  Plus,
+} from 'lucide-react';
 import horariosService from '../services/horariosService';
 import clienteService from '../services/clienteService';
 import instalacionesService from '../services/instalacionesService';
@@ -212,7 +230,7 @@ const ReservasClases = () => {
       });
 
       // Mostrar mensaje de éxito con animación
-      setSuccessMessage('✓ Reserva creada exitosamente');
+      setSuccessMessage('Reserva creada exitosamente');
       setTimeout(() => setSuccessMessage(''), 3000);
 
       cerrarModal();
@@ -252,7 +270,7 @@ const ReservasClases = () => {
       await horariosService.cancelarReserva(id);
 
       // Mostrar mensaje de éxito con animación
-      setSuccessMessage('✓ Reserva cancelada exitosamente');
+      setSuccessMessage('Reserva cancelada exitosamente');
       setTimeout(() => setSuccessMessage(''), 3000);
 
       await cargarDatos();
@@ -298,20 +316,20 @@ const ReservasClases = () => {
       <div className="page-header">
         <div>
           <h2>
-            <span className="header-icon">🎫</span>
+            <span className="header-icon"><Ticket size={20} /></span>
             Reservas de Clases
           </h2>
           <p className="subtitle">Gestiona las reservas de clases y actividades</p>
         </div>
         <button className="btn-primary" onClick={() => setShowModal(true)}>
-          + Nueva Reserva
+          <Plus size={18} /> Nueva Reserva
         </button>
       </div>
 
       {/* Estadísticas */}
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-icon stat-icon-blue">📊</div>
+          <div className="stat-icon stat-icon-blue"><BarChart3 size={24} /></div>
           <div className="stat-content">
             <h3>{estadisticas.total}</h3>
             <p>Total de Reservas</p>
@@ -319,7 +337,7 @@ const ReservasClases = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon stat-icon-green">✓</div>
+          <div className="stat-icon stat-icon-green"><CheckCircle2 size={24} /></div>
           <div className="stat-content">
             <h3>{estadisticas.confirmadas}</h3>
             <p>Confirmadas</p>
@@ -327,7 +345,7 @@ const ReservasClases = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon stat-icon-orange">📅</div>
+          <div className="stat-icon stat-icon-orange"><Calendar size={24} /></div>
           <div className="stat-content">
             <h3>{estadisticasSesiones.sesionesDisponibles}</h3>
             <p>Sesiones Disponibles</p>
@@ -335,7 +353,7 @@ const ReservasClases = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon stat-icon-purple">🏆</div>
+          <div className="stat-icon stat-icon-purple"><Trophy size={24} /></div>
           <div className="stat-content">
             <h3>{estadisticas.completadas}</h3>
             <p>Completadas</p>
@@ -343,7 +361,7 @@ const ReservasClases = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon stat-icon-red">✕</div>
+          <div className="stat-icon stat-icon-red"><XCircle size={24} /></div>
           <div className="stat-content">
             <h3>{estadisticas.canceladas}</h3>
             <p>Canceladas</p>
@@ -355,11 +373,11 @@ const ReservasClases = () => {
       <div className="filters-card">
         <div className="filters-header">
           <h3>
-            <span className="filter-icon">🔍</span>
+            <span className="filter-icon"><Search size={18} /></span>
             Filtros de Búsqueda
           </h3>
           <button className="btn-limpiar" onClick={limpiarFiltros}>
-            ✕ Limpiar Filtros
+            <X size={16} /> Limpiar Filtros
           </button>
         </div>
 
@@ -393,7 +411,7 @@ const ReservasClases = () => {
         <div className="alert alert-error">
           <span>{error}</span>
           <span className="alert-icon" onClick={() => setError(null)}>
-            ✕
+            <X size={16} />
           </span>
         </div>
       )}
@@ -403,7 +421,7 @@ const ReservasClases = () => {
         <div className="alert alert-success">
           <span>{successMessage}</span>
           <span className="alert-icon" onClick={() => setSuccessMessage('')}>
-            ✕
+            <X size={16} />
           </span>
         </div>
       )}
@@ -411,12 +429,12 @@ const ReservasClases = () => {
       {/* Grid de Cards de Reservas */}
       {loading ? (
         <div className="loading-spinner">
-          <span className="spinner">⏳</span>
+          <span className="spinner"><Loader size={24} /></span>
           <p>Cargando reservas...</p>
         </div>
       ) : reservasFiltradas.length === 0 ? (
         <div className="no-data-container">
-          <div className="no-data-icon">🎫</div>
+          <div className="no-data-icon"><Ticket size={26} /></div>
           <p>No se encontraron reservas</p>
         </div>
       ) : (
@@ -429,16 +447,16 @@ const ReservasClases = () => {
                   <span className="codigo-reserva">{reserva.codigo_reserva}</span>
                 </div>
                 <span className={`badge-estado badge-${reserva.estado}`}>
-                  {reserva.estado === 'confirmada' && '✓ Confirmada'}
-                  {reserva.estado === 'cancelada' && '✕ Cancelada'}
-                  {reserva.estado === 'completada' && '🏆 Completada'}
-                  {reserva.estado === 'no_asistio' && '⚠ No Asistió'}
+                  {reserva.estado === 'confirmada' && <><CheckCircle2 size={16} style={{ color: 'var(--success)' }} /> Confirmada</>}
+                  {reserva.estado === 'cancelada' && <><XCircle size={16} style={{ color: 'var(--danger)' }} /> Cancelada</>}
+                  {reserva.estado === 'completada' && <><Trophy size={16} /> Completada</>}
+                  {reserva.estado === 'no_asistio' && <><AlertTriangle size={16} style={{ color: 'var(--warning)' }} /> No Asistió</>}
                 </span>
               </div>
 
               <div className="reserva-card-body">
                 <div className="reserva-info-item">
-                  <span className="info-icon">👤</span>
+                  <span className="info-icon"><User size={16} /></span>
                   <div>
                     <span className="info-label">Cliente</span>
                     <span className="info-value">{reserva.cliente_nombre}</span>
@@ -446,7 +464,7 @@ const ReservasClases = () => {
                 </div>
 
                 <div className="reserva-info-item">
-                  <span className="info-icon">🏋️</span>
+                  <span className="info-icon"><Dumbbell size={16} /></span>
                   <div>
                     <span className="info-label">Entrenador</span>
                     <span className="info-value">{reserva.sesion_entrenador || 'No asignado'}</span>
@@ -454,7 +472,7 @@ const ReservasClases = () => {
                 </div>
 
                 <div className="reserva-info-item">
-                  <span className="info-icon">🕐</span>
+                  <span className="info-icon"><Clock size={16} /></span>
                   <div>
                     <span className="info-label">Horario</span>
                     <span className="info-value">
@@ -464,7 +482,7 @@ const ReservasClases = () => {
                 </div>
 
                 <div className="reserva-info-item">
-                  <span className="info-icon">📍</span>
+                  <span className="info-icon"><MapPin size={16} /></span>
                   <div>
                     <span className="info-label">Sede y Espacio</span>
                     <span className="info-value">{reserva.sesion_sede} - {reserva.sesion_espacio}</span>
@@ -472,7 +490,7 @@ const ReservasClases = () => {
                 </div>
 
                 <div className="reserva-info-item">
-                  <span className="info-icon">📅</span>
+                  <span className="info-icon"><Calendar size={16} /></span>
                   <div>
                     <span className="info-label">Fecha</span>
                     <span className="info-value">{formatFecha(reserva.sesion_fecha)}</span>
@@ -483,7 +501,7 @@ const ReservasClases = () => {
               {reserva.estado === 'confirmada' && (
                 <div className="reserva-card-footer">
                   <button className="btn-cancelar-reserva" onClick={() => cancelarReserva(reserva.id)}>
-                    ✕ Cancelar Reserva
+                    <X size={16} /> Cancelar Reserva
                   </button>
                 </div>
               )}
@@ -499,7 +517,7 @@ const ReservasClases = () => {
             <div className="modal-header">
               <h3>Nueva Reserva</h3>
               <button className="btn-close" onClick={cerrarModal}>
-                ✕
+                <X size={18} />
               </button>
             </div>
 
@@ -595,7 +613,7 @@ const ReservasClases = () => {
                   <label>4. Seleccionar Clase * ({sesiones.length} disponibles)</label>
                   {sesiones.length === 0 ? (
                     <div className="no-sesiones-message">
-                      <span>📅</span>
+                      <span><Calendar size={22} /></span>
                       <p>No hay clases disponibles para este espacio</p>
                     </div>
                   ) : (
@@ -619,24 +637,24 @@ const ReservasClases = () => {
                           >
                             <div className="sesion-card-header">
                               <span className="sesion-actividad" style={{ color }}>{actividad}</span>
-                              <span className="sesion-cupo">{disponibles}/{cupoTotal} 👥</span>
+                              <span className="sesion-cupo">{disponibles}/{cupoTotal} <Users size={16} /></span>
                             </div>
                             <div className="sesion-card-body">
                               <div className="sesion-info-row">
-                                <span className="sesion-icon">📅</span>
+                                <span className="sesion-icon"><Calendar size={16} /></span>
                                 <span className="sesion-text">{fecha}</span>
                               </div>
                               <div className="sesion-info-row">
-                                <span className="sesion-icon">🕐</span>
+                                <span className="sesion-icon"><Clock size={16} /></span>
                                 <span className="sesion-text">{horaInicio} - {horaFin}</span>
                               </div>
                               <div className="sesion-info-row">
-                                <span className="sesion-icon">🏋️</span>
+                                <span className="sesion-icon"><Dumbbell size={16} /></span>
                                 <span className="sesion-text">{entrenador}</span>
                               </div>
                             </div>
                             {sesionSeleccionada === sesion.id && (
-                              <div className="sesion-card-checkmark">✓</div>
+                              <div className="sesion-card-checkmark"><CheckCircle2 size={18} style={{ color: 'var(--success)' }} /></div>
                             )}
                           </div>
                         );

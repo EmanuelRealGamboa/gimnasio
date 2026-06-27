@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { BarChart3, RefreshCw, ArrowLeft, Boxes, CheckCircle2, AlertTriangle, XCircle, Search, X, Pencil, Save } from 'lucide-react';
 import inventarioService from '../services/inventarioService';
 import sedeService from '../services/sedeService';
 import './Inventario.css';
@@ -125,7 +126,7 @@ function InventarioList() {
         ubicacion_almacen: editFormData.ubicacion_almacen
       });
 
-      showNotif('✓ Stock actualizado exitosamente', 'success');
+      showNotif('Stock actualizado exitosamente', 'success');
       setShowEditModal(false);
       setEditingItem(null);
       await fetchInventario(); // Recargar inventario
@@ -181,7 +182,7 @@ function InventarioList() {
       {/* Header */}
       <div className="inventario-header">
         <div>
-          <h1>📊 Inventario por Sede</h1>
+          <h1><BarChart3 size={26} /> Inventario por Sede</h1>
           <p className="inventario-subtitle">Consulta el inventario disponible en cada sede</p>
         </div>
         <div style={{display: 'flex', gap: '1rem'}}>
@@ -190,13 +191,13 @@ function InventarioList() {
             onClick={fetchInventario}
             disabled={loading}
           >
-            🔄 {loading ? 'Actualizando...' : 'Actualizar'}
+            <RefreshCw size={18} /> {loading ? 'Actualizando...' : 'Actualizar'}
           </button>
           <button
             className="btn-secondary"
             onClick={() => navigate('/inventario/productos')}
           >
-            ← Ver Productos
+            <ArrowLeft size={18} /> Ver Productos
           </button>
         </div>
       </div>
@@ -205,7 +206,7 @@ function InventarioList() {
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)' }}>
-            📦
+            <Boxes size={26} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Total Registros</div>
@@ -215,7 +216,7 @@ function InventarioList() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }}>
-            ✓
+            <CheckCircle2 size={26} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Stock Normal</div>
@@ -225,7 +226,7 @@ function InventarioList() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}>
-            ⚠
+            <AlertTriangle size={26} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Stock Bajo</div>
@@ -235,7 +236,7 @@ function InventarioList() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' }}>
-            ✗
+            <XCircle size={26} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Sin Stock</div>
@@ -247,7 +248,7 @@ function InventarioList() {
       {/* Filters */}
       <div className="filters-section">
         <div className="search-box">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon"><Search size={18} /></span>
           <input
             type="text"
             placeholder="Buscar por producto o código..."
@@ -260,7 +261,7 @@ function InventarioList() {
               className="clear-search"
               onClick={() => setSearchTerm('')}
             >
-              ✕
+              <X size={16} />
             </button>
           )}
         </div>
@@ -316,7 +317,7 @@ function InventarioList() {
             {filteredInventario.length === 0 ? (
               <tr>
                 <td colSpan="7" className="text-center empty-state">
-                  <div className="empty-icon">📦</div>
+                  <div className="empty-icon"><Boxes size={64} /></div>
                   <p>No se encontraron registros de inventario</p>
                 </td>
               </tr>
@@ -356,7 +357,7 @@ function InventarioList() {
                         onClick={() => handleEditClick(item)}
                         title="Editar stock"
                       >
-                        ✏️
+                        <Pencil size={16} />
                       </button>
                     </td>
                   </tr>
@@ -372,8 +373,8 @@ function InventarioList() {
         <div className="modal-overlay" onClick={handleCancelEdit}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>✏️ Editar Stock</h2>
-              <button className="modal-close" onClick={handleCancelEdit}>✕</button>
+              <h2><Pencil size={20} /> Editar Stock</h2>
+              <button className="modal-close" onClick={handleCancelEdit}><X size={20} /></button>
             </div>
 
             <div className="modal-body">
@@ -459,7 +460,7 @@ function InventarioList() {
                 onClick={handleSaveEdit}
                 disabled={loading}
               >
-                {loading ? 'Guardando...' : '💾 Guardar Cambios'}
+                {loading ? 'Guardando...' : <><Save size={18} /> Guardar Cambios</>}
               </button>
             </div>
           </div>

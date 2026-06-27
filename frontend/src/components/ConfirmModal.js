@@ -1,3 +1,4 @@
+import { XCircle, AlertTriangle, Info, CheckCircle2, HelpCircle } from 'lucide-react';
 import './ConfirmModal.css';
 
 function ConfirmModal({
@@ -15,15 +16,15 @@ function ConfirmModal({
   const getIcon = () => {
     switch (type) {
       case 'danger':
-        return '⚠️';
+        return <XCircle size={40} />;
       case 'warning':
-        return '⚡';
+        return <AlertTriangle size={40} />;
       case 'info':
-        return 'ℹ️';
+        return <Info size={40} />;
       case 'success':
-        return '✓';
+        return <CheckCircle2 size={40} />;
       default:
-        return '❓';
+        return <HelpCircle size={40} />;
     }
   };
 

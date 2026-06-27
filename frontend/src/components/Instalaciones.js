@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Building2, Package, Users, Plus, Pencil, Trash2 } from 'lucide-react';
 import sedeService from '../services/sedeService';
 import espacioService from '../services/espacioService';
 import ConfirmModal from './ConfirmModal';
@@ -116,7 +117,7 @@ function Instalaciones() {
     successModal.className = 'success-modal-overlay';
     successModal.innerHTML = `
       <div class="success-modal">
-        <div class="success-icon">✓</div>
+        <div class="success-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
         <h2>¡Éxito!</h2>
         <p>${message}</p>
       </div>
@@ -153,7 +154,7 @@ function Instalaciones() {
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}>
-            🏢
+            <Building2 size={26} />
           </div>
           <div className="stat-content">
             <h3>{stats.totalSedes}</h3>
@@ -162,7 +163,7 @@ function Instalaciones() {
         </div>
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' }}>
-            📦
+            <Package size={26} />
           </div>
           <div className="stat-content">
             <h3>{stats.totalEspacios}</h3>
@@ -171,7 +172,7 @@ function Instalaciones() {
         </div>
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
-            👥
+            <Users size={26} />
           </div>
           <div className="stat-content">
             <h3>{stats.capacidadTotal}</h3>
@@ -187,14 +188,14 @@ function Instalaciones() {
             className={`tab ${activeTab === 'sedes' ? 'active' : ''}`}
             onClick={() => handleTabChange('sedes')}
           >
-            <span className="tab-icon">🏢</span>
+            <Building2 className="tab-icon" size={18} />
             Sedes
           </button>
           <button
             className={`tab ${activeTab === 'espacios' ? 'active' : ''}`}
             onClick={() => handleTabChange('espacios')}
           >
-            <span className="tab-icon">📦</span>
+            <Package className="tab-icon" size={18} />
             Espacios
           </button>
         </div>
@@ -202,7 +203,8 @@ function Instalaciones() {
           className="btn btn-primary"
           onClick={() => navigate(activeTab === 'sedes' ? '/sedes/new' : '/espacios/new')}
         >
-          + Nuevo {activeTab === 'sedes' ? 'Sede' : 'Espacio'}
+          <Plus size={18} />
+          Nuevo {activeTab === 'sedes' ? 'Sede' : 'Espacio'}
         </button>
       </div>
 
@@ -211,7 +213,7 @@ function Instalaciones() {
         <div className="search-box">
           <input
             type="text"
-            placeholder={`🔍 Buscar ${activeTab === 'sedes' ? 'sedes' : 'espacios'}...`}
+            placeholder={`Buscar ${activeTab === 'sedes' ? 'sedes' : 'espacios'}...`}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -274,21 +276,21 @@ function Instalaciones() {
                             }}
                             title="Ver espacios"
                           >
-                            🏢
+                            <Building2 size={18} />
                           </button>
                           <button
                             className="btn-action btn-edit"
                             onClick={() => navigate(`/sedes/edit/${sede.id}`)}
                             title="Editar"
                           >
-                            ✏️
+                            <Pencil size={18} />
                           </button>
                           <button
                             className="btn-action btn-delete"
                             onClick={() => handleDeleteClick(sede, 'sede')}
                             title="Eliminar"
                           >
-                            🗑️
+                            <Trash2 size={18} />
                           </button>
                         </td>
                       </tr>
@@ -332,14 +334,14 @@ function Instalaciones() {
                           onClick={() => navigate(`/espacios/edit/${espacio.id}`)}
                           title="Editar"
                         >
-                          ✏️
+                          <Pencil size={18} />
                         </button>
                         <button
                           className="btn-action btn-delete"
                           onClick={() => handleDeleteClick(espacio, 'espacio')}
                           title="Eliminar"
                         >
-                          🗑️
+                          <Trash2 size={18} />
                         </button>
                       </td>
                     </tr>

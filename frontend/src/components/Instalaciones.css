@@ -55,6 +55,7 @@
   justify-content: center;
   font-size: 1.75rem;
   flex-shrink: 0;
+  color: #ffffff;
 }
 
 .stat-content h3 {
@@ -294,6 +295,10 @@
   font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-normal);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .btn-primary {

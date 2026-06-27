@@ -1,5 +1,22 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  ClipboardList,
+  CheckCircle2,
+  DollarSign,
+  Gem,
+  Ticket,
+  CreditCard,
+  Building2,
+  Star,
+  Calendar,
+  Target,
+  Lock,
+  Unlock,
+  Pencil,
+  Trash2,
+  Plus,
+} from 'lucide-react';
 import membresiaService from '../services/membresiaService';
 import instalacionesService from '../services/instalacionesService';
 import ConfirmModal from './ConfirmModal';
@@ -142,7 +159,7 @@ function MembresiaList() {
     successModal.className = 'success-modal-overlay';
     successModal.innerHTML = `
       <div class="success-modal">
-        <div class="success-icon">✓</div>
+        <div class="success-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
         <h2>¡Éxito!</h2>
         <p>${message}</p>
       </div>
@@ -173,7 +190,7 @@ function MembresiaList() {
           className="btn-primary"
           onClick={() => navigate('/membresias/new')}
         >
-          + Nueva Membresía
+          <Plus size={18} /> Nueva Membresía
         </button>
       </div>
 
@@ -183,7 +200,7 @@ function MembresiaList() {
         <div className="stats-grid">
           <div className="stat-card">
             <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)' }}>
-              📋
+              <ClipboardList size={26} />
             </div>
             <div className="stat-content">
               <h3>{estadisticas.total_membresias}</h3>
@@ -192,7 +209,7 @@ function MembresiaList() {
           </div>
           <div className="stat-card">
             <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }}>
-              ✓
+              <CheckCircle2 size={26} />
             </div>
             <div className="stat-content">
               <h3>{estadisticas.activas}</h3>
@@ -201,7 +218,7 @@ function MembresiaList() {
           </div>
           <div className="stat-card">
             <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}>
-              💰
+              <DollarSign size={26} />
             </div>
             <div className="stat-content">
               <h3>{formatPrecio(estadisticas.precio_promedio)}</h3>
@@ -210,7 +227,7 @@ function MembresiaList() {
           </div>
           <div className="stat-card">
             <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)' }}>
-              💎
+              <Gem size={26} />
             </div>
             <div className="stat-content">
               <h3>{formatPrecio(estadisticas.precio_maximo)}</h3>
@@ -224,7 +241,7 @@ function MembresiaList() {
         <div className="search-box">
           <input
             type="text"
-            placeholder="🔍 Buscar por nombre..."
+            placeholder="Buscar por nombre..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -265,7 +282,7 @@ function MembresiaList() {
 
       {filteredMembresias.length === 0 ? (
         <div className="no-data-container">
-          <div className="no-data-icon">🎫</div>
+          <div className="no-data-icon"><Ticket size={48} /></div>
           <p>No se encontraron membresías</p>
         </div>
       ) : (
@@ -275,10 +292,10 @@ function MembresiaList() {
               {/* Header: Icono y Badge de Estado */}
               <div className="membresia-card-header">
                 <div className="membresia-avatar">
-                  <span className="avatar-icon">💳</span>
+                  <span className="avatar-icon"><CreditCard size={26} /></span>
                 </div>
                 <span className={`badge-estado-top ${membresia.activo ? 'badge-activo' : 'badge-inactivo'}`}>
-                  {membresia.activo ? '✓ ACTIVO' : 'INACTIVO'}
+                  {membresia.activo ? <><CheckCircle2 size={14} /> ACTIVO</> : 'INACTIVO'}
                 </span>
               </div>
 
@@ -290,10 +307,10 @@ function MembresiaList() {
               {/* Información con Iconos */}
               <div className="membresia-card-info">
                 <div className="info-row">
-                  <span className="info-icon">🏢</span>
+                  <span className="info-icon"><Building2 size={20} /></span>
                   <div className="info-content">
                     {membresia.permite_todas_sedes ? (
-                      <span className="badge-multi-sede">⭐ Todas las sedes</span>
+                      <span className="badge-multi-sede"><Star size={16} /> Todas las sedes</span>
                     ) : (
                       <span>{membresia.sede_nombre || 'N/A'}</span>
                     )}
@@ -301,21 +318,21 @@ function MembresiaList() {
                 </div>
 
                 <div className="info-row">
-                  <span className="info-icon">💰</span>
+                  <span className="info-icon"><DollarSign size={20} /></span>
                   <div className="info-content">
                     <span className="info-value-highlight">{formatPrecio(membresia.precio)}</span>
                   </div>
                 </div>
 
                 <div className="info-row">
-                  <span className="info-icon">📅</span>
+                  <span className="info-icon"><Calendar size={20} /></span>
                   <div className="info-content">
                     <span>Duración: {membresia.duracion_dias ? `${membresia.duracion_dias} días` : 'N/A'}</span>
                   </div>
                 </div>
 
                 <div className="info-row">
-                  <span className="info-icon">🎯</span>
+                  <span className="info-icon"><Target size={20} /></span>
                   <div className="info-content">
                     <span>Espacios: {membresia.espacios_count || 0}</span>
                   </div>
@@ -337,7 +354,7 @@ function MembresiaList() {
                   onClick={() => handleToggleActivo(membresia)}
                   title={membresia.activo ? 'Desactivar' : 'Activar'}
                 >
-                  <span className="btn-icon">{membresia.activo ? '🔒' : '🔓'}</span>
+                  <span className="btn-icon">{membresia.activo ? <Lock size={18} /> : <Unlock size={18} />}</span>
                   <span className="btn-text">{membresia.activo ? 'Desactivar' : 'Activar'}</span>
                 </button>
 
@@ -346,7 +363,7 @@ function MembresiaList() {
                   onClick={() => navigate(`/membresias/edit/${membresia.id}`)}
                   title="Editar"
                 >
-                  <span className="btn-icon">✏️</span>
+                  <span className="btn-icon"><Pencil size={18} /></span>
                   <span className="btn-text">Editar</span>
                 </button>
 
@@ -355,7 +372,7 @@ function MembresiaList() {
                   onClick={() => handleDeleteClick(membresia)}
                   title="Eliminar"
                 >
-                  <span className="btn-icon">🗑️</span>
+                  <span className="btn-icon"><Trash2 size={18} /></span>
                   <span className="btn-text">Eliminar</span>
                 </button>
               </div>

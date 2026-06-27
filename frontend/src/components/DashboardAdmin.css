@@ -59,6 +59,9 @@
 }
 
 .btn-refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 8px;
@@ -226,6 +229,9 @@
 }
 
 .kpi-tendencia {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
   font-size: 0.85rem;
   font-weight: 600;
   margin-top: 0.5rem;
@@ -261,6 +267,9 @@
 }
 
 .section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   color: var(--text-primary);
   font-size: 1.3rem;
   font-weight: 700;

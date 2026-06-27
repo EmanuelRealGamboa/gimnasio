@@ -1,5 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  Calendar,
+  BarChart3,
+  CheckCircle2,
+  Search,
+  X,
+  Loader,
+  PauseCircle,
+  XCircle,
+  Eye,
+  Pencil,
+  RefreshCw,
+  Trash2,
+  ArrowRight,
+  Info,
+  Plus,
+} from 'lucide-react';
 import horariosService from '../services/horariosService';
 import instalacionesService from '../services/instalacionesService';
 import ConfirmModal from './ConfirmModal';
@@ -129,7 +146,7 @@ const HorariosList = () => {
       await horariosService.deleteHorario(horarioToDelete);
 
       // Mostrar mensaje de éxito con animación
-      setSuccessMessage('✓ Horario eliminado exitosamente');
+      setSuccessMessage('Horario eliminado exitosamente');
       setTimeout(() => setSuccessMessage(''), 3000);
 
       setShowDeleteModal(false);
@@ -194,7 +211,7 @@ const HorariosList = () => {
 
       // Mostrar mensaje de éxito con animación
       setSuccessMessage(
-        `✓ ${resultado.mensaje || 'Sesiones generadas exitosamente'} - ` +
+        `${resultado.mensaje || 'Sesiones generadas exitosamente'} - ` +
         `${resultado.sesiones_creadas} sesiones creadas`
       );
       setTimeout(() => setSuccessMessage(''), 4000);
@@ -243,20 +260,20 @@ const HorariosList = () => {
       <div className="page-header">
         <div>
           <h2>
-            <span className="header-icon">📅</span>
+            <span className="header-icon"><Calendar size={20} /></span>
             Gestión de Horarios
           </h2>
           <p className="subtitle">Administra los horarios de clases y actividades del gimnasio</p>
         </div>
         <button className="btn-primary" onClick={() => navigate('/horarios/new')}>
-          + Nuevo Horario
+          <Plus size={18} /> Nuevo Horario
         </button>
       </div>
 
       {/* Estadísticas */}
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-icon stat-icon-blue">📊</div>
+          <div className="stat-icon stat-icon-blue"><BarChart3 size={24} /></div>
           <div className="stat-content">
             <h3>{estadisticas.total_horarios}</h3>
             <p>Total de Horarios</p>
@@ -264,7 +281,7 @@ const HorariosList = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon stat-icon-green">✓</div>
+          <div className="stat-icon stat-icon-green"><CheckCircle2 size={24} /></div>
           <div className="stat-content">
             <h3>{estadisticas.activos}</h3>
             <p>Horarios Activos</p>
@@ -272,7 +289,7 @@ const HorariosList = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon stat-icon-purple">📅</div>
+          <div className="stat-icon stat-icon-purple"><Calendar size={24} /></div>
           <div className="stat-content">
             <h3>{Object.values(estadisticas.por_dia).reduce((a, b) => Math.max(a, b), 0)}</h3>
             <p>Día con Más Clases</p>
@@ -284,11 +301,11 @@ const HorariosList = () => {
       <div className="filters-card">
         <div className="filters-header">
           <h3>
-            <span className="filter-icon">🔍</span>
+            <span className="filter-icon"><Search size={18} /></span>
             Filtros de Búsqueda
           </h3>
           <button className="btn-limpiar" onClick={limpiarFiltros}>
-            ✕ Limpiar Filtros
+            <X size={16} /> Limpiar Filtros
           </button>
         </div>
 
@@ -356,7 +373,7 @@ const HorariosList = () => {
       {error && (
         <div className="alert alert-error">
           <span className="alert-icon" onClick={() => setError(null)}>
-            ✕
+            <X size={16} />
           </span>
           {error}
         </div>
@@ -367,7 +384,7 @@ const HorariosList = () => {
         <div className="alert alert-success">
           <span>{successMessage}</span>
           <span className="alert-icon" onClick={() => setSuccessMessage('')}>
-            ✕
+            <X size={16} />
           </span>
         </div>
       )}
@@ -375,12 +392,12 @@ const HorariosList = () => {
       {/* Tabla de Horarios */}
       {loading ? (
         <div className="loading-spinner">
-          <span className="spinner">⏳</span>
+          <span className="spinner"><Loader size={24} /></span>
           <p>Cargando horarios...</p>
         </div>
       ) : horariosFiltrados.length === 0 ? (
         <div className="no-data-container">
-          <div className="no-data-icon">📅</div>
+          <div className="no-data-icon"><Calendar size={26} /></div>
           <p>No se encontraron horarios con los filtros seleccionados</p>
         </div>
       ) : (
@@ -412,7 +429,7 @@ const HorariosList = () => {
                   </td>
                   <td className="horario-cell">
                     <span className="hora-inicio">{formatHora(horario.hora_inicio)}</span>
-                    <span className="separador">→</span>
+                    <span className="separador"><ArrowRight size={16} /></span>
                     <span className="hora-fin">{formatHora(horario.hora_fin)}</span>
                   </td>
                   <td>{horario.entrenador_nombre}</td>
@@ -423,15 +440,21 @@ const HorariosList = () => {
                   <td className="text-center">{horario.cupo_maximo}</td>
                   <td>
                     <span className={`badge-estado badge-${horario.estado}`}>
-                      {horario.estado === 'activo' ? '✓ Activo' : horario.estado === 'suspendido' ? '⏸ Suspendido' : '✕ Cancelado'}
+                      {horario.estado === 'activo' ? (
+                        <><CheckCircle2 size={16} style={{ color: 'var(--success)' }} /> Activo</>
+                      ) : horario.estado === 'suspendido' ? (
+                        <><PauseCircle size={16} style={{ color: 'var(--warning)' }} /> Suspendido</>
+                      ) : (
+                        <><XCircle size={16} style={{ color: 'var(--danger)' }} /> Cancelado</>
+                      )}
                     </span>
                   </td>
                   <td className="acciones-cell">
                     <button className="btn-accion btn-ver" onClick={() => navigate(`/horarios/${horario.id}`)} title="Ver detalle">
-                      👁️
+                      <Eye size={16} />
                     </button>
                     <button className="btn-accion btn-editar" onClick={() => navigate(`/horarios/edit/${horario.id}`)} title="Editar">
-                      ✏️
+                      <Pencil size={16} />
                     </button>
                     {horario.estado === 'activo' && (
                       <>
@@ -440,10 +463,10 @@ const HorariosList = () => {
                           onClick={() => abrirModalGenerarSesiones(horario)}
                           title="Generar Sesiones"
                         >
-                          🔄
+                          <RefreshCw size={16} />
                         </button>
                         <button className="btn-accion btn-eliminar" onClick={() => confirmarEliminarHorario(horario.id)} title="Eliminar">
-                          🗑️
+                          <Trash2 size={16} />
                         </button>
                       </>
                     )}
@@ -460,9 +483,9 @@ const HorariosList = () => {
         <div className="modal-overlay" onClick={cerrarModalGenerarSesiones}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>🔄 Generar Sesiones</h3>
+              <h3><RefreshCw size={20} /> Generar Sesiones</h3>
               <button className="modal-close" onClick={cerrarModalGenerarSesiones}>
-                ✕
+                <X size={18} />
               </button>
             </div>
 
@@ -512,7 +535,7 @@ const HorariosList = () => {
                 </div>
 
                 <div className="info-message">
-                  <span className="info-icon">ℹ️</span>
+                  <span className="info-icon"><Info size={16} style={{ color: 'var(--info)' }} /></span>
                   <p>
                     Se crearán sesiones automáticamente para todos los{' '}
                     <strong>
@@ -528,7 +551,7 @@ const HorariosList = () => {
                     Cancelar
                   </button>
                   <button type="submit" className="btn-primary">
-                    🔄 Generar Sesiones
+                    <RefreshCw size={18} /> Generar Sesiones
                   </button>
                 </div>
               </form>

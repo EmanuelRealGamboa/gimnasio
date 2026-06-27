@@ -1,5 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  Plus,
+  Search,
+  Folder,
+  RefreshCw,
+  X,
+  Footprints,
+  Dumbbell,
+  Activity,
+  Armchair,
+  Package,
+  Tag,
+  Building2,
+  DollarSign,
+  Wrench,
+  AlertTriangle,
+  ClipboardList,
+} from 'lucide-react';
 import { activoService, categoriaActivoService } from '../services/gestionEquiposService';
 import './GestionEquipos.css';
 
@@ -66,7 +84,7 @@ const ActivoList = () => {
     successModal.className = 'success-modal-overlay';
     successModal.innerHTML = `
       <div class="success-modal">
-        <div class="success-icon">✓</div>
+        <div class="success-icon"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
         <h2>¡Éxito!</h2>
         <p>${message}</p>
       </div>
@@ -124,14 +142,14 @@ const ActivoList = () => {
           <p className="subtitle">Inventario de equipos y bienes del gimnasio</p>
         </div>
         <Link to="/gestion-equipos/activos/new" className="btn btn-primary">
-          + Nuevo Activo
+          <Plus size={18} /> Nuevo Activo
         </Link>
       </div>
 
       {/* Filtros */}
       <div className="filters-section">
         <div className="filter-search">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon"><Search size={18} /></span>
           <input
             type="text"
             placeholder="Buscar por código, nombre, marca, modelo..."
@@ -144,7 +162,7 @@ const ActivoList = () => {
         <div className="filters-row">
           <div className="filter-group">
             <label className="filter-label">
-              <span className="filter-icon">📁</span>
+              <span className="filter-icon"><Folder size={16} /></span>
               Categoría
             </label>
             <select
@@ -163,7 +181,7 @@ const ActivoList = () => {
 
           <div className="filter-group">
             <label className="filter-label">
-              <span className="filter-icon">🔄</span>
+              <span className="filter-icon"><RefreshCw size={16} /></span>
               Estado
             </label>
             <select
@@ -172,10 +190,10 @@ const ActivoList = () => {
               className="filter-select"
             >
               <option value="">Todos los estados</option>
-              <option value="activo">✓ Activo</option>
-              <option value="mantenimiento">🔧 En Mantenimiento</option>
-              <option value="inactivo">⏸️ Inactivo</option>
-              <option value="baja">🚫 Dado de Baja</option>
+              <option value="activo">Activo</option>
+              <option value="mantenimiento">En Mantenimiento</option>
+              <option value="inactivo">Inactivo</option>
+              <option value="baja">Dado de Baja</option>
             </select>
           </div>
 
@@ -183,7 +201,7 @@ const ActivoList = () => {
             onClick={() => setFiltros({ search: '', categoria: '', estado: '' })}
             className="btn-clear-filters"
           >
-            <span className="clear-icon">✕</span>
+            <span className="clear-icon"><X size={16} /></span>
             Limpiar filtros
           </button>
         </div>
@@ -225,11 +243,11 @@ const ActivoList = () => {
                   ) : (
                     <div className="activo-card-placeholder">
                       <span className="placeholder-icon">
-                        {activo.categoria_nombre?.includes('Cardiovascular') ? '🏃' :
-                         activo.categoria_nombre?.includes('Fuerza') ? '💪' :
-                         activo.categoria_nombre?.includes('Pesas') ? '🏋️' :
-                         activo.categoria_nombre?.includes('Funcional') ? '🤸' :
-                         activo.categoria_nombre?.includes('Mobiliario') ? '🪑' : '📦'}
+                        {activo.categoria_nombre?.includes('Cardiovascular') ? <Footprints size={48} /> :
+                         activo.categoria_nombre?.includes('Fuerza') ? <Dumbbell size={48} /> :
+                         activo.categoria_nombre?.includes('Pesas') ? <Dumbbell size={48} /> :
+                         activo.categoria_nombre?.includes('Funcional') ? <Activity size={48} /> :
+                         activo.categoria_nombre?.includes('Mobiliario') ? <Armchair size={48} /> : <Package size={48} />}
                       </span>
                       <span className="placeholder-text">Sin Imagen</span>
                     </div>
@@ -245,24 +263,24 @@ const ActivoList = () => {
 
                   <div className="activo-info-simple">
                     <div className="info-row">
-                      <span className="info-icon">📁</span>
+                      <span className="info-icon"><Folder size={16} /></span>
                       <span className="info-text">{activo.categoria_nombre}</span>
                     </div>
 
                     {activo.marca && (
                       <div className="info-row">
-                        <span className="info-icon">🏷️</span>
+                        <span className="info-icon"><Tag size={16} /></span>
                         <span className="info-text">{activo.marca} {activo.modelo ? `- ${activo.modelo}` : ''}</span>
                       </div>
                     )}
 
                     <div className="info-row">
-                      <span className="info-icon">🏢</span>
+                      <span className="info-icon"><Building2 size={16} /></span>
                       <span className="info-text">{activo.sede_nombre}</span>
                     </div>
 
                     <div className="info-row">
-                      <span className="info-icon">💰</span>
+                      <span className="info-icon"><DollarSign size={16} /></span>
                       <span className="info-text">{formatCurrency(activo.valor)}</span>
                     </div>
                   </div>
@@ -270,14 +288,14 @@ const ActivoList = () => {
                   {/* Alertas importantes */}
                   {activo.proximo_mantenimiento && activo.proximo_mantenimiento.dias_restantes <= 15 && (
                     <div className="mantenimiento-badge">
-                      <span className="badge-icon">🔧</span>
+                      <span className="badge-icon"><Wrench size={16} /></span>
                       <span>Mantenimiento en {activo.proximo_mantenimiento.dias_restantes} días</span>
                     </div>
                   )}
 
                   {activo.en_mantenimiento && (
                     <div className="en-mantenimiento-badge">
-                      <span className="badge-icon">⚠️</span>
+                      <span className="badge-icon"><AlertTriangle size={16} style={{ color: 'var(--warning)' }} /></span>
                       <span>En mantenimiento</span>
                     </div>
                   )}
@@ -288,7 +306,7 @@ const ActivoList = () => {
                     to={`/gestion-equipos/activos/${activo.activo_id}`}
                     className="btn-ver-detalles"
                   >
-                    <span className="btn-icon">📋</span>
+                    <span className="btn-icon"><ClipboardList size={18} /></span>
                     <span className="btn-text">Ver Detalles Completos</span>
                   </Link>
                 </div>

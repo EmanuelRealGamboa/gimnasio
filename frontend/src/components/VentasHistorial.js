@@ -1,4 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import {
+  BarChart3,
+  RefreshCw,
+  ShoppingCart,
+  DollarSign,
+  TrendingUp,
+  Search,
+  X,
+  Loader2,
+  Inbox,
+  Check,
+  Eye,
+  Ban,
+  ReceiptText,
+  ArrowLeft,
+  ArrowRight,
+} from 'lucide-react';
 import ventasService from '../services/ventasService';
 import instalacionesService from '../services/instalacionesService';
 import './VentasHistorial.css';
@@ -176,20 +193,21 @@ const VentasHistorial = () => {
       <div className="historial-header">
         <div className="header-left">
           <h1>
-            <span className="header-icon">📊</span>
+            <span className="header-icon"><BarChart3 size={26} /></span>
             Historial de Ventas
           </h1>
           <p className="subtitle">Consulta y gestiona el registro de ventas realizadas</p>
         </div>
         <button className="btn-primary" onClick={cargarVentas}>
-          🔄 Actualizar
+          <RefreshCw size={18} />
+          Actualizar
         </button>
       </div>
 
       {/* Estadísticas */}
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-icon stat-icon-blue">🛒</div>
+          <div className="stat-icon stat-icon-blue"><ShoppingCart size={28} /></div>
           <div className="stat-content">
             <h3>{estadisticas.total_ventas}</h3>
             <p>Total de Ventas</p>
@@ -197,7 +215,7 @@ const VentasHistorial = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon stat-icon-green">💰</div>
+          <div className="stat-icon stat-icon-green"><DollarSign size={28} /></div>
           <div className="stat-content">
             <h3>{formatPrecio(estadisticas.ingresos_totales)}</h3>
             <p>Ingresos Totales</p>
@@ -205,7 +223,7 @@ const VentasHistorial = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon stat-icon-purple">📈</div>
+          <div className="stat-icon stat-icon-purple"><TrendingUp size={28} /></div>
           <div className="stat-content">
             <h3>{formatPrecio(estadisticas.ticket_promedio)}</h3>
             <p>Ticket Promedio</p>
@@ -217,11 +235,12 @@ const VentasHistorial = () => {
       <div className="filters-card">
         <div className="filters-header">
           <h3>
-            <span className="filter-icon">🔍</span>
+            <span className="filter-icon"><Search size={18} /></span>
             Filtros de Búsqueda
           </h3>
           <button className="btn-limpiar" onClick={limpiarFiltros}>
-            ✕ Limpiar Filtros
+            <X size={16} />
+            Limpiar Filtros
           </button>
         </div>
 
@@ -296,7 +315,7 @@ const VentasHistorial = () => {
       {/* Mensajes */}
       {error && (
         <div className="alert alert-error">
-          <span className="alert-icon" onClick={() => setError(null)}>✕</span>
+          <span className="alert-icon" onClick={() => setError(null)}><X size={18} /></span>
           {error}
         </div>
       )}
@@ -304,12 +323,12 @@ const VentasHistorial = () => {
       {/* Tabla de ventas */}
       {loading ? (
         <div className="loading-spinner">
-          <span className="spinner">⏳</span>
+          <span className="spinner"><Loader2 size={48} /></span>
           <p>Cargando ventas...</p>
         </div>
       ) : ventasActuales.length === 0 ? (
         <div className="no-data-container">
-          <div className="no-data-icon">📋</div>
+          <div className="no-data-icon"><Inbox size={64} /></div>
           <p>No se encontraron ventas con los filtros seleccionados</p>
         </div>
       ) : (
@@ -345,7 +364,11 @@ const VentasHistorial = () => {
                     </td>
                     <td>
                       <span className={`badge-estado badge-${venta.estado}`}>
-                        {venta.estado === 'completada' ? '✓ Completada' : '✕ Cancelada'}
+                        {venta.estado === 'completada' ? (
+                          <><Check size={16} /> Completada</>
+                        ) : (
+                          <><X size={16} /> Cancelada</>
+                        )}
                       </span>
                     </td>
                     <td className="acciones-cell">
@@ -354,7 +377,7 @@ const VentasHistorial = () => {
                         onClick={() => verDetalle(venta)}
                         title="Ver detalle"
                       >
-                        👁️
+                        <Eye size={20} />
                       </button>
                       {venta.estado === 'completada' && (
                         <button
@@ -362,7 +385,7 @@ const VentasHistorial = () => {
                           onClick={() => cancelarVenta(venta.venta_id)}
                           title="Cancelar venta"
                         >
-                          🚫
+                          <Ban size={20} />
                         </button>
                       )}
                     </td>
@@ -380,7 +403,8 @@ const VentasHistorial = () => {
                 onClick={() => setPaginaActual(paginaActual - 1)}
                 disabled={paginaActual === 1}
               >
-                ← Anterior
+                <ArrowLeft size={16} />
+                Anterior
               </button>
 
               <div className="pagination-info">
@@ -392,7 +416,8 @@ const VentasHistorial = () => {
                 onClick={() => setPaginaActual(paginaActual + 1)}
                 disabled={paginaActual === totalPaginas}
               >
-                Siguiente →
+                Siguiente
+                <ArrowRight size={16} />
               </button>
             </div>
           )}
@@ -405,10 +430,10 @@ const VentasHistorial = () => {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h2>
-                <span className="modal-icon">🧾</span>
+                <span className="modal-icon"><ReceiptText size={22} /></span>
                 Detalle de Venta #{ventaSeleccionada.venta_id}
               </h2>
-              <button className="btn-cerrar-modal" onClick={cerrarModal}>✕</button>
+              <button className="btn-cerrar-modal" onClick={cerrarModal}><X size={20} /></button>
             </div>
 
             <div className="modal-body">
@@ -439,7 +464,11 @@ const VentasHistorial = () => {
                   <div className="info-item">
                     <span className="info-label">Estado:</span>
                     <span className={`badge-estado badge-${ventaSeleccionada.estado}`}>
-                      {ventaSeleccionada.estado === 'completada' ? '✓ Completada' : '✕ Cancelada'}
+                      {ventaSeleccionada.estado === 'completada' ? (
+                        <><Check size={16} /> Completada</>
+                      ) : (
+                        <><X size={16} /> Cancelada</>
+                      )}
                     </span>
                   </div>
                 </div>
@@ -513,7 +542,8 @@ const VentasHistorial = () => {
                   className="btn-cancelar-venta"
                   onClick={() => cancelarVenta(ventaSeleccionada.venta_id)}
                 >
-                  🚫 Cancelar Venta
+                  <Ban size={18} />
+                  Cancelar Venta
                 </button>
               )}
               <button className="btn-cerrar" onClick={cerrarModal}>

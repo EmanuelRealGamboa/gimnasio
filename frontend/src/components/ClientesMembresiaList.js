@@ -1,5 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  Ticket,
+  Users,
+  DollarSign,
+  Clock,
+  BarChart3,
+  Search,
+  X,
+  CheckCircle2,
+  Sparkles,
+  AlertTriangle,
+  XCircle,
+  Phone,
+  Building2
+} from 'lucide-react';
 import membresiaService from '../services/membresiaService';
 import clienteService from '../services/clienteService';
 import instalacionesService from '../services/instalacionesService';
@@ -178,7 +193,7 @@ function ClientesMembresiaList() {
       {/* Header */}
       <div className="ventas-header">
         <div>
-          <h1>🎫 Servicios - Membresías</h1>
+          <h1><Ticket size={22} /> Servicios - Membresías</h1>
           <p className="ventas-subtitle">Gestiona las suscripciones de los clientes</p>
         </div>
       </div>
@@ -187,7 +202,7 @@ function ClientesMembresiaList() {
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }}>
-            👥
+            <Users size={24} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Suscripciones Activas</div>
@@ -197,7 +212,7 @@ function ClientesMembresiaList() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }}>
-            💰
+            <DollarSign size={24} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Ingresos del Mes</div>
@@ -207,7 +222,7 @@ function ClientesMembresiaList() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}>
-            ⏰
+            <Clock size={24} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Vencidas</div>
@@ -217,7 +232,7 @@ function ClientesMembresiaList() {
 
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #666666 0%, #2a2a2a 100%)' }}>
-            📊
+            <BarChart3 size={24} />
           </div>
           <div className="stat-content">
             <div className="stat-label">Total Suscripciones</div>
@@ -229,7 +244,7 @@ function ClientesMembresiaList() {
       {/* Search Bar and Filters */}
       <div className="filters-section">
         <div className="search-box">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon"><Search size={18} /></span>
           <input
             type="text"
             placeholder="Buscar cliente por nombre..."
@@ -242,7 +257,7 @@ function ClientesMembresiaList() {
               className="clear-search"
               onClick={() => setSearchTerm('')}
             >
-              ✕
+              <X size={18} />
             </button>
           )}
         </div>
@@ -274,28 +289,28 @@ function ClientesMembresiaList() {
           className={`filter-tab ${statusFilter === 'activas' ? 'active' : ''}`}
           onClick={() => setStatusFilter('activas')}
         >
-          <span className="tab-icon">✅</span>
+          <span className="tab-icon"><CheckCircle2 size={16} style={{ color: 'var(--success)' }} /></span>
           <span className="tab-label">Activas</span>
         </button>
         <button
           className={`filter-tab ${statusFilter === 'recientes' ? 'active' : ''}`}
           onClick={() => setStatusFilter('recientes')}
         >
-          <span className="tab-icon">🆕</span>
+          <span className="tab-icon"><Sparkles size={16} /></span>
           <span className="tab-label">Recientes (7 días)</span>
         </button>
         <button
           className={`filter-tab ${statusFilter === 'proximas_vencer' ? 'active' : ''}`}
           onClick={() => setStatusFilter('proximas_vencer')}
         >
-          <span className="tab-icon">⚠️</span>
+          <span className="tab-icon"><AlertTriangle size={16} style={{ color: 'var(--warning)' }} /></span>
           <span className="tab-label">Próximas a Vencer (≤5 días)</span>
         </button>
         <button
           className={`filter-tab ${statusFilter === 'vencidas_canceladas' ? 'active' : ''}`}
           onClick={() => setStatusFilter('vencidas_canceladas')}
         >
-          <span className="tab-icon">❌</span>
+          <span className="tab-icon"><XCircle size={16} style={{ color: 'var(--danger)' }} /></span>
           <span className="tab-label">Vencidas/Canceladas</span>
         </button>
       </div>
@@ -328,7 +343,7 @@ function ClientesMembresiaList() {
                       {cliente.estado}
                     </span>
                     {cliente.tiene_membresia_activa ? (
-                      <span className="badge badge-success">✓ Con Membresía</span>
+                      <span className="badge badge-success"><CheckCircle2 size={14} /> Con Membresía</span>
                     ) : (
                       <span className="badge badge-warning">Sin Membresía</span>
                     )}
@@ -350,10 +365,10 @@ function ClientesMembresiaList() {
       {/* Clientes con Membresía */}
       <div className="section">
         <h2 className="section-title">
-          {statusFilter === 'activas' && '✅ Clientes con Membresía Activa'}
-          {statusFilter === 'recientes' && '🆕 Clientes Recientes (Últimos 7 días)'}
-          {statusFilter === 'proximas_vencer' && '⚠️ Membresías Próximas a Vencer'}
-          {statusFilter === 'vencidas_canceladas' && '❌ Membresías Vencidas/Canceladas'}
+          {statusFilter === 'activas' && <><CheckCircle2 size={18} style={{ color: 'var(--success)' }} /> Clientes con Membresía Activa</>}
+          {statusFilter === 'recientes' && <><Sparkles size={18} /> Clientes Recientes (Últimos 7 días)</>}
+          {statusFilter === 'proximas_vencer' && <><AlertTriangle size={18} style={{ color: 'var(--warning)' }} /> Membresías Próximas a Vencer</>}
+          {statusFilter === 'vencidas_canceladas' && <><XCircle size={18} style={{ color: 'var(--danger)' }} /> Membresías Vencidas/Canceladas</>}
           <span style={{
             marginLeft: '10px',
             fontSize: '0.9rem',
@@ -366,7 +381,7 @@ function ClientesMembresiaList() {
 
         {filteredClientes.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-icon">🎫</div>
+            <div className="empty-icon"><Ticket size={48} /></div>
             <p>No hay clientes con membresía activa {sedeFilter ? 'en esta sede' : ''}</p>
             <p className="empty-subtitle">
               {sedeFilter ? 'Prueba seleccionando otra sede' : 'Usa el buscador para encontrar clientes y suscribirlos'}
@@ -387,18 +402,18 @@ function ClientesMembresiaList() {
                   <div className="cliente-info">
                     <h3>{cliente.nombre} {cliente.apellido_paterno} {cliente.apellido_materno}</h3>
                     <p className="cliente-email">{cliente.email}</p>
-                    <p className="cliente-telefono">📞 {cliente.telefono}</p>
+                    <p className="cliente-telefono"><Phone size={16} /> {cliente.telefono}</p>
                   </div>
                 </div>
 
                 <div className="membresia-info">
                   <div className="membresia-plan">
-                    <span className="membresia-icon">🎫</span>
+                    <span className="membresia-icon"><Ticket size={20} /></span>
                     <div>
                       <h4>{cliente.suscripcion.membresia_nombre}</h4>
                       <p>{cliente.suscripcion.membresia_tipo}</p>
                       {cliente.suscripcion.sede_nombre && (
-                        <p className="membresia-sede">🏢 {cliente.suscripcion.sede_nombre}</p>
+                        <p className="membresia-sede"><Building2 size={16} /> {cliente.suscripcion.sede_nombre}</p>
                       )}
                     </div>
                   </div>
@@ -423,7 +438,7 @@ function ClientesMembresiaList() {
                       if (isVencida(estado)) {
                         return (
                           <div className="membresia-vencida-badge">
-                            <span>⚠️ VENCIDA</span>
+                            <span><AlertTriangle size={16} style={{ color: 'var(--warning)' }} /> VENCIDA</span>
                             <span className="vencida-text">Requiere renovación</span>
                           </div>
                         );

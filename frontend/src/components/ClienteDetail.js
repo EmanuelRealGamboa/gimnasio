@@ -1,5 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import {
+  AlertTriangle,
+  ArrowLeft,
+  Pencil,
+  BarChart3,
+  User,
+  Mail,
+  Phone,
+  Cake,
+  VenusAndMars,
+  MapPin,
+  Dumbbell,
+  RefreshCw,
+  Calendar,
+  Target,
+  Siren,
+  Users
+} from 'lucide-react';
 import clienteService from '../services/clienteService';
 import './ClienteDetail.css';
 
@@ -66,10 +84,11 @@ function ClienteDetail() {
     return (
       <div className="cliente-detail-container">
         <div className="error-card">
-          <div className="error-icon">⚠️</div>
+          <div className="error-icon"><AlertTriangle size={48} style={{ color: 'var(--warning)' }} /></div>
           <h3>{error || 'Cliente no encontrado'}</h3>
           <button className="btn-back-error" onClick={() => navigate('/clientes')}>
-            ← Volver a la lista
+            <ArrowLeft size={18} />
+            Volver a la lista
           </button>
         </div>
       </div>
@@ -81,14 +100,16 @@ function ClienteDetail() {
       {/* Header */}
       <div className="detail-header">
         <button className="btn-back" onClick={() => navigate('/clientes')}>
-          ← Volver
+          <ArrowLeft size={18} />
+          Volver
         </button>
         <button
           className="btn-edit"
           onClick={() => navigate(`/clientes/edit/${id}`)}
           style={{ color: '#ffffff' }}
         >
-          ✏️ Editar Cliente
+          <Pencil size={18} />
+          Editar Cliente
         </button>
       </div>
 
@@ -112,7 +133,7 @@ function ClienteDetail() {
               className="nivel-badge-large"
               style={{ backgroundColor: getNivelColor(cliente.nivel_experiencia) }}
             >
-              📊 {cliente.nivel_experiencia?.toUpperCase()}
+              <BarChart3 size={16} /> {cliente.nivel_experiencia?.toUpperCase()}
             </span>
           </div>
         </div>
@@ -125,21 +146,21 @@ function ClienteDetail() {
         <div className="info-card">
           <div className="card-header">
             <div className="card-icon" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}>
-              👤
+              <User size={24} />
             </div>
             <h2>Información Personal</h2>
           </div>
           <div className="card-content">
             <div className="info-row">
-              <span className="info-label">📧 Email</span>
+              <span className="info-label"><Mail size={16} /> Email</span>
               <span className="info-value">{cliente.email || 'No especificado'}</span>
             </div>
             <div className="info-row">
-              <span className="info-label">📱 Teléfono</span>
+              <span className="info-label"><Phone size={16} /> Teléfono</span>
               <span className="info-value">{cliente.telefono || 'No especificado'}</span>
             </div>
             <div className="info-row">
-              <span className="info-label">🎂 Fecha de Nacimiento</span>
+              <span className="info-label"><Cake size={16} /> Fecha de Nacimiento</span>
               <span className="info-value">
                 {cliente.fecha_nacimiento
                   ? new Date(cliente.fecha_nacimiento).toLocaleDateString('es-MX', {
@@ -151,11 +172,11 @@ function ClienteDetail() {
               </span>
             </div>
             <div className="info-row">
-              <span className="info-label">⚧ Sexo</span>
+              <span className="info-label"><VenusAndMars size={16} /> Sexo</span>
               <span className="info-value">{cliente.sexo || 'No especificado'}</span>
             </div>
             <div className="info-row">
-              <span className="info-label">📍 Dirección</span>
+              <span className="info-label"><MapPin size={16} /> Dirección</span>
               <span className="info-value">{cliente.direccion || 'No especificado'}</span>
             </div>
           </div>
@@ -165,13 +186,13 @@ function ClienteDetail() {
         <div className="info-card">
           <div className="card-header">
             <div className="card-icon" style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}>
-              🏋️
+              <Dumbbell size={24} />
             </div>
             <h2>Información del Cliente</h2>
           </div>
           <div className="card-content">
             <div className="info-row">
-              <span className="info-label">📊 Nivel de Experiencia</span>
+              <span className="info-label"><BarChart3 size={16} /> Nivel de Experiencia</span>
               <span
                 className="nivel-badge-inline"
                 style={{ backgroundColor: getNivelColor(cliente.nivel_experiencia) }}
@@ -180,7 +201,7 @@ function ClienteDetail() {
               </span>
             </div>
             <div className="info-row">
-              <span className="info-label">🔄 Estado</span>
+              <span className="info-label"><RefreshCw size={16} /> Estado</span>
               <span
                 className="estado-badge-inline"
                 style={{ backgroundColor: getEstadoColor(cliente.estado) }}
@@ -189,7 +210,7 @@ function ClienteDetail() {
               </span>
             </div>
             <div className="info-row">
-              <span className="info-label">📅 Fecha de Registro</span>
+              <span className="info-label"><Calendar size={16} /> Fecha de Registro</span>
               <span className="info-value">
                 {cliente.fecha_registro
                   ? new Date(cliente.fecha_registro).toLocaleDateString('es-MX', {
@@ -207,7 +228,7 @@ function ClienteDetail() {
         <div className="info-card full-width">
           <div className="card-header">
             <div className="card-icon" style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}>
-              🎯
+              <Target size={24} />
             </div>
             <h2>Objetivo de Fitness</h2>
           </div>
@@ -223,22 +244,22 @@ function ClienteDetail() {
           <div className="info-card full-width">
             <div className="card-header">
               <div className="card-icon" style={{ background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' }}>
-                🚨
+                <Siren size={24} />
               </div>
               <h2>Contacto de Emergencia</h2>
             </div>
             <div className="card-content">
               <div className="info-grid-3">
                 <div className="info-row">
-                  <span className="info-label">👤 Nombre</span>
+                  <span className="info-label"><User size={16} /> Nombre</span>
                   <span className="info-value">{cliente.nombre_contacto || 'No especificado'}</span>
                 </div>
                 <div className="info-row">
-                  <span className="info-label">📱 Teléfono</span>
+                  <span className="info-label"><Phone size={16} /> Teléfono</span>
                   <span className="info-value">{cliente.telefono_contacto || 'No especificado'}</span>
                 </div>
                 <div className="info-row">
-                  <span className="info-label">👥 Parentesco</span>
+                  <span className="info-label"><Users size={16} /> Parentesco</span>
                   <span className="info-value">{cliente.parentesco || 'No especificado'}</span>
                 </div>
               </div>

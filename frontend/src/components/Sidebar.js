@@ -1,5 +1,22 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import {
+  Home,
+  Users,
+  Contact,
+  CreditCard,
+  Building2,
+  Wrench,
+  Calendar,
+  Package,
+  DollarSign,
+  KeyRound,
+  SprayCan,
+  LogOut,
+  ChevronLeft,
+  ChevronRight,
+  ChevronDown,
+} from 'lucide-react';
 import authService from '../services/authService';
 import './Sidebar.css';
 
@@ -25,48 +42,48 @@ function Sidebar() {
     {
       id: 'dashboard',
       label: 'Principal',
-      icon: '🏠',
+      icon: Home,
       path: authService.getDashboardRoute(),
     },
     {
       id: 'personal',
       label: 'Personal',
-      icon: '👥',
+      icon: Users,
       path: '/employees',
       adminOnly: true,
     },
     {
       id: 'clientes',
       label: 'Clientes',
-      icon: '🤸',
+      icon: Contact,
       path: '/clientes',
       adminOnly: true,
     },
     {
       id: 'membresias',
       label: 'Membresías',
-      icon: '💳',
+      icon: CreditCard,
       path: '/membresias',
       adminOnly: true,
     },
     {
       id: 'instalaciones',
       label: 'Instalaciones',
-      icon: '🏢',
+      icon: Building2,
       path: '/instalaciones',
       adminOnly: true,
     },
     {
       id: 'gestion-equipos',
       label: 'Equipos y Mantenimiento',
-      icon: '🔧',
+      icon: Wrench,
       path: '/gestion-equipos',
       adminOnly: true,
     },
     {
       id: 'horarios',
       label: 'Horarios',
-      icon: '📅',
+      icon: Calendar,
       submenu: [
         {
           id: 'tipos-actividad',
@@ -94,14 +111,14 @@ function Sidebar() {
     {
       id: 'inventario',
       label: 'Inventario',
-      icon: '📦',
+      icon: Package,
       path: '/inventario',
       adminOnly: true,
     },
     {
       id: 'ventas',
       label: 'Ventas',
-      icon: '💰',
+      icon: DollarSign,
       submenu: [
         {
           id: 'ventas-servicios',
@@ -129,7 +146,7 @@ function Sidebar() {
     {
       id: 'accesos',
       label: 'Accesos',
-      icon: '🔐',
+      icon: KeyRound,
       submenu: [
         {
           label: 'Control de Accesos',
@@ -145,7 +162,7 @@ function Sidebar() {
     {
       id: 'limpieza',
       label: 'Limpieza',
-      icon: '🧹',
+      icon: SprayCan,
       path: '/limpieza',
       adminOnly: true,
     },
@@ -187,7 +204,7 @@ function Sidebar() {
           onClick={() => setIsCollapsed(!isCollapsed)}
           aria-label={isCollapsed ? "Expandir menú" : "Contraer menú"}
         >
-          {isCollapsed ? '→' : '←'}
+          {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
         </button>
       </div>
 
@@ -200,11 +217,13 @@ function Sidebar() {
                   className={`nav-item ${item.submenu.some(sub => isActive(sub.path)) ? 'active' : ''}`}
                   onClick={() => toggleSubmenu(item.id)}
                 >
-                  <span className="nav-icon">{item.icon}</span>
+                  <span className="nav-icon">{item.icon && <item.icon size={20} />}</span>
                   {!isCollapsed && (
                     <>
                       <span className="nav-label">{item.label}</span>
-                      <span className="submenu-arrow">{expandedMenu === item.id ? '▼' : '▶'}</span>
+                      <span className="submenu-arrow">
+                        {expandedMenu === item.id ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                      </span>
                     </>
                   )}
                 </button>
@@ -227,7 +246,7 @@ function Sidebar() {
                 className={`nav-item ${isActive(item.path) ? 'active' : ''}`}
                 onClick={() => navigate(item.path)}
               >
-                <span className="nav-icon">{item.icon}</span>
+                <span className="nav-icon">{item.icon && <item.icon size={20} />}</span>
                 {!isCollapsed && <span className="nav-label">{item.label}</span>}
               </button>
             )}
@@ -255,7 +274,7 @@ function Sidebar() {
           </div>
         )}
         <button className="logout-btn-sidebar" onClick={handleLogout}>
-          <span className="nav-icon">🚪</span>
+          <span className="nav-icon"><LogOut size={20} /></span>
           {!isCollapsed && <span>Salir</span>}
         </button>
       </div>

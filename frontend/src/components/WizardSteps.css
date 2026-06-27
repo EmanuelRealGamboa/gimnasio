@@ -54,7 +54,9 @@
 }
 
 .step-check {
-  font-size: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .step-info {

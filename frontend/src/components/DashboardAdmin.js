@@ -4,6 +4,11 @@ import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
+import {
+  RefreshCw, Users, Ticket, DollarSign, DoorOpen, CheckCircle2, XCircle,
+  TrendingUp, TrendingDown, Minus, Activity, Flame, Building2, ShoppingCart,
+  BellRing, AlertTriangle, Package, Ban, Zap, UserPlus, Eye, UserCog
+} from 'lucide-react';
 import dashboardService from '../services/dashboardService';
 import instalacionesService from '../services/instalacionesService';
 import './DashboardAdmin.css';
@@ -116,9 +121,9 @@ function DashboardAdmin() {
   };
 
   const getTendenciaIcon = (tendencia) => {
-    if (tendencia > 0) return '↑';
-    if (tendencia < 0) return '↓';
-    return '→';
+    if (tendencia > 0) return <TrendingUp size={16} />;
+    if (tendencia < 0) return <TrendingDown size={16} />;
+    return <Minus size={16} />;
   };
 
   const getTendenciaClass = (tendencia) => {
@@ -174,7 +179,7 @@ function DashboardAdmin() {
             ))}
           </select>
           <button onClick={fetchStats} className="btn-refresh">
-            🔄 Actualizar
+            <RefreshCw size={16} /> Actualizar
           </button>
         </div>
       </div>
@@ -253,7 +258,7 @@ function DashboardAdmin() {
       <div className="kpi-grid">
         <div className="kpi-card">
           <div className="kpi-icon" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}>
-            👥
+            <Users size={26} color="#fff" />
           </div>
           <div className="kpi-content">
             <div className="kpi-label">Clientes Activos</div>
@@ -266,7 +271,7 @@ function DashboardAdmin() {
 
         <div className="kpi-card">
           <div className="kpi-icon" style={{ background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)' }}>
-            🎫
+            <Ticket size={26} color="#fff" />
           </div>
           <div className="kpi-content">
             <div className="kpi-label">Membresías Activas</div>
@@ -279,7 +284,7 @@ function DashboardAdmin() {
 
         <div className="kpi-card">
           <div className="kpi-icon" style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}>
-            💰
+            <DollarSign size={26} color="#fff" />
           </div>
           <div className="kpi-content">
             <div className="kpi-label">Ingresos del Mes</div>
@@ -292,13 +297,13 @@ function DashboardAdmin() {
 
         <div className="kpi-card">
           <div className="kpi-icon" style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' }}>
-            🚪
+            <DoorOpen size={26} color="#fff" />
           </div>
           <div className="kpi-content">
             <div className="kpi-label">Accesos Hoy</div>
             <div className="kpi-value">{stats?.kpis?.accesos_hoy || 0}</div>
             <div className="kpi-detail">
-              ✅ {stats?.kpis?.accesos_autorizados || 0} autorizados • ❌ {stats?.kpis?.accesos_denegados || 0} denegados
+              <CheckCircle2 size={14} style={{ color: 'var(--success)', verticalAlign: 'text-bottom' }} /> {stats?.kpis?.accesos_autorizados || 0} autorizados • <XCircle size={14} style={{ color: 'var(--danger)', verticalAlign: 'text-bottom' }} /> {stats?.kpis?.accesos_denegados || 0} denegados
             </div>
           </div>
         </div>
@@ -306,7 +311,7 @@ function DashboardAdmin() {
 
       {/* Gráfica de Tendencia de Accesos */}
       <div className="chart-section">
-        <h2 className="section-title">📊 Tendencia de Accesos (Últimos 30 días)</h2>
+        <h2 className="section-title"><Activity size={20} /> Tendencia de Accesos (Últimos 30 días)</h2>
         <div className="chart-container">
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={stats?.graficas?.accesos_30_dias || []}>
@@ -346,7 +351,7 @@ function DashboardAdmin() {
       {/* Gráficas de Ingresos y Membresías */}
       <div className="charts-grid">
         <div className="chart-section">
-          <h2 className="section-title">💰 Ingresos por Concepto</h2>
+          <h2 className="section-title"><DollarSign size={20} /> Ingresos por Concepto</h2>
           <div className="chart-container">
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={stats?.graficas?.ingresos_por_concepto || []}>
@@ -382,7 +387,7 @@ function DashboardAdmin() {
         </div>
 
         <div className="chart-section">
-          <h2 className="section-title">🎫 Distribución de Membresías</h2>
+          <h2 className="section-title"><Ticket size={20} /> Distribución de Membresías</h2>
           <div className="chart-container">
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
@@ -417,7 +422,7 @@ function DashboardAdmin() {
       {/* Top Productos Más Vendidos */}
       {stats?.graficas?.productos_mas_vendidos?.length > 0 && (
         <div className="chart-section">
-          <h2 className="section-title">🔥 Top 10 Productos Más Vendidos</h2>
+          <h2 className="section-title"><Flame size={20} /> Top 10 Productos Más Vendidos</h2>
           <div className="chart-container">
             <ResponsiveContainer width="100%" height={300}>
               <BarChart
@@ -462,7 +467,7 @@ function DashboardAdmin() {
       {/* Gráfica de Evolución de Ingresos Mensuales */}
       {stats?.graficas?.evolucion_ingresos?.length > 0 && (
         <div className="chart-section-full">
-          <h2 className="section-title">📈 Evolución de Ingresos Mensuales</h2>
+          <h2 className="section-title"><TrendingUp size={20} /> Evolución de Ingresos Mensuales</h2>
           <ResponsiveContainer width="100%" height={350}>
             <LineChart data={stats.graficas.evolucion_ingresos}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -521,7 +526,7 @@ function DashboardAdmin() {
       {/* Comparativas entre Sedes */}
       {stats?.comparativas_sedes?.length > 0 && (
         <div className="comparativas-section">
-          <h2 className="section-title">🏢 Comparativa de Rendimiento por Sede</h2>
+          <h2 className="section-title"><Building2 size={20} /> Comparativa de Rendimiento por Sede</h2>
           <div className="comparativas-grid">
             {stats.comparativas_sedes.map((sede, index) => (
               <div key={index} className="comparativa-card">
@@ -557,7 +562,7 @@ function DashboardAdmin() {
         {/* Últimas Ventas de Productos */}
         {stats?.ultimas_ventas?.length > 0 && (
           <div className="table-section">
-            <h2 className="section-title">🛒 Últimas Ventas de Productos</h2>
+            <h2 className="section-title"><ShoppingCart size={20} /> Últimas Ventas de Productos</h2>
             <div className="table-container">
               <table className="data-table">
                 <thead>
@@ -586,7 +591,7 @@ function DashboardAdmin() {
         {/* Últimas Suscripciones */}
         {stats?.ultimas_suscripciones?.length > 0 && (
           <div className="table-section">
-            <h2 className="section-title">🎫 Últimas Suscripciones</h2>
+            <h2 className="section-title"><Ticket size={20} /> Últimas Suscripciones</h2>
             <div className="table-container">
               <table className="data-table">
                 <thead>
@@ -618,11 +623,11 @@ function DashboardAdmin() {
       {/* Alertas y Acciones Rápidas */}
       <div className="bottom-grid">
         <div className="alerts-section">
-          <h2 className="section-title">🚨 Alertas</h2>
+          <h2 className="section-title"><BellRing size={20} /> Alertas</h2>
           <div className="alerts-list">
             {stats?.alertas?.membresias_por_vencer > 0 && (
               <div className="alert-item alert-warning">
-                <span className="alert-icon">⚠️</span>
+                <span className="alert-icon"><AlertTriangle size={20} style={{ color: 'var(--warning)' }} /></span>
                 <div className="alert-content">
                   <strong>{stats.alertas.membresias_por_vencer}</strong> membresías por vencer en 7 días
                 </div>
@@ -637,7 +642,7 @@ function DashboardAdmin() {
 
             {stats?.alertas?.productos_stock_bajo > 0 && (
               <div className="alert-item alert-danger">
-                <span className="alert-icon">📦</span>
+                <span className="alert-icon"><Package size={20} style={{ color: 'var(--danger)' }} /></span>
                 <div className="alert-content">
                   <strong>{stats.alertas.productos_stock_bajo}</strong> productos con stock bajo
                 </div>
@@ -652,7 +657,7 @@ function DashboardAdmin() {
 
             {stats?.alertas?.accesos_denegados_hoy > 0 && (
               <div className="alert-item alert-info">
-                <span className="alert-icon">🚫</span>
+                <span className="alert-icon"><Ban size={20} style={{ color: 'var(--info)' }} /></span>
                 <div className="alert-content">
                   <strong>{stats.alertas.accesos_denegados_hoy}</strong> accesos denegados hoy
                 </div>
@@ -669,7 +674,7 @@ function DashboardAdmin() {
              stats?.alertas?.productos_stock_bajo === 0 &&
              stats?.alertas?.accesos_denegados_hoy === 0 && (
               <div className="no-alerts">
-                <span className="check-icon">✅</span>
+                <span className="check-icon"><CheckCircle2 size={20} style={{ color: 'var(--success)' }} /></span>
                 <p>No hay alertas pendientes</p>
               </div>
             )}
@@ -699,30 +704,30 @@ function DashboardAdmin() {
         </div>
 
         <div className="quick-actions-section">
-          <h2 className="section-title">⚡ Acciones Rápidas</h2>
+          <h2 className="section-title"><Zap size={20} /> Acciones Rápidas</h2>
           <div className="action-buttons-grid">
             <button onClick={() => navigate('/clientes/new')} className="action-btn">
-              <span className="action-icon">➕</span>
+              <span className="action-icon"><UserPlus size={22} /></span>
               Nuevo Cliente
             </button>
             <button onClick={() => navigate('/ventas/productos')} className="action-btn">
-              <span className="action-icon">🛒</span>
+              <span className="action-icon"><ShoppingCart size={22} /></span>
               Venta Rápida
             </button>
             <button onClick={() => navigate('/accesos/monitor')} className="action-btn">
-              <span className="action-icon">👁️</span>
+              <span className="action-icon"><Eye size={22} /></span>
               Monitor Accesos
             </button>
             <button onClick={() => navigate('/employees/new')} className="action-btn">
-              <span className="action-icon">👤</span>
+              <span className="action-icon"><UserCog size={22} /></span>
               Nuevo Empleado
             </button>
             <button onClick={() => navigate('/membresias')} className="action-btn">
-              <span className="action-icon">🎫</span>
+              <span className="action-icon"><Ticket size={22} /></span>
               Gestionar Membresías
             </button>
             <button onClick={() => navigate('/inventario')} className="action-btn">
-              <span className="action-icon">📦</span>
+              <span className="action-icon"><Package size={22} /></span>
               Inventario
             </button>
           </div>

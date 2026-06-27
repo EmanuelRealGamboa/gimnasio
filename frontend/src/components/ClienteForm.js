@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import clienteService from '../services/clienteService';
 import sedeService from '../services/sedeService';
 import './ClienteForm.css';
@@ -171,7 +172,7 @@ function ClienteForm() {
     successModal.className = 'success-modal-overlay';
     successModal.innerHTML = `
       <div class="success-modal">
-        <div class="success-icon">✓</div>
+        <div class="success-icon">&#10003;</div>
         <h2>¡Éxito!</h2>
         <p>${message}</p>
       </div>
@@ -192,7 +193,8 @@ function ClienteForm() {
           className="btn-back"
           onClick={() => navigate('/clientes')}
         >
-          ← Volver
+          <ArrowLeft size={18} />
+          Volver
         </button>
       </div>
 

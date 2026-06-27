@@ -1,5 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  Dumbbell,
+  BarChart3,
+  CheckCircle2,
+  XCircle,
+  Search,
+  X,
+  Loader,
+  Pencil,
+  Trash2,
+  Plus,
+} from 'lucide-react';
 import horariosService from '../services/horariosService';
 import instalacionesService from '../services/instalacionesService';
 import './TipoActividadList.css';
@@ -108,20 +120,20 @@ const TipoActividadList = () => {
       <div className="page-header">
         <div>
           <h2>
-            <span className="header-icon">🏋️</span>
+            <span className="header-icon"><Dumbbell size={20} /></span>
             Tipos de Actividad
           </h2>
           <p className="subtitle">Gestiona los tipos de actividades disponibles en cada sede</p>
         </div>
         <button className="btn-primary" onClick={() => navigate('/horarios/tipos-actividad/new')}>
-          + Nueva Actividad
+          <Plus size={18} /> Nueva Actividad
         </button>
       </div>
 
       {/* Estadísticas */}
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-icon stat-icon-blue">📊</div>
+          <div className="stat-icon stat-icon-blue"><BarChart3 size={24} /></div>
           <div className="stat-content">
             <h3>{estadisticas.total}</h3>
             <p>Total Actividades</p>
@@ -129,7 +141,7 @@ const TipoActividadList = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon stat-icon-green">✓</div>
+          <div className="stat-icon stat-icon-green"><CheckCircle2 size={24} /></div>
           <div className="stat-content">
             <h3>{estadisticas.activos}</h3>
             <p>Activas</p>
@@ -137,7 +149,7 @@ const TipoActividadList = () => {
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon stat-icon-red">✕</div>
+          <div className="stat-icon stat-icon-red"><XCircle size={24} /></div>
           <div className="stat-content">
             <h3>{estadisticas.inactivos}</h3>
             <p>Inactivas</p>
@@ -149,11 +161,11 @@ const TipoActividadList = () => {
       <div className="filters-card">
         <div className="filters-header">
           <h3>
-            <span className="filter-icon">🔍</span>
+            <span className="filter-icon"><Search size={18} /></span>
             Filtros de Búsqueda
           </h3>
           <button className="btn-limpiar" onClick={limpiarFiltros}>
-            ✕ Limpiar Filtros
+            <X size={16} /> Limpiar Filtros
           </button>
         </div>
 
@@ -197,7 +209,7 @@ const TipoActividadList = () => {
         <div className="alert alert-error">
           <span>{error}</span>
           <span className="alert-icon" onClick={() => setError(null)}>
-            ✕
+            <X size={16} />
           </span>
         </div>
       )}
@@ -205,12 +217,12 @@ const TipoActividadList = () => {
       {/* Tabla */}
       {loading ? (
         <div className="loading-spinner">
-          <span className="spinner">⏳</span>
+          <span className="spinner"><Loader size={24} /></span>
           <p>Cargando tipos de actividad...</p>
         </div>
       ) : tiposFiltrados.length === 0 ? (
         <div className="no-data-container">
-          <div className="no-data-icon">🏋️</div>
+          <div className="no-data-icon"><Dumbbell size={26} /></div>
           <p>No se encontraron tipos de actividad</p>
         </div>
       ) : (
@@ -253,7 +265,11 @@ const TipoActividadList = () => {
                   </td>
                   <td>
                     <span className={`badge-estado ${tipo.activo ? 'badge-activo' : 'badge-inactivo'}`}>
-                      {tipo.activo ? '✓ Activo' : '✕ Inactivo'}
+                      {tipo.activo ? (
+                        <><CheckCircle2 size={16} style={{ color: 'var(--success)' }} /> Activo</>
+                      ) : (
+                        <><XCircle size={16} style={{ color: 'var(--danger)' }} /> Inactivo</>
+                      )}
                     </span>
                   </td>
                   <td className="acciones-cell">
@@ -262,10 +278,10 @@ const TipoActividadList = () => {
                       onClick={() => navigate(`/horarios/tipos-actividad/edit/${tipo.id}`)}
                       title="Editar"
                     >
-                      ✏️
+                      <Pencil size={16} />
                     </button>
                     <button className="btn-accion btn-eliminar" onClick={() => eliminarTipo(tipo.id)} title="Eliminar">
-                      🗑️
+                      <Trash2 size={16} />
                     </button>
                   </td>
                 </tr>

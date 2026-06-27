@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Save, X, Pencil, ArrowLeft, FileText, Home, GraduationCap } from 'lucide-react';
 import employeeService from '../services/employeeService';
 import ConfirmModal from './ConfirmModal';
 import './EmployeeDetail.css';
@@ -101,7 +102,7 @@ function EmployeeDetail() {
     successModal.className = 'success-modal-overlay';
     successModal.innerHTML = `
       <div class="success-modal">
-        <div class="success-icon">✓</div>
+        <div class="success-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
         <h2>¡Éxito!</h2>
         <p>${message}</p>
       </div>
@@ -177,14 +178,16 @@ function EmployeeDetail() {
                   onClick={handleSaveClick}
                   disabled={saving}
                 >
-                  {saving ? '💾 Guardando...' : '💾 Guardar'}
+                  <Save size={18} />
+                  {saving ? 'Guardando...' : 'Guardar'}
                 </button>
                 <button
                   className="btn btn-secondary"
                   onClick={handleEditToggle}
                   disabled={saving}
                 >
-                  ✖ Cancelar
+                  <X size={18} />
+                  Cancelar
                 </button>
               </>
             ) : (
@@ -193,13 +196,15 @@ function EmployeeDetail() {
                   className="btn btn-primary"
                   onClick={handleEditToggle}
                 >
-                  ✏️ Editar
+                  <Pencil size={18} />
+                  Editar
                 </button>
                 <button
                   className="btn btn-secondary"
                   onClick={() => navigate('/employees')}
                 >
-                  ← Volver
+                  <ArrowLeft size={18} />
+                  Volver
                 </button>
               </>
             )}
@@ -303,7 +308,7 @@ function EmployeeDetail() {
           <div className="documents-grid">
             <div className="document-item">
               <div className="document-header">
-                <span className="document-icon">📄</span>
+                <span className="document-icon"><FileText size={24} /></span>
                 <label>Identificación Oficial</label>
               </div>
               {employee.identificacion_url ? (
@@ -322,7 +327,7 @@ function EmployeeDetail() {
 
             <div className="document-item">
               <div className="document-header">
-                <span className="document-icon">🏠</span>
+                <span className="document-icon"><Home size={24} /></span>
                 <label>Comprobante de Domicilio</label>
               </div>
               {employee.comprobante_url ? (
@@ -341,7 +346,7 @@ function EmployeeDetail() {
 
             <div className="document-item">
               <div className="document-header">
-                <span className="document-icon">🎓</span>
+                <span className="document-icon"><GraduationCap size={24} /></span>
                 <label>Certificados</label>
               </div>
               {employee.certificados_url ? (

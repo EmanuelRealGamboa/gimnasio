@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Pencil, Plus, ArrowLeft, Save } from 'lucide-react';
 import inventarioService from '../services/inventarioService';
 import sedeService from '../services/sedeService';
 import './Inventario.css';
@@ -140,10 +141,10 @@ function ProductoForm() {
 
       if (isEditMode) {
         await inventarioService.updateProducto(id, dataToSend);
-        showNotif('✓ Producto actualizado exitosamente', 'success');
+        showNotif('Producto actualizado exitosamente', 'success');
       } else {
         await inventarioService.createProducto(dataToSend);
-        showNotif('✓ Producto creado exitosamente', 'success');
+        showNotif('Producto creado exitosamente', 'success');
       }
 
       setTimeout(() => {
@@ -177,7 +178,7 @@ function ProductoForm() {
       {/* Header */}
       <div className="inventario-header">
         <div>
-          <h1>{isEditMode ? '✏️ Editar Producto' : '➕ Nuevo Producto'}</h1>
+          <h1>{isEditMode ? <><Pencil size={26} /> Editar Producto</> : <><Plus size={26} /> Nuevo Producto</>}</h1>
           <p className="inventario-subtitle">
             {isEditMode ? 'Modifica los datos del producto' : 'Completa los datos para crear un nuevo producto'}
           </p>
@@ -186,7 +187,7 @@ function ProductoForm() {
           className="btn-secondary"
           onClick={() => navigate('/inventario/productos')}
         >
-          ← Volver
+          <ArrowLeft size={18} /> Volver
         </button>
       </div>
 
@@ -348,7 +349,7 @@ function ProductoForm() {
                 </>
               ) : (
                 <>
-                  {isEditMode ? '💾 Actualizar' : '➕ Crear'} Producto
+                  {isEditMode ? <><Save size={18} /> Actualizar</> : <><Plus size={18} /> Crear</>} Producto
                 </>
               )}
             </button>

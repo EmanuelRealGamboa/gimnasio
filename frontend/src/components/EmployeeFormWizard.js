@@ -4,6 +4,7 @@ import employeeService from '../services/employeeService';
 import roleService from '../services/roleService';
 import sedeService from '../services/sedeService';
 import espacioService from '../services/espacioService';
+import { Eye, EyeOff, CheckCircle2, Info, ArrowLeft, ArrowRight } from 'lucide-react';
 import RoleSelector, { ROLES } from './RoleSelector';
 import WizardSteps from './WizardSteps';
 import './EmployeeForm.css';
@@ -96,7 +97,7 @@ function EmployeeFormWizard() {
   // Filtrar espacios cuando cambia la sede seleccionada
   useEffect(() => {
     if (formData.sede_id) {
-      console.log('🔍 Filtrando espacios para la sede:', formData.sede_id);
+      console.log('Filtrando espacios para la sede:', formData.sede_id);
       fetchEspacios(formData.sede_id);
       // Limpiar espacios seleccionados al cambiar de sede
       setFormData(prev => ({
@@ -112,7 +113,7 @@ function EmployeeFormWizard() {
   const fetchRoles = async () => {
     try {
       const response = await roleService.getRoles();
-      console.log('📋 Roles cargados desde el backend:', response.data);
+      console.log('Roles cargados desde el backend:', response.data);
       setRoles(response.data);
     } catch (err) {
       console.error('Error al cargar roles:', err);
@@ -122,7 +123,7 @@ function EmployeeFormWizard() {
   const fetchSedes = async () => {
     try {
       const response = await sedeService.getSedes();
-      console.log('🏢 Sedes cargadas desde el backend:', response.data);
+      console.log('Sedes cargadas desde el backend:', response.data);
       setSedes(response.data);
     } catch (err) {
       console.error('Error al cargar sedes:', err);
@@ -133,7 +134,7 @@ function EmployeeFormWizard() {
   const fetchEspacios = async (sedeId = null) => {
     try {
       const response = await espacioService.getEspacios(sedeId);
-      console.log('🏋️ Espacios cargados desde el backend:', response.data);
+      console.log('Espacios cargados desde el backend:', response.data);
       setEspacios(response.data);
     } catch (err) {
       console.error('Error al cargar espacios:', err);
@@ -155,22 +156,22 @@ function EmployeeFormWizard() {
     setSelectedRoleKey(roleKey);
     const roleData = ROLES.find(r => r.id === roleKey);
 
-    console.log('🎯 Rol seleccionado:', roleKey);
-    console.log('📌 Datos del rol:', roleData);
-    console.log('🗂️ Roles disponibles en BD:', roles);
+    console.log('Rol seleccionado:', roleKey);
+    console.log('Datos del rol:', roleData);
+    console.log('Roles disponibles en BD:', roles);
 
     // Buscar el rol en la base de datos por nombreDB
     let rolId = '';
     if (roles.length > 0 && roleData) {
-      console.log('🔍 Buscando rol con nombre:', roleData.nombreDB);
+      console.log('Buscando rol con nombre:', roleData.nombreDB);
       const roleDB = roles.find(r => r.nombre === roleData.nombreDB);
-      console.log('✅ Rol encontrado en BD:', roleDB);
+      console.log('Rol encontrado en BD:', roleDB);
       if (roleDB) {
         rolId = roleDB.id;
       }
     }
 
-    console.log('🆔 rol_id asignado:', rolId);
+    console.log('rol_id asignado:', rolId);
 
     setFormData(prev => ({
       ...prev,
@@ -268,7 +269,7 @@ function EmployeeFormWizard() {
         });
       }
 
-      console.log('📤 Enviando datos con archivos...');
+      console.log('Enviando datos con archivos...');
 
       // Wizard solo para crear empleados nuevos
       await employeeService.createEmployee(formDataToSend);
@@ -306,7 +307,7 @@ function EmployeeFormWizard() {
     successModal.className = 'success-modal-overlay';
     successModal.innerHTML = `
       <div class="success-modal">
-        <div class="success-icon">✓</div>
+        <div class="success-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
         <h2>¡Éxito!</h2>
         <p>${message}</p>
       </div>
@@ -476,7 +477,7 @@ function EmployeeFormWizard() {
                     }}
                     title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                   >
-                    {showPassword ? '👁️' : '👁️‍🗨️'}
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
               </div>
@@ -638,8 +639,8 @@ function EmployeeFormWizard() {
                 }}
               />
               {files.identificacion && (
-                <small style={{ color: '#22c55e', display: 'block', marginTop: '5px' }}>
-                  ✓ {files.identificacion.name}
+                <small style={{ color: '#22c55e', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', marginTop: '5px' }}>
+                  <CheckCircle2 size={16} style={{ color: 'var(--success)' }} /> {files.identificacion.name}
                 </small>
               )}
             </div>
@@ -658,8 +659,8 @@ function EmployeeFormWizard() {
                 }}
               />
               {files.comprobante && (
-                <small style={{ color: '#22c55e', display: 'block', marginTop: '5px' }}>
-                  ✓ {files.comprobante.name}
+                <small style={{ color: '#22c55e', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', marginTop: '5px' }}>
+                  <CheckCircle2 size={16} style={{ color: 'var(--success)' }} /> {files.comprobante.name}
                 </small>
               )}
             </div>
@@ -679,8 +680,8 @@ function EmployeeFormWizard() {
                 }}
               />
               {files.certificados.length > 0 && (
-                <small style={{ color: '#22c55e', display: 'block', marginTop: '5px' }}>
-                  ✓ {files.certificados.length} archivo(s) seleccionado(s)
+                <small style={{ color: '#22c55e', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', marginTop: '5px' }}>
+                  <CheckCircle2 size={16} style={{ color: 'var(--success)' }} /> {files.certificados.length} archivo(s) seleccionado(s)
                 </small>
               )}
             </div>
@@ -692,9 +693,12 @@ function EmployeeFormWizard() {
               borderRadius: '8px',
               border: '1px solid rgba(34, 197, 94, 0.3)'
             }}>
-              <p style={{ margin: 0, fontSize: '0.9rem', color: '#666666' }}>
-                ℹ️ Revisa que toda la información sea correcta antes de continuar.
-                Al hacer clic en "Crear Empleado" se registrará el empleado en el sistema.
+              <p style={{ margin: 0, fontSize: '0.9rem', color: '#666666', display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
+                <Info size={18} style={{ color: 'var(--info)', flexShrink: 0, marginTop: '2px' }} />
+                <span>
+                  Revisa que toda la información sea correcta antes de continuar.
+                  Al hacer clic en "Crear Empleado" se registrará el empleado en el sistema.
+                </span>
               </p>
             </div>
           </div>
@@ -934,6 +938,7 @@ function EmployeeFormWizard() {
             <button
               type="button"
               className="btn btn-secondary"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
               onClick={() => {
                 if (currentStep === 1) {
                   navigate('/employees');
@@ -942,16 +947,25 @@ function EmployeeFormWizard() {
                 }
               }}
             >
-              {currentStep === 1 ? 'Cancelar' : '← Anterior'}
+              {currentStep === 1 ? (
+                'Cancelar'
+              ) : (
+                <>
+                  <ArrowLeft size={18} />
+                  Anterior
+                </>
+              )}
             </button>
 
             {currentStep < WIZARD_STEPS.length ? (
               <button
                 type="button"
                 className="btn btn-primary"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
                 onClick={nextStep}
               >
-                Siguiente →
+                Siguiente
+                <ArrowRight size={18} />
               </button>
             ) : (
               <button

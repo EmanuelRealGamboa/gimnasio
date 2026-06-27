@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Plus, Pencil, Trash2 } from 'lucide-react';
 import espacioService from '../services/espacioService';
 import sedeService from '../services/sedeService';
 import ConfirmModal from './ConfirmModal';
@@ -107,7 +108,7 @@ function EspacioList() {
     successModal.className = 'success-modal-overlay';
     successModal.innerHTML = `
       <div class="success-modal">
-        <div class="success-icon">✓</div>
+        <div class="success-icon"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
         <h2>¡Éxito!</h2>
         <p>${message}</p>
       </div>
@@ -128,7 +129,8 @@ function EspacioList() {
           className="btn btn-primary"
           onClick={() => navigate('/espacios/new')}
         >
-          + Nuevo Espacio
+          <Plus size={18} />
+          Nuevo Espacio
         </button>
       </div>
 
@@ -138,7 +140,7 @@ function EspacioList() {
         <div className="search-box">
           <input
             type="text"
-            placeholder="🔍 Buscar por nombre, descripción o sede..."
+            placeholder="Buscar por nombre, descripción o sede..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -191,14 +193,14 @@ function EspacioList() {
                       onClick={() => navigate(`/espacios/edit/${espacio.id}`)}
                       title="Editar"
                     >
-                      ✏️
+                      <Pencil size={18} />
                     </button>
                     <button
                       className="btn-action btn-delete"
                       onClick={() => handleDeleteClick(espacio)}
                       title="Eliminar"
                     >
-                      🗑️
+                      <Trash2 size={18} />
                     </button>
                   </td>
                 </tr>

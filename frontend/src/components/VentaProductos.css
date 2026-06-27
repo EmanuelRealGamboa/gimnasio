@@ -29,9 +29,18 @@
   margin: 0;
 }
 
+.header-icon,
+.sede-icon,
+.search-icon,
+.badge-icon,
+.alert-icon,
+.alert-icon-warning {
+  display: inline-flex;
+  align-items: center;
+}
+
 .header-icon {
   color: var(--primary-color);
-  font-size: 2.5rem;
 }
 
 /* Selector de Sede en Header */
@@ -741,7 +750,10 @@
   border: 1px solid rgba(239, 68, 68, 0.3);
   color: var(--danger);
   border-radius: var(--radius-md);
-  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   font-weight: 600;
 }
 

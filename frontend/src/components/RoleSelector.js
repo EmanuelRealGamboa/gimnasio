@@ -1,3 +1,4 @@
+import { Crown, Dumbbell, DollarSign, Brush, HardHat, Check } from 'lucide-react';
 import './RoleSelector.css';
 
 const ROLES = [
@@ -5,7 +6,7 @@ const ROLES = [
     id: 'administrador',
     nombre: 'Administrador',
     nombreDB: 'Administrador',
-    icon: '👑',
+    icon: Crown,
     descripcion: 'Gestión completa del sistema y supervisión',
     color: '#2a2a2a'
   },
@@ -13,7 +14,7 @@ const ROLES = [
     id: 'entrenador',
     nombre: 'Entrenador',
     nombreDB: 'Entrenador',
-    icon: '💪',
+    icon: Dumbbell,
     descripcion: 'Gestión de entrenamientos y rutinas',
     color: '#22c55e'
   },
@@ -21,7 +22,7 @@ const ROLES = [
     id: 'cajero',
     nombre: 'Cajero',
     nombreDB: 'Recepcionista',
-    icon: '💰',
+    icon: DollarSign,
     descripcion: 'Gestión de pagos y transacciones',
     color: '#f59e0b'
   },
@@ -29,7 +30,7 @@ const ROLES = [
     id: 'limpieza',
     nombre: 'Personal de Limpieza',
     nombreDB: 'Personal de Limpieza',
-    icon: '🧹',
+    icon: Brush,
     descripcion: 'Gestión de tareas de limpieza',
     color: '#666666'
   },
@@ -37,7 +38,7 @@ const ROLES = [
     id: 'supervisor',
     nombre: 'Supervisor de Espacio',
     nombreDB: 'Supervisor de Instalaciones',
-    icon: '🏗️',
+    icon: HardHat,
     descripcion: 'Supervisión de instalaciones y equipamiento',
     color: '#666666'
   }
@@ -52,23 +53,26 @@ function RoleSelector({ selectedRole, onSelectRole }) {
       </p>
 
       <div className="roles-grid">
-        {ROLES.map((role) => (
-          <div
-            key={role.id}
-            className={`role-card ${selectedRole === role.id ? 'selected' : ''}`}
-            onClick={() => onSelectRole(role.id)}
-            style={{
-              '--role-color': role.color
-            }}
-          >
-            <div className="role-icon">{role.icon}</div>
-            <h4 className="role-name">{role.nombre}</h4>
-            <p className="role-description">{role.descripcion}</p>
-            <div className="role-check">
-              {selectedRole === role.id && <span>✓</span>}
+        {ROLES.map((role) => {
+          const RoleIcon = role.icon;
+          return (
+            <div
+              key={role.id}
+              className={`role-card ${selectedRole === role.id ? 'selected' : ''}`}
+              onClick={() => onSelectRole(role.id)}
+              style={{
+                '--role-color': role.color
+              }}
+            >
+              <div className="role-icon"><RoleIcon size={48} /></div>
+              <h4 className="role-name">{role.nombre}</h4>
+              <p className="role-description">{role.descripcion}</p>
+              <div className="role-check">
+                {selectedRole === role.id && <Check size={16} />}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

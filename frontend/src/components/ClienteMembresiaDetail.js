@@ -1,5 +1,28 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import {
+  XCircle,
+  ArrowLeft,
+  User,
+  Mail,
+  Phone,
+  Target,
+  BarChart3,
+  Ticket,
+  Plus,
+  RefreshCw,
+  X,
+  DollarSign,
+  CreditCard,
+  Calendar,
+  Building2,
+  Star,
+  Dumbbell,
+  MapPin,
+  AlertTriangle,
+  Clock,
+  ClipboardList
+} from 'lucide-react';
 import membresiaService from '../services/membresiaService';
 import clienteService from '../services/clienteService';
 import SuscribirMembresiaModal from './SuscribirMembresiaModal';
@@ -62,7 +85,7 @@ function ClienteMembresiaDetail() {
 
   const handleSuscripcionCreada = () => {
     setShowSuscribirModal(false);
-    showNotif('✓ Suscripción creada exitosamente', 'success');
+    showNotif('Suscripción creada exitosamente', 'success');
     fetchClienteData();
   };
 
@@ -80,7 +103,7 @@ function ClienteMembresiaDetail() {
     try {
       await membresiaService.cancelarSuscripcion(suscripcionActiva.id);
       setShowConfirmModal(false);
-      showNotif('✓ Suscripción cancelada exitosamente', 'success');
+      showNotif('Suscripción cancelada exitosamente', 'success');
       fetchClienteData();
     } catch (err) {
       console.error('Error al cancelar suscripción:', err);
@@ -113,7 +136,7 @@ function ClienteMembresiaDetail() {
       }
       await membresiaService.renovarSuscripcion(suscripcionId, 'efectivo');
       setShowConfirmModal(false);
-      showNotif('✓ Suscripción renovada exitosamente', 'success');
+      showNotif('Suscripción renovada exitosamente', 'success');
       fetchClienteData();
     } catch (err) {
       console.error('Error al renovar suscripción:', err);
@@ -164,7 +187,7 @@ function ClienteMembresiaDetail() {
     return (
       <div className="ventas-container">
         <div className="empty-state">
-          <div className="empty-icon">❌</div>
+          <div className="empty-icon"><XCircle size={48} style={{ color: 'var(--danger)' }} /></div>
           <p>No se encontró el cliente</p>
           <button className="btn-primary" onClick={() => navigate('/ventas/servicios')}>
             Volver
@@ -186,10 +209,11 @@ function ClienteMembresiaDetail() {
       {/* Header */}
       <div className="ventas-header">
         <button className="btn-back" onClick={() => navigate('/ventas/servicios')}>
-          ← Volver
+          <ArrowLeft size={18} />
+          Volver
         </button>
         <div>
-          <h1>👤 Detalle del Cliente</h1>
+          <h1><User size={20} /> Detalle del Cliente</h1>
           <p className="ventas-subtitle">Información y gestión de membresía</p>
         </div>
       </div>
@@ -203,8 +227,8 @@ function ClienteMembresiaDetail() {
           <div className="cliente-detail-info">
             <h2>{cliente.nombre} {cliente.apellido_paterno} {cliente.apellido_materno}</h2>
             <div className="cliente-detail-meta">
-              <span>📧 {cliente.email}</span>
-              <span>📞 {cliente.telefono}</span>
+              <span><Mail size={16} /> {cliente.email}</span>
+              <span><Phone size={16} /> {cliente.telefono}</span>
               <span className={`badge badge-${cliente.estado}`}>{cliente.estado}</span>
             </div>
           </div>
@@ -212,13 +236,13 @@ function ClienteMembresiaDetail() {
 
         {cliente.objetivo_fitness && (
           <div className="cliente-detail-section">
-            <h3>🎯 Objetivo Fitness</h3>
+            <h3><Target size={18} /> Objetivo Fitness</h3>
             <p>{cliente.objetivo_fitness}</p>
           </div>
         )}
 
         <div className="cliente-detail-section">
-          <h3>📊 Información Adicional</h3>
+          <h3><BarChart3 size={18} /> Información Adicional</h3>
           <div className="info-grid">
             <div className="info-item">
               <span className="info-label">Nivel de Experiencia</span>
@@ -236,16 +260,16 @@ function ClienteMembresiaDetail() {
       {suscripcionActiva ? (
         <div className="suscripcion-activa-section">
           <div className="section-header">
-            <h2>🎫 Membresía Activa</h2>
+            <h2><Ticket size={20} /> Membresía Activa</h2>
             <div className="section-actions">
               <button className="btn-success" onClick={handleSuscribirClick}>
-                ➕ Adquirir Otra Membresía
+                <Plus size={18} /> Adquirir Otra Membresía
               </button>
               <button className="btn-secondary" onClick={handleRenovarClick}>
-                🔄 Renovar
+                <RefreshCw size={18} /> Renovar
               </button>
               <button className="btn-danger" onClick={handleCancelarClick}>
-                ❌ Cancelar
+                <X size={18} /> Cancelar
               </button>
             </div>
           </div>
@@ -288,20 +312,20 @@ function ClienteMembresiaDetail() {
 
               <div className="membresia-details">
                 <div className="detail-item">
-                  <span className="detail-label">💰 Precio Pagado</span>
+                  <span className="detail-label"><DollarSign size={16} /> Precio Pagado</span>
                   <span className="detail-value">${parseFloat(suscripcionActiva.precio_pagado).toFixed(2)}</span>
                 </div>
                 <div className="detail-item">
-                  <span className="detail-label">💳 Método de Pago</span>
+                  <span className="detail-label"><CreditCard size={16} /> Método de Pago</span>
                   <span className="detail-value">{suscripcionActiva.metodo_pago_display}</span>
                 </div>
                 <div className="detail-item">
-                  <span className="detail-label">📅 Fecha de Suscripción</span>
+                  <span className="detail-label"><Calendar size={16} /> Fecha de Suscripción</span>
                   <span className="detail-value">{new Date(suscripcionActiva.fecha_suscripcion).toLocaleDateString('es-MX')}</span>
                 </div>
                 {suscripcionActiva.sede_nombre && (
                   <div className="detail-item">
-                    <span className="detail-label">🏢 Sede</span>
+                    <span className="detail-label"><Building2 size={16} /> Sede</span>
                     <span className="detail-value">{suscripcionActiva.sede_nombre}</span>
                   </div>
                 )}
@@ -310,20 +334,20 @@ function ClienteMembresiaDetail() {
               {/* Espacios Disponibles */}
               {suscripcionActiva.espacios_disponibles && suscripcionActiva.espacios_disponibles.length > 0 && (
                 <div className="espacios-section">
-                  <h4>🎯 Espacios Incluidos</h4>
+                  <h4><Target size={18} /> Espacios Incluidos</h4>
                   {suscripcionActiva.membresia_info?.permite_todas_sedes && (
                     <div className="multi-sede-badge-info">
-                      ⭐ Esta membresía da acceso a todas las sedes del gimnasio
+                      <Star size={16} /> Esta membresía da acceso a todas las sedes del gimnasio
                     </div>
                   )}
                   <div className="espacios-grid">
                     {suscripcionActiva.espacios_disponibles.map((espacio) => (
                       <div key={espacio.id} className="espacio-card">
-                        <div className="espacio-icon">🏋️</div>
+                        <div className="espacio-icon"><Dumbbell size={22} /></div>
                         <div className="espacio-info">
                           <span className="espacio-nombre">{espacio.nombre}</span>
                           {espacio.sede && (
-                            <span className="espacio-sede">📍 {espacio.sede}</span>
+                            <span className="espacio-sede"><MapPin size={16} /> {espacio.sede}</span>
                           )}
                         </div>
                       </div>
@@ -351,7 +375,7 @@ function ClienteMembresiaDetail() {
       ) : suscripcionVencida ? (
         <div className="suscripcion-vencida-section">
           <div className="section-header">
-            <h2>⚠️ Membresía Vencida</h2>
+            <h2><AlertTriangle size={20} style={{ color: 'var(--warning)' }} /> Membresía Vencida</h2>
           </div>
 
           <div className="membresia-vencida-card">
@@ -368,7 +392,7 @@ function ClienteMembresiaDetail() {
             <div className="membresia-vencida-body">
               <div className="vencida-info">
                 <p className="vencida-mensaje">
-                  ⏰ Esta membresía venció el <strong>{new Date(suscripcionVencida.fecha_fin).toLocaleDateString('es-MX')}</strong>
+                  <Clock size={16} /> Esta membresía venció el <strong>{new Date(suscripcionVencida.fecha_fin).toLocaleDateString('es-MX')}</strong>
                 </p>
                 <p className="vencida-descripcion">
                   El cliente puede renovar esta membresía o seleccionar un nuevo plan.
@@ -377,16 +401,16 @@ function ClienteMembresiaDetail() {
 
               <div className="membresia-details">
                 <div className="detail-item">
-                  <span className="detail-label">💰 Precio Original</span>
+                  <span className="detail-label"><DollarSign size={16} /> Precio Original</span>
                   <span className="detail-value">${parseFloat(suscripcionVencida.precio_pagado).toFixed(2)}</span>
                 </div>
                 <div className="detail-item">
-                  <span className="detail-label">📅 Fecha de Vencimiento</span>
+                  <span className="detail-label"><Calendar size={16} /> Fecha de Vencimiento</span>
                   <span className="detail-value">{new Date(suscripcionVencida.fecha_fin).toLocaleDateString('es-MX')}</span>
                 </div>
                 {suscripcionVencida.sede_nombre && (
                   <div className="detail-item">
-                    <span className="detail-label">🏢 Sede</span>
+                    <span className="detail-label"><Building2 size={16} /> Sede</span>
                     <span className="detail-value">{suscripcionVencida.sede_nombre}</span>
                   </div>
                 )}
@@ -394,10 +418,10 @@ function ClienteMembresiaDetail() {
 
               <div className="vencida-actions">
                 <button className="btn-renovar-vencida" onClick={handleRenovarClick}>
-                  🔄 Renovar Esta Membresía
+                  <RefreshCw size={18} /> Renovar Esta Membresía
                 </button>
                 <button className="btn-cambiar-plan" onClick={handleSuscribirClick}>
-                  🎫 Suscribir a Otro Plan
+                  <Ticket size={18} /> Suscribir a Otro Plan
                 </button>
               </div>
             </div>
@@ -406,10 +430,10 @@ function ClienteMembresiaDetail() {
       ) : (
         <div className="no-suscripcion-section">
           <div className="empty-state">
-            <div className="empty-icon">🎫</div>
+            <div className="empty-icon"><Ticket size={48} /></div>
             <p>Este cliente no tiene una membresía activa</p>
             <button className="btn-primary" onClick={handleSuscribirClick}>
-              ➕ Suscribir a Membresía
+              <Plus size={18} /> Suscribir a Membresía
             </button>
           </div>
         </div>
@@ -418,7 +442,7 @@ function ClienteMembresiaDetail() {
       {/* Historial de Suscripciones */}
       {suscripciones.length > 0 && (
         <div className="historial-section">
-          <h2>📋 Historial de Suscripciones</h2>
+          <h2><ClipboardList size={20} /> Historial de Suscripciones</h2>
           <div className="historial-table">
             <table className="data-table">
               <thead>

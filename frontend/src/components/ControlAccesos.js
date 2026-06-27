@@ -1,5 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  DoorOpen,
+  Smartphone,
+  Search,
+  X,
+  AlertTriangle,
+  Plus,
+  ClipboardList,
+  Mail,
+  Phone,
+  ArrowRight,
+  Check,
+  CheckCircle2,
+  XCircle,
+  User,
+  BarChart3,
+  Clock,
+  CreditCard,
+  Timer,
+  Star,
+  RefreshCw,
+  ShoppingCart,
+  Loader2,
+  Dumbbell,
+  Zap
+} from 'lucide-react';
 import accesosService from '../services/accesosService';
 import instalacionesService from '../services/instalacionesService';
 import './ControlAccesos.css';
@@ -279,7 +305,7 @@ const ControlAccesos = () => {
       <div className="accesos-header">
         <div className="header-left">
           <h1>
-            <span className="header-icon">🚪</span>
+            <span className="header-icon"><DoorOpen size={24} /></span>
             Control de Accesos
           </h1>
           <p className="subtitle">Valida y registra el acceso de clientes al gimnasio</p>
@@ -339,7 +365,7 @@ const ControlAccesos = () => {
                         <strong>{cliente.nombre_completo}</strong>
                       </div>
                       <div className="sugerencia-telefono">
-                        📱 {cliente.telefono}
+                        <Smartphone size={16} /> {cliente.telefono}
                       </div>
                     </div>
                   ))}
@@ -354,7 +380,11 @@ const ControlAccesos = () => {
                 className="btn-buscar"
                 disabled={loading || !sedeSeleccionada}
               >
-                {loading ? '⏳ Buscando...' : '🔍 Buscar'}
+                {loading ? (
+                  <><Loader2 size={18} className="spin" /> Buscando...</>
+                ) : (
+                  <><Search size={18} /> Buscar</>
+                )}
               </button>
               {busquedaRealizada && (
                 <button
@@ -362,7 +392,7 @@ const ControlAccesos = () => {
                   className="btn-limpiar"
                   onClick={resetearBusqueda}
                 >
-                  ✕ Limpiar
+                  <X size={18} /> Limpiar
                 </button>
               )}
             </div>
@@ -372,10 +402,10 @@ const ControlAccesos = () => {
         {/* Mensajes de error */}
         {error && (
           <div className="alert alert-error">
-            <span>⚠️ {error}</span>
+            <span><AlertTriangle size={16} style={{ color: 'var(--warning)' }} /> {error}</span>
             {error.includes('No se encontró') && (
               <button className="btn-registro" onClick={irARegistroCliente}>
-                ➕ Registrar nuevo cliente
+                <Plus size={18} /> Registrar nuevo cliente
               </button>
             )}
           </div>
@@ -385,16 +415,16 @@ const ControlAccesos = () => {
       {/* Resultados de búsqueda múltiple */}
       {resultadosMultiples.length > 0 && (
         <div className="resultados-card">
-          <h3>📋 {mensajeEstado}</h3>
+          <h3><ClipboardList size={20} /> {mensajeEstado}</h3>
           <div className="resultados-list">
             {resultadosMultiples.map(cliente => (
               <div key={cliente.cliente_id} className="resultado-item" onClick={() => seleccionarCliente(cliente.cliente_id)}>
                 <div className="resultado-info">
                   <h4>{cliente.nombre_completo}</h4>
-                  <p>📧 {cliente.email || 'Sin email'}</p>
-                  <p>📞 {cliente.telefono || 'Sin teléfono'}</p>
+                  <p><Mail size={16} /> {cliente.email || 'Sin email'}</p>
+                  <p><Phone size={16} /> {cliente.telefono || 'Sin teléfono'}</p>
                 </div>
-                <button className="btn-seleccionar">Seleccionar →</button>
+                <button className="btn-seleccionar">Seleccionar <ArrowRight size={16} /></button>
               </div>
             ))}
           </div>
@@ -408,12 +438,12 @@ const ControlAccesos = () => {
             <div className="modal-header">
               <h2>
                 {accesoAutorizado ? (
-                  <><span className="status-icon">✓</span> Acceso Autorizado</>
+                  <><span className="status-icon"><CheckCircle2 size={24} style={{ color: 'var(--success)' }} /></span> Acceso Autorizado</>
                 ) : (
-                  <><span className="status-icon">✕</span> Acceso Denegado</>
+                  <><span className="status-icon"><XCircle size={24} style={{ color: 'var(--danger)' }} /></span> Acceso Denegado</>
                 )}
               </h2>
-              <button className="btn-cerrar-modal" onClick={cerrarModal}>✕</button>
+              <button className="btn-cerrar-modal" onClick={cerrarModal}><X size={20} /></button>
             </div>
 
             <div className="modal-body">
@@ -423,16 +453,16 @@ const ControlAccesos = () => {
                   {clienteInfo.foto_url ? (
                     <img src={clienteInfo.foto_url} alt={clienteInfo.nombre_completo} />
                   ) : (
-                    <div className="foto-placeholder">👤</div>
+                    <div className="foto-placeholder"><User size={26} /></div>
                   )}
                 </div>
                 <div className="cliente-datos">
                   <h3>{clienteInfo.nombre_completo}</h3>
-                  <p>📧 {clienteInfo.email || 'Sin email'}</p>
-                  <p>📞 {clienteInfo.telefono || 'Sin teléfono'}</p>
-                  <p>📊 Total de accesos: <strong>{clienteInfo.total_accesos}</strong></p>
+                  <p><Mail size={16} /> {clienteInfo.email || 'Sin email'}</p>
+                  <p><Phone size={16} /> {clienteInfo.telefono || 'Sin teléfono'}</p>
+                  <p><BarChart3 size={16} /> Total de accesos: <strong>{clienteInfo.total_accesos}</strong></p>
                   {clienteInfo.ultimo_acceso && (
-                    <p>🕐 Último acceso: {formatFecha(clienteInfo.ultimo_acceso)}</p>
+                    <p><Clock size={16} /> Último acceso: {formatFecha(clienteInfo.ultimo_acceso)}</p>
                   )}
                 </div>
               </div>
@@ -440,17 +470,17 @@ const ControlAccesos = () => {
               {/* Estado de membresía */}
               {accesoAutorizado ? (
                 <div className="membresia-card membresia-activa">
-                  <h4>💳 Membresía Activa</h4>
+                  <h4><CreditCard size={20} /> Membresía Activa</h4>
                   <div className="membresia-info">
                     <p><strong>Plan:</strong> {clienteInfo.membresia_nombre}</p>
                     <p><strong>Tipo:</strong> {clienteInfo.membresia_tipo}</p>
                     <p><strong>Válida desde:</strong> {formatFecha(clienteInfo.fecha_inicio)}</p>
                     <p><strong>Válida hasta:</strong> {formatFecha(clienteInfo.fecha_fin)}</p>
                     <p className="dias-restantes">
-                      <strong>⏱️ Días restantes:</strong> {clienteInfo.dias_restantes}
+                      <strong><Timer size={16} /> Días restantes:</strong> {clienteInfo.dias_restantes}
                     </p>
                     {clienteInfo.permite_todas_sedes ? (
-                      <p className="badge-multisede">⭐ Acceso a todas las sedes</p>
+                      <p className="badge-multisede"><Star size={16} /> Acceso a todas las sedes</p>
                     ) : (
                       <p><strong>Sede:</strong> {clienteInfo.sede_suscripcion_nombre}</p>
                     )}
@@ -458,7 +488,7 @@ const ControlAccesos = () => {
                 </div>
               ) : (
                 <div className="membresia-card membresia-inactiva">
-                  <h4>⚠️ {clienteInfo.tiene_membresia_activa ? 'Membresía No Válida Para Esta Sede' : 'Sin Membresía Activa'}</h4>
+                  <h4><AlertTriangle size={20} style={{ color: 'var(--warning)' }} /> {clienteInfo.tiene_membresia_activa ? 'Membresía No Válida Para Esta Sede' : 'Sin Membresía Activa'}</h4>
                   <p className="motivo-denegado">{clienteInfo.motivo_denegado}</p>
 
                   {/* Mostrar info de membresía existente si tiene una */}
@@ -472,7 +502,11 @@ const ControlAccesos = () => {
 
                   {/* Botón para comprar o actualizar membresía */}
                   <button className="btn-comprar" onClick={irAComprarMembresia}>
-                    {clienteInfo.tiene_membresia_activa ? '🔄 Comprar Membresía para Esta Sede' : '🛒 Comprar Membresía'}
+                    {clienteInfo.tiene_membresia_activa ? (
+                      <><RefreshCw size={18} /> Comprar Membresía para Esta Sede</>
+                    ) : (
+                      <><ShoppingCart size={18} /> Comprar Membresía</>
+                    )}
                   </button>
                 </div>
               )}
@@ -482,7 +516,11 @@ const ControlAccesos = () => {
               {accesoAutorizado ? (
                 <>
                   <button className="btn-confirmar" onClick={confirmarAcceso} disabled={loading}>
-                    {loading ? '⏳ Registrando...' : '✓ Confirmar Acceso'}
+                    {loading ? (
+                      <><Loader2 size={18} className="spin" /> Registrando...</>
+                    ) : (
+                      <><Check size={18} /> Confirmar Acceso</>
+                    )}
                   </button>
                   <button className="btn-cancelar" onClick={cerrarModal}>
                     Cancelar
@@ -502,13 +540,12 @@ const ControlAccesos = () => {
       {mostrarBienvenida && (
         <div className="bienvenida-overlay">
           <div className="bienvenida-modal">
-            <div className="bienvenida-icono">✓</div>
+            <div className="bienvenida-icono"><CheckCircle2 size={64} style={{ color: 'var(--success)' }} /></div>
             <h1 className="bienvenida-titulo">¡Bienvenido a tu gimnasio!</h1>
             <p className="bienvenida-mensaje">Que tengas un excelente entrenamiento</p>
             <div className="bienvenida-decoracion">
-              <span className="emoji-animado">💪</span>
-              <span className="emoji-animado">🏋️</span>
-              <span className="emoji-animado">⚡</span>
+              <span className="emoji-animado"><Dumbbell size={32} /></span>
+              <span className="emoji-animado"><Zap size={32} /></span>
             </div>
           </div>
         </div>

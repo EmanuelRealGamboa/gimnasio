@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import {
+  Calendar,
+  X,
+  Loader,
+  ClipboardList,
+  AlarmClock,
+  Settings,
+  Save,
+  CheckCircle2,
+  ArrowLeft,
+} from 'lucide-react';
 import horariosService from '../services/horariosService';
 import instalacionesService from '../services/instalacionesService';
 import ConfirmModal from './ConfirmModal';
@@ -214,7 +225,7 @@ const HorarioForm = () => {
     return (
       <div className="horario-form-container">
         <div className="loading-spinner">
-          <span className="spinner">⏳</span>
+          <span className="spinner"><Loader size={24} /></span>
           <p>Cargando formulario...</p>
         </div>
       </div>
@@ -227,13 +238,13 @@ const HorarioForm = () => {
       <div className="form-header">
         <div>
           <h2>
-            <span className="header-icon">📅</span>
+            <span className="header-icon"><Calendar size={20} /></span>
             {isEdit ? 'Editar Horario' : 'Nuevo Horario'}
           </h2>
           <p className="subtitle">Complete la información para {isEdit ? 'actualizar' : 'crear'} el horario</p>
         </div>
         <button type="button" className="btn-secondary" onClick={() => navigate('/horarios')}>
-          ← Volver
+          <ArrowLeft size={18} /> Volver
         </button>
       </div>
 
@@ -242,7 +253,7 @@ const HorarioForm = () => {
         <div className="alert alert-error">
           <span>{error}</span>
           <span className="alert-icon" onClick={() => setError(null)}>
-            ✕
+            <X size={16} />
           </span>
         </div>
       )}
@@ -252,7 +263,7 @@ const HorarioForm = () => {
         <div className="alert alert-success">
           <span>{successMessage}</span>
           <span className="alert-icon" onClick={() => setSuccessMessage('')}>
-            ✕
+            <X size={16} />
           </span>
         </div>
       )}
@@ -262,7 +273,7 @@ const HorarioForm = () => {
         {/* Card: Información General */}
         <div className="form-card">
           <div className="card-header">
-            <h3>📋 Información General</h3>
+            <h3><ClipboardList size={18} /> Información General</h3>
           </div>
           <div className="card-body">
             <div className="form-row">
@@ -357,7 +368,7 @@ const HorarioForm = () => {
         {/* Card: Horario y Fechas */}
         <div className="form-card">
           <div className="card-header">
-            <h3>⏰ Horario y Fechas</h3>
+            <h3><AlarmClock size={18} /> Horario y Fechas</h3>
           </div>
           <div className="card-body">
             <div className="form-row">
@@ -431,7 +442,7 @@ const HorarioForm = () => {
         {/* Card: Configuración Adicional */}
         <div className="form-card">
           <div className="card-header">
-            <h3>⚙️ Configuración Adicional</h3>
+            <h3><Settings size={18} /> Configuración Adicional</h3>
           </div>
           <div className="card-body">
             <div className="form-row">
@@ -479,7 +490,13 @@ const HorarioForm = () => {
             Cancelar
           </button>
           <button type="submit" className="btn-primary" disabled={loading}>
-            {loading ? '⏳ Guardando...' : isEdit ? '💾 Actualizar Horario' : '✅ Crear Horario'}
+            {loading ? (
+              <><Loader size={18} /> Guardando...</>
+            ) : isEdit ? (
+              <><Save size={18} /> Actualizar Horario</>
+            ) : (
+              <><CheckCircle2 size={18} /> Crear Horario</>
+            )}
           </button>
         </div>
       </form>

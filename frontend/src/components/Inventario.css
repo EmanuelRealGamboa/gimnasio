@@ -22,6 +22,9 @@
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .inventario-subtitle {
@@ -70,6 +73,7 @@
   justify-content: center;
   font-size: 28px;
   flex-shrink: 0;
+  color: #ffffff;
 }
 
 .stat-content {
@@ -113,6 +117,9 @@
   transform: translateY(-50%);
   font-size: 18px;
   z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-secondary);
 }
 
 .search-input {
@@ -144,6 +151,8 @@
   cursor: pointer;
   padding: 4px 8px;
   transition: color 0.3s;
+  display: inline-flex;
+  align-items: center;
 }
 
 .clear-search:hover {
@@ -295,6 +304,9 @@
   font-size: 18px;
   border-radius: 8px;
   transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-action:hover {
@@ -349,6 +361,9 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .btn-secondary:hover {
@@ -515,6 +530,9 @@
   font-size: 64px;
   margin-bottom: 16px;
   opacity: 0.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .empty-state p {
@@ -649,6 +667,9 @@
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .modal-close {
@@ -660,6 +681,8 @@
   padding: 4px 8px;
   border-radius: 4px;
   transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
 }
 
 .modal-close:hover {
